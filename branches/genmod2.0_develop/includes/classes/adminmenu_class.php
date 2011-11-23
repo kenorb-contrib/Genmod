@@ -65,8 +65,9 @@ class AdminMenu {
 //		$string = "<td class=\"NavBlockLabel".ucfirst(strtolower($side))."\">";
 		$string = "<td class=\"NavBlockLabel AdminNavBlockOption\">";
 		if (!empty($help)) $string .= "<div class=\"HelpIconContainer\">".PrintHelpLink($help, $qm, $help2, false, true)."</div><div class=\"AdminNavBlockOptionText\">";
-		$string .= "<a href=\"".$link."\">".$text."</a></div>";
-		if (!empty($help)) $string .= "</td>";
+		$string .= "<a href=\"".$link."\">".$text."</a>";
+		if (!empty($help)) $string .= "</div>";
+		$string .= "</td>";
 		if ($side == "left") $this->leftitems[] = $string;
 		else $this->rightitems[] = $string;
 	}

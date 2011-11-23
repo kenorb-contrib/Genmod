@@ -70,13 +70,14 @@ else {
 		}
 	}
 }
-print "\n</div>\n";
+print "\n</div>\n"; // Close HelpContent
 
 print "<div class=\"HelpFooter\">";
 print "<div class=\"HelpFooterLink\"><a href=\"#top\" title=\"".GM_LANG_move_up."\">$UpArrow</a></div>";
 print "<div class=\"HelpFooterLink\"><a href=\"help_text.php?help=help_contents_help\">".GM_LANG_help_contents."</a></div>";
 print "<div class=\"HelpFooterLink\"><a href=\"#\" onclick=\"window.close();\">".GM_LANG_close_window."</a></div>";
 print "<div class=\"ClearBoth;\">&nbsp;</div>";
-print "</div>";
+print "</div>"; // Close HelpFooter
+print "</div>"; // Close HelpPage
 PrintSimpleFooter();
 ?>

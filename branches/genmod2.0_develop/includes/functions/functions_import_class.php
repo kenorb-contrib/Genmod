@@ -608,7 +608,7 @@ abstract class ImportFunctions {
 			$isdead = -1;
 			$indi = array();
 			$names = NameFunctions::GetIndiNames($indirec, true);
-			$soundex_codes = ImportFunctions::GetSoundexStrings($names, true, $indirec);
+			$soundex_codes = self::GetSoundexStrings($names, true, $indirec);
 			foreach($names as $indexval => $name) {
 				$sql = "INSERT INTO ".TBLPREFIX."names VALUES('0', '".DbLayer::EscapeQuery($gid)."[".$gedfile."]','".DbLayer::EscapeQuery($gid)."','".$gedfile."','".DbLayer::EscapeQuery($name[0])."','".DbLayer::EscapeQuery($name[1])."','".DbLayer::EscapeQuery($name[5])."', '".DbLayer::EscapeQuery($name[2])."', '".DbLayer::EscapeQuery($name[3])."','".DbLayer::EscapeQuery($name[4])."')";
 				$res = NewQuery($sql);
@@ -1352,18 +1352,19 @@ abstract class ImportFunctions {
 		
 		$name_array = $indi->name_array;
 		$name_array[] = array($newname, $letter, $surname, "C");
-		$soundex_codes = ImportFunctions::GetSoundexStrings($name_array, false, $indirec);
+		$soundex_codes = self::GetSoundexStrings($name_array, true, $indirec);
 		$sql = "DELETE FROM ".TBLPREFIX."soundex WHERE s_gid='".$kgid."'";
 		$sql = "INSERT INTO ".TBLPREFIX."soundex VALUES ";
+		$addsql = "";
 		foreach ($soundex_codes as $type => $ncodes) {
 			foreach ($ncodes as $nametype => $tcodes) {
 				foreach ($tcodes as $key => $code) {
-					$sql .= "(NULL, '".$kgid."', '".$indi->gedcomid."', '".$type."', '".$nametype."', '".$code."'), ";
+					$addsql .= "(NULL, '".$kgid."', '".$indi->gedcomid."', '".$type."', '".$nametype."', '".$code."'), ";
 				}
 			}
 		}
-		$sql = substr($sql, 0, strlen($sql)-2);
-		$res = NewQuery($sql);
+		$addsql = substr($addsql, 0, strlen($addsql)-2);
+		$res = NewQuery($sql.$addsql);
 		if ($res) $res->FreeResult();
 		$sql = "UPDATE ".TBLPREFIX."individuals SET i_gedrec='".DbLayer::EscapeQuery($indirec)."' WHERE i_id='".DbLayer::EscapeQuery($indi->xref)."' AND i_file='".$indi->gedcomid."'";
 		$res = NewQuery($sql);

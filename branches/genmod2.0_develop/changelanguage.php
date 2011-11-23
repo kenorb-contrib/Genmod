@@ -140,8 +140,8 @@ $maxlines = max($active, $inactive);
 			break;
 		default : ?>
 			<form name="lang_config_form" method="get" action="<?php print SCRIPT_NAME;?>">
+			<input type="hidden" name="action" value="config_lang" />
 			<table class="NavBlockTable AdminNavBlockTable">
-				<input type="hidden" name="action" value="config_lang" />
 				<tr>
 					<td colspan="6" class="NavBlockHeader AdminNavBlockHeader">
 						<div class="AdminNavBlockTitle">
@@ -190,7 +190,7 @@ $maxlines = max($active, $inactive);
 							<td class="NavBlockLabel">
 								<?php print constant("GM_LANG_".$d_LangName) ?>
 							</td>
-							<td class="NavBlockLabel">
+							<td class="NavBlockLabel NavBlockCheckRadio">
 								<input
 								<?php
 								if (AdminFunctions::LanguageInUse($value)) print " disabled=\"disabled\"";
@@ -217,7 +217,7 @@ $maxlines = max($active, $inactive);
 							<td class="NavBlockLabel">
 								<?php print constant("GM_LANG_".$d_LangName); ?>
 							</td>
-							<td class="NavBlockLabel">
+							<td class="NavBlockLabel NavBlockCheckRadio">
 								<input type="checkbox" value="<?php print $value; ?>" onclick="enabledisablelanguage('<?php print $value; ?>');" /> 
 							</td>
 							<td class="NavBlockLabel">

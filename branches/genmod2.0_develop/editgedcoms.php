@@ -87,13 +87,13 @@ if ($action == "deletecount") {
 <!-- Setup the middle box -->
 <div id="AdminColumnMiddle">
 	<form name="defaultform" method="post" action="editgedcoms.php">
+	<input type="hidden" name="action" value="setdefault" />
 	<table class="NavBlockTable AdminNavBlockTable">
 	<tr><td class="NavBlockHeader AdminNavBlockHeader" colspan="5">
 		<?php print "<span class=\"AdminNavBlockTitle\">".GM_LANG_current_gedcoms."</span>"; 
 		if (!empty($message)) print "<br />".$message;
 		?>
 	</td></tr>
-	<input type="hidden" name="action" value="setdefault" />
 		<tr><td class="NavBlockLabel EditGedcomsAdminNavBlockLabel" colspan="5">
 			<?php
 			// Default gedcom choice
@@ -204,8 +204,8 @@ if ($action == "deletecount") {
 				print "<a href=\"editconfig_gedcom.php?source=reupload_form&amp;gedid=$gedc\">".GM_LANG_ged_reupload."</a>";
 				print "</td>";
 				print "<td class=\"NavBlockLabel EditGedcomsAdminNavBlockLabel\"><a href=\"javascript: ".GM_LANG_submitter_record."\" onclick=\"window.open('edit_interface.php?action=submitter&amp;gedfile=".$gedc."','','width=800,height=600,resizable=1,scrollbars=1'); return false;\">".GM_LANG_submitter_record."</a></td>";
-				print "<td  class=\"NavBlockLabel EditGedcomsAdminNavBlockLabel\"&nbsp;</td>";
-				print "<td  class=\"NavBlockLabel EditGedcomsAdminNavBlockLabel\"&nbsp;</td>";
+				print "<td  class=\"NavBlockLabel EditGedcomsAdminNavBlockLabel\">&nbsp;</td>";
+				print "<td  class=\"NavBlockLabel EditGedcomsAdminNavBlockLabel\">&nbsp;</td>";
 				print "</tr>";
 			}
 		}

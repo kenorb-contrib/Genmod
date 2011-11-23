@@ -71,16 +71,18 @@ $controller->CheckRawEdited();
 			<a class="HeaderAccessKeys" href="javascript:show_gedcom_record();" title="<?php print GM_LANG_view_gedcom ?>" tabindex="-1" accesskey="<?php print GM_LANG_accesskey_family_gedcom; ?>"><?php print GM_LANG_view_gedcom ?></a>
 		<?php } ?>
 	</div>
-<div>
+</div>
 <table id="FamLowerBlock">
 	<tr>
 		<td id="FamChildren" style="width: <?php print $pbwidth+38?>px;">
 		<?php PersonFunctions::PrintFamilyChildren($controller->family, "", 0, "", $controller->view);?>
+		</td>
 		<td id="FamGroupDetails">
 		<?php 
 		$controller->PrintFamilyGroupHeader();
 		$controller->PrintTabs();
 		?>
+		</td>
 	</tr>
 </table>
 <?php PrintFooter();?>

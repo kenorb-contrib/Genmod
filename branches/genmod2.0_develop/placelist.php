@@ -331,11 +331,12 @@ if ($placelist_controller->level > 0) {
 		$cnt = ($ci > 0) + ($cf > 0) + ($cs > 0);
 		print "<td class=\"ListTableHeader\" colspan=\"".$cnt."\">".GM_LANG_place_list_objects;
 		PrintHelpLink("ppp_name_list_help", "qm");
-		print "</td></tr><tr>";
+		print "</td></tr>";
+		if ($cnt > 0) print "<tr>";
 		if ($ci>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_individuals."</td>";
 		if ($cs>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_sources."</td>";
 		if ($cf>0) print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
-		print "</tr><tr>";
+		if ($cnt > 0) print "</tr><tr>";
 		if ($ci>0) {
 			print "\n\t\t<td class=\"ListTableContent\">";
 			print "\n<ul>";
@@ -362,7 +363,7 @@ if ($placelist_controller->level > 0) {
 			}
 			print "</ul></td>";
 		}
-		print "\n\t\t</tr><tr>";
+		if ($cnt > 0) print "\n\t\t</tr><tr>";
 		if ($ci>0) {
 			print "<td class=\"ListTableColumnFooter\">";
 			print GM_LANG_total_indis." ".$ci;
@@ -394,7 +395,7 @@ if ($placelist_controller->level > 0) {
 			print "</td>\n";
 		}
 		if ($cnt == 0) {
-			print "<td class=\"ListTableColumnFooter\">".GM_LANG_no_results."</td>";
+			print "<tr><td class=\"ListTableColumnFooter\">".GM_LANG_no_results."</td>";
 		}
 		print "</tr>\n\t</table>";
 		print "</div>";

@@ -95,7 +95,7 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 				}
 			}
 			print "\n\t</select>";
-			print "<div class=\"RSSBlockButton\"><a id=\"rss_button\" href=\"rss.php?lang=" . $LANGUAGE . "\"><img class=\"icon\" src=\"images/xml.gif\" alt=\"RSS\" title=\"RSS\" /></a></div>";
+			print "<div class=\"RSSBlockButton\"><a id=\"rss_button\" href=\"rss.php?lang=" . $LANGUAGE . "\"><img class=\"Icon\" src=\"images/xml.gif\" alt=\"RSS\" title=\"RSS\" /></a></div>";
 			print "</form>\n";
 		print "</div>";
 	print "</div>";

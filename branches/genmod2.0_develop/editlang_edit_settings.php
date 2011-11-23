@@ -113,6 +113,10 @@ if ($action != "save" && $action != "toggleActive") { ?>
 	<form name="Form1" method="post" action="editlang_edit_settings.php">
 		<input type="hidden" name="action" value="save" />
 		<input type="hidden" name="ln" value="<?php print $ln;?>" />
+		<?php
+		if ($action == "new_lang") print "<input type=\"hidden\" name=\"new_old\" value=\"new\" />";
+		else print "<input type=\"hidden\" name=\"new_old\" value=\"old\" />"; 
+		?>
 	<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td class="NavBlockHeader AdminNavBlockHeader" colspan="2">
@@ -125,8 +129,6 @@ if ($action != "save" && $action != "toggleActive") { ?>
 			</td>
 		</tr>
 		<?php                          
-		if ($action == "new_lang") print "<input type=\"hidden\" name=\"new_old\" value=\"new\" />";
-		else print "<input type=\"hidden\" name=\"new_old\" value=\"old\" />";
 		if ($action != "new_lang") {
 			if ($protectActive) $v_lang_use = true;
 			if (!isset($v_lang_use)) $v_lang_use = $gm_lang_use[$ln];
@@ -394,6 +396,7 @@ if ($action != "save" && $action != "toggleActive") { ?>
 				<input type="submit" value="<?php print GM_LANG_cancel;?>" onclick="CloseWindow();" />
 			</td>
 		</tr>
+		</table>
 	</form>
 	<?php
 }
@@ -492,7 +495,7 @@ if ($action == "save") {
 	}
 }
 if ($sentHeader) {
-	print "</div>";
+	print "<!-- Close EditLangContent //--></div>"; // Close EditLangContent
 	PrintSimpleFooter();
 }
 else if ($action == "toggleActive") {

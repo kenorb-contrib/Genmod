@@ -323,14 +323,14 @@ if ($action != "choose") {
 				
 				print "</div>\n";
 				print "<div class=\"NavBlockFooter\"><a href=\"edit_merge.php?action=choose\">".GM_LANG_merge_more."</a></div>\n";
-//				print "</div>\n";
+				print "</div>"; //Close middle section
 			}
 			if ($action == "select") {
 				print "<div id=\"AdminColumnMiddle\">";
 				print "<form method=\"post\" action=\"edit_merge.php\">\n";
 				print "<input type=\"hidden\" name=\"gid1\" value=\"$gid1\" />\n";
 				print "<input type=\"hidden\" name=\"gid2\" value=\"$gid2\" />\n";
-				print "<input type=\"hidden\" name=\"ged\" value=\"$mergeged\" />\n";
+				print "<input type=\"hidden\" name=\"mergeged\" value=\"$mergeged\" />\n";
 				print "<input type=\"hidden\" name=\"action\" value=\"merge\" />\n";
 				$equal_count=0;
 				$skip1 = array();
@@ -391,7 +391,6 @@ if ($action != "choose") {
 <script language="JavaScript" type="text/javascript">
 <!--
 	function reload() {
-		window.location='<?php print SCRIPT_NAME; ?>';
 	}
 //-->
 </script>

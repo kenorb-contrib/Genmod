@@ -470,6 +470,11 @@ if (!isset($themeselect)) $themeselect="";
 <!-- Setup the middle box -->
 <div id="AdminColumnMiddle">
 <form enctype="multipart/form-data" method="post" name="configform" action="editconfig_gedcom.php">
+	<input type="hidden" name="action" value="update" />
+	<input type="hidden" name="source" value="<?php print $source; ?>" />
+	<input type="hidden" name="oldgedid" value="<?php print $oldgedid; ?>" />
+	<input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT; ?>" />
+	<input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print GedcomConfig::$LAST_CHANGE_EMAIL; ?>" />
 
 <table class="NavBlockTable AdminNavBlockTable">
 	<tr>
@@ -482,11 +487,6 @@ if (!isset($themeselect)) $themeselect="";
 			?>
 		</td>
 	</tr>
-	<input type="hidden" name="action" value="update" />
-	<input type="hidden" name="source" value="<?php print $source; ?>" />
-	<input type="hidden" name="oldgedid" value="<?php print $oldgedid; ?>" />
-	<input type="hidden" name="old_DAYS_TO_SHOW_LIMIT" value="<?php print GedcomConfig::$DAYS_TO_SHOW_LIMIT; ?>" />
-	<input type="hidden" name="NEW_LAST_CHANGE_EMAIL" value="<?php print GedcomConfig::$LAST_CHANGE_EMAIL; ?>" />
 	<?php
 	if (!empty($error_msg)) print "<br /><span class=\"Error\">".$error_msg."</span><br />\n";
 	$i = 0;
@@ -1090,7 +1090,7 @@ foreach ($factarr["user"] as $factkey=>$factlabel) {
 		}
 	}
 }
-print "</tr>";
+print "</td></tr>";
 print "</table>"; 
 ?>
 		</td>
@@ -1609,6 +1609,7 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick
 	else print "document.configform.GEDCOMPATH.focus();";?>
 //-->
 </script>
+</div>
 <?php
 SwitchGedcom();
 PrintFooter();

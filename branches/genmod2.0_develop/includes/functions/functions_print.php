@@ -746,16 +746,16 @@ function PrintText($help, $level=0, $noprint=0){
 	
 	 $sentence = "";
 	 if ($level>0) {
-		 // check nested var
-		 if (isset($$help)) $sentence = $$help;
-		 // check constant
-		 else if (defined($help)) $sentence = constant($help);
-		 // check constant with prefix
-		 else if (defined("GM_".$help)) $sentence = constant("GM_".$help);
+		 // check langvar
+		 if (defined("GM_LANG_".$help)) $sentence = constant("GM_LANG_".$help);
 		 // check fact constant
 		 else if (defined("GM_FACT_".$help)) $sentence = constant("GM_FACT_".$help);
-		 // check langvar
-		 else if (defined("GM_LANG_".$help)) $sentence = constant("GM_LANG_".$help);
+		 // check constant
+		 else if (defined($help)) $sentence = constant($help);
+		 // check nested var
+		 else if (isset($$help)) $sentence = $$help;
+		 // check constant with prefix
+		 else if (defined("GM_".$help)) $sentence = constant("GM_".$help);
 		 else (!defined("GM_LANG_".$help) ? $sentence = LanguageFunctions::GetString($help, $LANGUAGE) : $sentence = constant("GM_LANG_".$help));
 	 }
 	 if (empty($sentence)) {

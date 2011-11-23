@@ -66,6 +66,7 @@ switch ($action) {
 	// Backup part
 	if ($action == "backup") { ?>
 		<form action="<?php print SCRIPT_NAME; ?>" method="post">
+		<input type="hidden" name="action" value="backup" />
 		<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
@@ -74,12 +75,10 @@ switch ($action) {
 				</span>
 			</td>
 		</tr>
-		<input type="hidden" name="action" value="backup" />
 		<?php
 		// If first time, let the user choose the options
 		if ($step == 1) {
 			?>
-			<input type="hidden" name="step" value="2" />
 			<?php if ($nomedia) { 
 				print "<tr><td class=\"NavBlockColumnHeader\"><br />".GM_LANG_um_nomedia."<br /><br /></td></tr>";
 			}
@@ -123,6 +122,7 @@ switch ($action) {
 			<tr>
 				<td colspan="2" class="NavBlockFooter">
 					<input type="submit" name="submit" value="<?php print GM_LANG_um_mk_bu; ?>" />
+					<input type="hidden" name="step" value="2" />
 				</td>
 			</tr>
 			</table>
@@ -153,7 +153,7 @@ switch ($action) {
 				print "<tr><td class=\"NavBlockColumnHeader AdminNavBlockColumnHeader\">".GM_LANG_um_mediaexp."</td></tr>";
 				print "<tr><td class=\"NavBlockFooter\">";
 				print "<input type=\"submit\" name=\"submit\" value=\"".GM_LANG_um_proceed_bu."\" />";
-				print "</td></tr>";
+				print "</td></tr></table>";
 				print "</form>";
 				PrintFooter();
 				exit;
@@ -285,12 +285,13 @@ switch ($action) {
 			}
 			
 			@set_time_limit($time_limit);
+			print "</table></form>";
 		}
-		print "</table></form>";
 	}
 	
 	if ($action == "restore") { ?>
 		<form action="<?php print SCRIPT_NAME; ?>" method="post">
+		<input type="hidden" name="action" value="restore" />
 		<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
@@ -312,7 +313,6 @@ switch ($action) {
 			$found = false;
 			?>
 			
-				<input type="hidden" name="action" value="restore" />
 				<?php 
 				if(in_array("export_config.sql", $files)) { 
 					$found = true;

@@ -61,7 +61,7 @@ else {
 	while($secs < $maxtime) {
 		$secs++;
 //	print "Maximum execution time is at least ".$secs." seconds<br />";
-		print "<script><!--\ndocument.getElementById('max_progress').innerHTML='".$secs."';//-->\n</script>";
+		print "<script type=\"text/javascript\"><!--\ndocument.getElementById('max_progress').innerHTML='".$secs."';//-->\n</script>";
 		flush();
 		@ob_flush();
 		SystemConfig::SetConfigDBValue('max_execution_time', $secs);

@@ -488,7 +488,7 @@ switch ($action) {
 			?>
 			<tr><td class="NavBlockFooter" colspan="2">
 			<input type="submit" value="<?php print GM_LANG_save; ?>" />&nbsp;
-			</td</tr>
+			</td></tr>
 			</table>
 		</form>
 		<?php
@@ -572,7 +572,7 @@ switch ($action) {
 			<tr><td class="NavBlockFooter" colspan="2">
 			<input type="submit" value="<?php print GM_LANG_save; ?>" />&nbsp;
 			<input type="button" value="<?php print GM_LANG_sort_by_birth; ?>" onclick="document.reorder_form.action.value='reorder_children'; document.reorder_form.submit();" />
-			</td</tr>
+			</td></tr>
 			</table>
 		</form>
 		<?php
@@ -704,7 +704,7 @@ switch ($action) {
 				<?php print GM_LANG_relation_families; ?>
 				</td></tr>
 				<?php
-				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_PEDI."</td><td class=\"NavBlockLabel\">".GM_LANG_family."</td><td class=\"NavBlockLabel\">".GM_LANG_primary."</tr>";
+				print "<tr><td class=\"NavBlockLabel\">".GM_FACT_PEDI."</td><td class=\"NavBlockLabel\">".GM_LANG_family."</td><td class=\"NavBlockLabel\">".GM_LANG_primary."</td></tr>";
 				$families = $object->childfamilies;
 				foreach($families as $key => $family) {
 					if ($family->isdeleted) unset($families[$key]);
@@ -723,12 +723,12 @@ switch ($action) {
 						print "checked=\"checked\" ";
 						$hasprimary = true;
 					}
-					print "></td></tr>\n";
+					print "/></td></tr>\n";
 				}
 				print "<tr><td colspan=\"2\" class=\"NavBlockLabel\">".GM_LANG_no_primary."</td><td class=\"NavBlockField\">";
 				print "<input type=\"radio\" name=\"select_prim\" value=\"noprim\" ";
 				if (!$hasprimary) print "checked=\"checked\" ";
-				print "></td></tr>\n";
+				print "/></td></tr>\n";
 			?>
 			<tr><td class="NavBlockFooter" colspan = "3">
 			<input type="submit" value="<?php print GM_LANG_save; ?>" />
@@ -852,7 +852,7 @@ switch ($action) {
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type;?>" />
 			<table class="NavBlockTable EditTable">
-				<tr><td colspan="4" class="NavBlockColumnHeader EditTableColumnHeader"><?php PrintHelpLink("change_family_instr","qm","change_family_instr"); ?><?php print GM_LANG_change_family_members; ?></td></tr>
+				<tr><td colspan="4" class="NavBlockColumnHeader EditTableColumnHeader"><?php PrintHelpLink("change_family_instr","qm","change_family_members"); ?><?php print GM_LANG_change_family_members; ?></td></tr>
 				<tr>
 					<td class="NavBlockLabel"><?php print GM_LANG_family_role; ?></td>
 					<td class="NavBlockLabel"><?php print GM_LANG_name; ?></td>
@@ -1288,7 +1288,7 @@ switch ($action) {
 			print "</form>\n";
 			if (isset($focus)) {
 				?>
-				<script>
+				<script type="text/javascript">
 				<!--
 				document.getElementById('<?php print $focus; ?>').focus();
 				//-->
@@ -1567,9 +1567,7 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<table class=\"NavBlockTable EditTable\">";
-		print "<tr>";
 		EditFunctions::AddTagSeparator($change_type);
-		print "</tr>";
 		if ($famtag == "CHIL"){
 			$showbio = true;
 			foreach ($object->childfamilies as $id => $family) {
@@ -1634,9 +1632,8 @@ switch ($action) {
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<table class=\"NavBlockTable EditTable\">";
-		print "<tr>";
 		EditFunctions::AddTagSeparator("link_as_child");
-		print "<td class=\"NavBlockLabel\">".GM_LANG_family."</td>";
+		print "<tr><td class=\"NavBlockLabel\">".GM_LANG_family."</td>";
 		print "<td class=\"NavBlockField\"><input type=\"text\" id=\"famid\" name=\"famid\" size=\"8\" onblur=\"sndReq('famlink', 'getfamilydescriptor', true, 'famid', this.value, '', '');\"/> ";
 		LinkFunctions::PrintFindFamilyLink("famid");
 		print "&nbsp;<span id=\"famlink\"></span>";
@@ -1660,7 +1657,7 @@ switch ($action) {
 		print "\n</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
-		print "<script>";
+		print "<script type=\"text/javascript\">";
 		print "<!--\naddchildform.famid.focus();\n//-->";
 		print "</script>";
 		break;
@@ -2274,7 +2271,7 @@ switch ($action) {
 				}
 			}
 			EditFunctions::AddAutoAcceptLink();
-			print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_save."\" /></tr></td>\n";
+			print "<tr><td class=\"NavBlockFooter\" colspan=\"2\"><input type=\"submit\" value=\"".GM_LANG_save."\" /></td></tr>\n";
 			print "</table>";
 			print "</form>\n";
 //		}
@@ -2386,7 +2383,7 @@ switch ($action) {
 		print "</td></tr>";
 		print "</table>\n";
 		print "</form>\n";
-		print "<script><!--\n";
+		print "<script type=\"text/javascript\"><!--\n";
 		print "linkspouseform.spouseid.focus();";
 		print "//--></script>";
 		break;

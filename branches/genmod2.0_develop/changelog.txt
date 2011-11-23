@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed admin_maint error if no site selected (sjouke)
 - Fixed block summary doesn't show in index edit (sjouke)
 - Fixed submitter record edited from wrong gedcom (sjouke)
 - Fixed error in import of married names (sjouke)

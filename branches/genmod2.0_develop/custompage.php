@@ -54,10 +54,10 @@ if ($custompage->action == "edit") {
 			include("modules/CKEditor/ckeditor.php");
 		}
 		print "<form name=\"htmlpage\" method=\"post\" action=\"custompage.php\">";
-		print "<input type=\"hidden\" name=\"action\" value=\"".$custompage->action."\">";
+		print "<input type=\"hidden\" name=\"action\" value=\"".$custompage->action."\" />";
 	
-		if ($custompage->page_id == "newpage") print "<input type=\"hidden\" name=\"page_id\" value=\"newpage\">";
-		else print "<input type=\"hidden\" name=\"page_id\" value=\"".$custompage->page_id."\">";
+		if ($custompage->page_id == "newpage") print "<input type=\"hidden\" name=\"page_id\" value=\"newpage\" />";
+		else print "<input type=\"hidden\" name=\"page_id\" value=\"".$custompage->page_id."\" />";
 		print "<table class=\"NavBlockTable CustomPageNavTable\">";
 		print "<tr><td colspan=\"2\" class=\"NavBlockHeader\">".($custompage->page_id == "newpage" ? GM_LANG_custom_page_add : GM_LANG_custom_page_edit)."</td></tr>";
 		print "<tr><td class=\"NavBlockLabel CustomPageTitleLabel\">".GM_LANG_title."</td><td class=\"NavBlockField\"><input type=\"text\" name=\"title\" value=\"";
@@ -80,10 +80,10 @@ if ($custompage->action == "edit") {
 			if ($custompage->page_id != "newpage") print $custompage->page->content;
 			print "</textarea>";
 		}
-		print "</td</tr>";
+		print "</td></tr>";
 		print "<tr><td colspan=\"2\" class=\"NavBlockFooter\">";
-		print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_save."\">";
-		print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_cancel."\">";
+		print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_save."\" />";
+		print "<input type=\"submit\" name=\"task\" value=\"".GM_LANG_cancel."\" />";
 		print "</td></tr></table>";
 		print "</form>";
 	}

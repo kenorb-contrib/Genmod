@@ -209,7 +209,7 @@ if (count($news)>0) { ?>
 			$menu->AddItem("help_editlang.php", "qm", "", "editlang.php", GM_LANG_translator_tools, "left");
 			$menu->AddItem("help_faq.php", "qm", "", "faq.php", GM_LANG_faq_list, "right");
 			$menu->AddItem("admin_maint_help", "qm", "maintenance", "admin_maint.php", GM_LANG_maintenance, "left");
-			$menu->AddItem("help_viewlog.php", "qm", "view_syslog", "javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', ''); return false;\"", (AdminFunctions::NewLogRecs("S") ? "<span id=\"syslog\" class=\"Error\">".GM_LANG_view_syslog."</span>" : "<span id=\"syslog\">".GM_LANG_view_syslog."</span>"), "right");
+			$menu->AddItem("help_viewlog.php", "qm", "view_syslog", "javascript: ".GM_LANG_view_syslog."\" onclick=\"window.open('viewlog.php?cat=S&amp;max=20', '', 'top=50,left=10,width=1000,height=600,scrollbars=1,resizable=1'); ChangeClass('syslog', ''); return false;", (AdminFunctions::NewLogRecs("S") ? "<span id=\"syslog\" class=\"Error\">".GM_LANG_view_syslog."</span>" : "<span id=\"syslog\">".GM_LANG_view_syslog."</span>"), "right");
 			$menu->PrintSpacer();
 			$menu->PrintItems();
 		}

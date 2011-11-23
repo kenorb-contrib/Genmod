@@ -132,7 +132,7 @@ abstract class ActionController {
 		print "<td class=\"FactLabelCell\"><div id=\"todo_txt\" class=\"FactLabelCellText\">";
 		PrintHelpLink("add_todo_help", "qm");
 		print GM_LANG_add_todo."</div></td>";
-		print "<td class=\"FactDetailCell\" id=\"add_todo\"><a href=\"javascript: ".GM_LANG_add_todo."\" onsubmit=\"document.getElementById('todo_txt').style.display='none'; sndReq('add_todo', 'action_add', true, 'type', '".$type."'); return false;\">".GM_LANG_add_todo."</a>";
+		print "<td class=\"FactDetailCell\" id=\"add_todo\"><a href=\"javascript: ".GM_LANG_add_todo."\" onclick=\"document.getElementById('todo_txt').style.display='none'; sndReq('add_todo', 'action_add', true, 'type', '".$type."'); return false;\">".GM_LANG_add_todo."</a>";
 		print "</td>";
 		print "</tr>";
 	}

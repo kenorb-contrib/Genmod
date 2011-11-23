@@ -230,7 +230,7 @@ class FamlistController extends ListController {
 			$fam_private = array();
 			$count = count($names);
 			$i=0;
-			print "<table class=\"ListTable IndiFamListTable\"><tr>";
+			print "<table class=\"ListTable IndiFamListTable\">";
 			print "<tr><td class=\"ListTableHeader\" colspan=\"2\">";
 			// List with a specific surname
 			if ($this->surname_sublist == "yes" && $this->surname != "") {

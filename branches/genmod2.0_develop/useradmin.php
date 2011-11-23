@@ -1595,7 +1595,7 @@ if (($action == "listusers") || ($action == "edituser2") || ($action == "deleteu
 		<div id="AdminColumnLeft">
 			<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
 			<?php AdminFunctions::AdminLink("useradmin.php", GM_LANG_user_admin); ?>
-			<?php if ($view != "preview") AdminFunctions::AdminLink("javascript: ".GM_LANG_do_massupdate."\" onclick=\"document.userlist.action.value='massupdate'; document.userlist.submit();return false;\"" , GM_LANG_do_massupdate);
+			<?php if ($view != "preview") AdminFunctions::AdminLink("javascript: ".GM_LANG_do_massupdate."\" onclick=\"document.userlist.action.value='massupdate'; document.userlist.submit();return false;" , GM_LANG_do_massupdate);
 			?>
 		</div>
 		<div id="UserListing">
@@ -1861,15 +1861,15 @@ if ($action == "cleanup") {
 				if ((mktime(0, 0, 0, date("m")-$month, date("d"), date("Y")) > $datelogin) && ($user->verified == "Y") && ($user->verified_by_admin == "Y")) {
 					?>
 					<tr>
-					<td class="NavBlockLabel AdminNavBlockLabel">
-						<?php print $user->username." - ".$user->firstname." ".$user->lastname."</td>";
-						print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_usr_idle_toolong;
-						print GetChangedDate(date("d", $datelogin)." ".date("M", $datelogin)." ".date("Y", $datelogin));?>
-					</td>
-					<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
-						<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
-						<?php $ucnt++; ?>
-					</td>
+						<td class="NavBlockLabel AdminNavBlockLabel">
+							<?php print $user->username." - ".$user->firstname." ".$user->lastname."</td>";
+							print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".GM_LANG_usr_idle_toolong;
+							print GetChangedDate(date("d", $datelogin)." ".date("M", $datelogin)." ".date("Y", $datelogin));?>
+						</td>
+						<td class="NavBlockField AdminNavBlockField NavBlockCheckRadio">
+							<input type="checkbox" name="<?php print "del_".preg_replace(array("/\./","/-/","/ /"), array("_","_","_"), $user->username); ?>" value="yes" />
+							<?php $ucnt++; ?>
+						</td>
 					</tr>
 					<?php
 				}
@@ -1947,7 +1947,7 @@ if ($action == "cleanup") {
 					<td class="NavBlockFooter" colspan="3">
 						<input type="submit" value="<?php print GM_LANG_del_proceed; ?>" />
 					</td>
-				<tr>
+				</tr>
 			<?php } ?>
 		</table>
 		</form>
@@ -2000,12 +2000,12 @@ if ($action == "") {
 			$menu->SetBarText(GM_LANG_user_admin);
 			$menu->SetBarStyle("AdminNavBlockHeader");
 			$menu->AddItem("", "", "", "useradmin.php?action=listusers", GM_LANG_current_users, "left");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_message_to_all."\" onclick=\"message('all', 'messaging2', '', ''); return false;",  GM_LANG_message_to_all, "right");
 			$menu->AddItem("", "", "", "useradmin.php?action=cleanup", GM_LANG_cleanup_users, "left");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_never_logged_in."\" onclick=\"message('never_logged', 'messaging2', '', ''); return false;", GM_LANG_broadcast_never_logged_in, "right");
 			$menu->AddItem("", "", "", "useradmin.php?action=cleanup_messages", GM_LANG_cleanup_messages, "left");
+			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_not_logged_6mo."\" onclick=\"message('last_6mo', 'messaging2', '', ''); return false;", GM_LANG_broadcast_not_logged_6mo, "right");
 			$menu->AddItem("", "", "", "useradmin.php?action=createform", GM_LANG_add_user, "left");
-			$menu->AddItem("", "", "", "javascript: ".GM_LANG_message_to_all."\" onclick=\"message('all', 'messaging2', '', ''); return false;\"",  GM_LANG_message_to_all, "right");
-			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_never_logged_in."\" onclick=\"message('never_logged', 'messaging2', '', ''); return false;\"", GM_LANG_broadcast_never_logged_in, "right");
-			$menu->AddItem("", "", "", "javascript: ".GM_LANG_broadcast_not_logged_6mo."\" onclick=\"message('last_6mo', 'messaging2', '', ''); return false;\"", GM_LANG_broadcast_not_logged_6mo, "right");
 			$menu->PrintItems();
 			if ($message != "") {
 				print "<div class=\"Error\">".$message."</div>";
@@ -2227,8 +2227,7 @@ if ($action == "cleanup_messages") {
 				<?php print GM_LANG_select;?>
 			</td>
 		</tr>
-		<tr>
-			<?php
+		<?php
 			if (!isset($users)) $users = UserController::GetUsers();
 			$count = 0;
 			$mons = array();

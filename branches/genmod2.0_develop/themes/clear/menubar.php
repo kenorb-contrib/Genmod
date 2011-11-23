@@ -140,7 +140,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			</div>
 		<?php } 
 		else { ?>
-			<div id="HeaderLogo" />
+			<div id="HeaderLogo"></div>
 		<?php } ?>
 		<div id="HeaderMenuBar" style="float: <?php print $ldir; ?>;">
 			<?php foreach (array_keys($showmenu) as $number => $name) { 

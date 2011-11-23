@@ -182,12 +182,12 @@ class FanchartController extends ChartController {
 		// check for GD 2.x library
 		if (!defined("IMG_ARC_PIE")) {
 			print "<span class=\"Error\">".GM_LANG_gd_library."</span>";
-			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"Icon\" alt=\"\" /></a><br /><br />";
 			return false;
 		}
 		if (!function_exists("ImageTtfBbox")) {
 			print "<span class=\"Error\">".GM_LANG_gd_freetype."</span>";
-			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"icon\" alt=\"\" /></a><br /><br />";
+			print " <a href=\"" . GM_LANG_gd_helplink . "\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["help"]["small"]."\" class=\"Icon\" alt=\"\" /></a><br /><br />";
 			return false;
 		}
 	
