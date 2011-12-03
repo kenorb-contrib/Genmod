@@ -3,7 +3,7 @@
  * File contains var's to glue Help_text for Genmod together
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ define("GM_LANG_end_ahelp", "<center class=\"Error\">#gm_lang[end_admin_help]#</
 define("GM_LANG_redast", "<span class=\"Error\"<b>*</b></span>");
 
 // lower to UPPER conversions
-define("GM_LANG_upper_mygedview", Str2Upper(GM_LANG_mygedview));
+define("GM_LANG_upper_mygenmod", Str2Upper(GM_LANG_mygenmod));
 
 // Header
 define("GM_LANG_header_help_items", "<a name=\"header\">&nbsp;</a>#gm_lang[header_help]#<br /><a name=\"header_search\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_search_help]#<br /><a name=\"header_lang_select\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_lang_select_help]#<br /><a name=\"header_user_links\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_user_links_help]#<br /><a name=\"header_favorites\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_favorites_help]#<br /><a name=\"header_theme\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_theme_help]#<br />");
@@ -76,13 +76,13 @@ define("GM_LANG_general_help", "<a name=\"header_general\">&nbsp;</a>#gm_lang[he
 // page help for the Welcome page
 define("GM_LANG_help_index.php", "#gm_lang[index_help]#<br />#gm_lang[index_portal_help_blocks]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[header_help_items]#<br /><br /><a href=\"#top\">$UpArrow </a>#gm_lang[menu_help_items]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[general_help]#<br /><a href=\"#top\">$UpArrow </a>#gm_lang[def_help_items]#<br />");
 
-// page help for the MyGedView page
-define("GM_LANG_mygedview_portal_help_blocks", "<a name=\"mygedview_portal\"></a>#gm_lang[mygedview_portal_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_welcome\"></a>#gm_lang[mygedview_welcome_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_customize\"></a>#gm_lang[mygedview_customize_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_message\"></a>#gm_lang[mygedview_message_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_events\"></a>#gm_lang[index_events_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_onthisday\"></a>#gm_lang[index_onthisday_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_favorites\"></a>#gm_lang[mygedview_favorites_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_stats\"></a>#gm_lang[index_stats_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_myjournal\"></a>#gm_lang[mygedview_myjournal_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_media\"></a>#gm_lang[index_media_help]#<br /><a href=\"#mygedview_portal\">$UpArrow </a><a name=\"mygedview_loggedin\"></a>#gm_lang[index_loggedin_help]#<br /><a name=\"mygedview_recent_changes\"></a><a href=\"#mygedview_portal\">$UpArrow </a>#gm_lang[recent_changes_help]#<br />");
-define("GM_LANG_index_myged_help", "#gm_lang[mygedview_portal_help_blocks]#<br />");
+// page help for the MyGenmod page
+define("GM_LANG_mygenmod_portal_help_blocks", "<a name=\"mygenmod_portal\"></a>#gm_lang[mygenmod_portal_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_welcome\"></a>#gm_lang[mygenmod_welcome_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_customize\"></a>#gm_lang[mygenmod_customize_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_message\"></a>#gm_lang[mygenmod_message_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_events\"></a>#gm_lang[index_events_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_onthisday\"></a>#gm_lang[index_onthisday_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_favorites\"></a>#gm_lang[mygenmod_favorites_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_stats\"></a>#gm_lang[index_stats_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_myjournal\"></a>#gm_lang[mygenmod_myjournal_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_media\"></a>#gm_lang[index_media_help]#<br /><a href=\"#mygenmod_portal\">$UpArrow </a><a name=\"mygenmod_loggedin\"></a>#gm_lang[index_loggedin_help]#<br /><a name=\"mygenmod_recent_changes\"></a><a href=\"#mygenmod_portal\">$UpArrow </a>#gm_lang[recent_changes_help]#<br />");
+define("GM_LANG_index_myged_help", "#gm_lang[mygenmod_portal_help_blocks]#<br />");
 
 
 //Login
-define("GM_LANG_help_login.php", "#gm_lang[login_page_help]#<br />#gm_lang[mygedview_login_help]#");
+define("GM_LANG_help_login.php", "#gm_lang[login_page_help]#<br />#gm_lang[mygenmod_login_help]#");
 define("GM_LANG_help_login_register.php", "~#gm_lang[requestaccount]#~<br /><br />#gm_lang[register_info_01]#");
 define("GM_LANG_help_login_lost_pw.php", "~#gm_lang[lost_pw_reset]#~<br /><br />#gm_lang[pls_note11]#");
 define("GM_LANG_index_login_register_help", "#gm_lang[index_login_help]#<br />#gm_lang[new_user_help]#<br /><br />#gm_lang[new_password_help]#<br />");
@@ -147,7 +147,7 @@ define("GM_LANG_search_used_in_contents", "<div class=\"PageTitleName\"><b>#gm_l
 	to be displayed if the text of define("welcome_page"] is clicked in the Help Contents
 */
 define("GM_LANG_h1", "help_index.php,welcome_page");
-define("GM_LANG_h2", "index_myged_help,mygedview");
+define("GM_LANG_h2", "index_myged_help,mygenmod");
 define("GM_LANG_h3", "help_calendar.php,anniversary_calendar");
 define("GM_LANG_h4", "help_clippings.php,clip_cart");
 define("GM_LANG_h5", "help_descendancy.php,descend_chart");

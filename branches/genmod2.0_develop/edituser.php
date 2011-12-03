@@ -3,7 +3,7 @@
  * Administrative User Interface.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -191,7 +191,7 @@ if ($action=="edituser2") {
 		<td class="NavBlockField" valign="top"><?php
 		if (GedcomConfig::$ENABLE_MULTI_LANGUAGE) {
 			$tab++;
-			print "<select name=\"user_language\" tabindex=\"".$tab."\" style=\"{ font-size: 9pt; }\">";
+			print "<select name=\"user_language\" tabindex=\"".$tab."\">";
 			foreach ($gm_language as $key => $value) {
 				if ($language_settings[$key]["gm_lang_use"]) {
 					print "\n\t\t\t<option value=\"$key\"";

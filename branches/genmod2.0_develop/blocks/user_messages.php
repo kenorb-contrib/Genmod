@@ -5,7 +5,7 @@
  * This block will print a users messages
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,8 +41,8 @@ function print_user_messages($block=true, $config="", $side, $index) {
 
 		print "<div id=\"user_messages\" class=\"BlockContainer\">\n";
 			print "<div class=\"BlockHeader\">";
-				PrintHelpLink("mygedview_message_help", "qm", "my_messages");
-				print GM_LANG_my_messages." &lrm;(".count($usermessages).")&lrm;";
+				PrintHelpLink("mygenmod_message_help", "qm", "my_messages");
+				print "<div class=\"BlockHeaderText\">".GM_LANG_my_messages." &lrm;(".count($usermessages).")&lrm;</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

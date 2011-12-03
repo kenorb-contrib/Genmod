@@ -4,7 +4,7 @@
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,8 +94,8 @@ if (!isset($action)) $action="";
 if ($gm_user->username == "") {
 	if (!empty($command)) {
 		if ($command=="user") {
-			if (LOGIN_URL == "") header("Location: login.php?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
-			else header("Location: ".LOGIN_URL."?help_message=mygedview_login_help&url=".urlencode("index.php?command=user"));
+			if (LOGIN_URL == "") header("Location: login.php?help_message=mygenmod_login_help&url=".urlencode("index.php?command=user"));
+			else header("Location: ".LOGIN_URL."?help_message=mygenmod_login_help&url=".urlencode("index.php?command=user"));
 			exit;
 		}
 	}
@@ -171,7 +171,7 @@ else $ublocks = new Blocks("gedcom", "", $action);
 
 if ($command=="user") {
 	$helpindex = "index_myged_help";
-	PrintHeader(GM_LANG_mygedview);
+	PrintHeader(GM_LANG_mygenmod);
 }
 else {
 	PrintHeader("");
@@ -198,8 +198,8 @@ else {
 //-- start of main content section
 if ($command=="user") {
 	print "<div id=\"IndexMyGenmodBlock\">";
-	print "<div class=\"MyGenmodHeader\">".GM_LANG_mygedview."</div>";
-	print GM_LANG_mygedview_desc;
+	print "<div class=\"MyGenmodHeader\">".GM_LANG_mygenmod."</div>";
+	print GM_LANG_mygenmod_desc;
 	print "</div>\n";
 }
 $disp_stats = false;
@@ -253,7 +253,7 @@ if (count($ublocks->right) != 0) {
 
 if (($command=="user") and (!$ublocks->welcome_block_present)) {
 	print "<div>";
-	PrintHelpLink("mygedview_customize_help", "qm");
+	PrintHelpLink("mygenmod_customize_help", "qm");
 	print "<a href=\"#\" onclick=\"window.open('index_edit.php?name=".$gm_user->username."&amp;command=user', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1');\">".GM_LANG_customize_page."</a>\n";
 	print "</div>";
 }

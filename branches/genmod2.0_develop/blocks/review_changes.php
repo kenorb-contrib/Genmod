@@ -5,7 +5,7 @@
  * This block prints the changes that still need to be reviewed and accepted by an administrator
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ function review_changes_block($block = true, $config="", $side, $index) {
 						print "</a>";
 					}
 				}
-				print GM_LANG_review_changes;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_review_changes."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				if ($gm_user->userCanAccept()) print "<div class=\"ReviewChangesLink\"><a href=\"#\" onclick=\"window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;\">".GM_LANG_accept_changes."</a></div>\n";

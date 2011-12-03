@@ -3,7 +3,7 @@
  * HTML Report Generator
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * used by the SAX parser to generate HTML reports from the XML report file.
  * @package Genmod

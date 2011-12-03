@@ -3,7 +3,7 @@
  * Parses gedcom file and displays a list of the general notes in the file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ if ($note_count > 0){
 	print "</tr><tr><td class=\"ListTableColumnFooter\"".($note_count>12 ? " colspan=\"2\"" : "").">".GM_LANG_total_notes." ".$note_total;
 	if ($note_hide > 0) print "<br />".GM_LANG_hidden." ".$note_hide;
 }
-else print "<span class=\"Warning\"><i>".GM_LANG_no_results."</span>";
+else print "<span class=\"Warning\">".GM_LANG_no_results."</span>";
 
 print "</td>\n\t\t</tr>\n\t</table>";
 

@@ -1,11 +1,10 @@
 <!-- Theme footer file
 linkbreaks added to give space between footer and content -->
 <?php
-global $CONFIG_PARMS, $spider, $gm_user;
+global $CONFIG_PARMS, $spider, $gm_user, $MEDIA_IN_DB;
 if (!isset($without_close)) print "</div> <!-- closing div id=\"content\" -->\n";
-print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
 	PrintContactLinks();
-	print "<div class=\"center\" style=\"width:99%;\">";
+	print "<div class=\"FooterExecutionStats\">";
 	if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
 	if (DEBUG) PrintCachedObjectCount();
 	if(CONFIGURED) {
@@ -19,5 +18,4 @@ print "<div id=\"footer\" class=\"$TEXT_DIRECTION\">";
 	print MediaFS::GetStorageType();
 	print "</a>  - Version ".GM_VERSION." ".GM_VERSION_RELEASE;
 	print "</div>";
-	print "</div> <!-- close div id=\"footer\" -->\n";
 ?>

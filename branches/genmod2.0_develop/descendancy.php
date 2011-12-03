@@ -3,7 +3,7 @@
  * Parses gedcom file and displays a descendancy tree.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ if ($descendancy_controller->chart_style) {
 }
 else {
 // descendancy list
-	print "<ul style=\"list-style: none; display: block;\" id=\"descendancy_chart\">\r\n";
+	print "<ul id=\"descendancy_chart\">\r\n";
 	$descendancy_controller->PrintChildDescendancy($descendancy_controller->xref, $descendancy_controller->num_generations);
 	print "</ul>";
 }

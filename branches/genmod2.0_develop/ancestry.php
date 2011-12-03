@@ -6,7 +6,7 @@
  * ($rootid=1, father=2, mother=3 ...)
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ END;
 	}
 }
 else {
-	print "<ul style=\"list-style: none; display: block;\" id=\"ancestry_chart\">\r\n";
+	print "<ul id=\"ancestry_chart\">\r\n";
 	$ancestry_controller->PrintChildAscendancy($ancestry_controller->root, 1, $ancestry_controller->num_generations);
 	print "</ul>";
 }

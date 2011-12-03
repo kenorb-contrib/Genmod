@@ -5,7 +5,7 @@
  * Display all of the information about an individual
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ $controller->CheckPrivate();
 $controller->CheckRawEdited();
 
 ?>
-<div id="IndiHeaderContainer" class="<?php echo $TEXT_DIRECTION;?>">
+<div class="DetailHeaderSection">
 	<!-- NOTE: Display person picture -->
 	<?php if ($controller->canshowhighlightedobj) {
 		print '<div id="IndiPictureContainer" class="'.$TEXT_DIRECTION.'">';
@@ -109,7 +109,7 @@ $controller->CheckRawEdited();
 				$controller->GenderRecord($factobj->factrec, $factobj->fact);
 				print "<span class=\"IndiHeaderLabel $TEXT_DIRECTION\">".PrintReady(GM_LANG_sex.":")."</span>&nbsp;<span class=\"IndiHeaderField\">".$controller->indi->sexdetails["gender"];
 				print " <img src=\"".$controller->indi->sexdetails["image"]."\" title=\"".$controller->indi->sexdetails["gender"]."\" alt=\"".$controller->indi->sexdetails["gender"];
-				print "\" width=\"0\" height=\"0\" class=\"SexImage\" border=\"0\" />";
+				print "\" width=\"0\" height=\"0\" class=\"GenderImage\" border=\"0\" />";
 				if ($controller->indi->canedit && !$controller->indi->isdeleted && $factobj->style != "ChangeOld") {
 					if ($controller->indi->sexdetails["add"]) print "<br /><a class=\"SmallEditLinks\" href=\"#\" onclick=\"add_new_record('".$controller->xref."', 'SEX', 'add_gender', 'INDI'); return false;\">".GM_LANG_edit."</a>";
 					else {
@@ -183,7 +183,6 @@ if ($controller->view != "preview") {
 	
 //-->
 </script>
-<div id="show_changes"></div>
 <?php $controller->PrintDetailJS(); ?>
 
 <?php

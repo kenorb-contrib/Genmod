@@ -5,7 +5,7 @@
  * This block allows administrators to enter news items for the active gedcom
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ function print_gedcom_news($block = true, $config="", $side, $index) {
 		print "<div class=\"BlockHeader\">";
 			if ($gm_user->userGedcomAdmin()) PrintHelpLink("index_gedcom_news_ahelp", "qm_ah");
 			else PrintHelpLink("index_gedcom_news_help", "qm", "gedcom_news");
-			print GM_LANG_gedcom_news;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_gedcom_news."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

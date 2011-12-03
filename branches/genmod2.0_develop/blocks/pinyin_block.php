@@ -5,7 +5,7 @@
  * This block will print basic information and links for the user.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ function print_pinyin_block($block=true, $config="", $side, $index) {
 	print "<!-- Start PinYin translation Block //-->";
 		print "<div id=\"pinyin_block\" class=\"BlockContainer\">\n";
 			print "<div class=\"BlockHeader\">";
-				print GM_LANG_pinyin_translator;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_pinyin_translator."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				print GM_LANG_pinyin_translate_desc."<br /><br />";

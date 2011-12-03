@@ -3,7 +3,7 @@
  * PopUp Window to provide editing features.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -300,7 +300,7 @@ switch ($action) {
 			}
 		}
 		$change_id = EditFunctions::GetNewXref("CHANGE");
-		print "<form method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">\n";
+		print "<form method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"update_submitter\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"gedfile\" value=\"".$gedfile."\" />\n";
@@ -448,7 +448,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "reorder_media":
 		?>
-		<form name="reorder_form" method="post" action="edit_interface.php" style="display:inline;">
+		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="action" value="reorder_media_update" />
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
@@ -523,7 +523,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "reorder_children":
 		?>
-		<form name="reorder_form" method="post" action="edit_interface.php" style="display:inline;">
+		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="action" value="reorder_update" />
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
@@ -607,7 +607,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "reorder_fams":
 		?>
-		<form name="reorder_form" method="post" action="edit_interface.php" style="display:inline;">
+		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="action" value="reorder_fams_update" />
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="change_type" value="<?php print $change_type; ?>" />
@@ -693,7 +693,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "relation_fams":
 		?>
-		<form name="reorder_form" method="post" action="edit_interface.php" style="display:inline;">
+		<form name="reorder_form" method="post" action="edit_interface.php">
 			<input type="hidden" name="action" value="relation_fams_update" />
 			<input type="hidden" name="pid" value="<?php print $pid; ?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
@@ -846,7 +846,7 @@ switch ($action) {
 		}
 		//-->
 		</script>
-		<form name="changefamform" method="post" action="edit_interface.php" style="display:inline;">
+		<form name="changefamform" method="post" action="edit_interface.php">
 			<input type="hidden" name="action" value="changefamily_update" />
 			<input type="hidden" name="famid" value="<?php print $famid;?>" />
 			<input type="hidden" name="pid_type" value="<?php print $pid_type; ?>" />
@@ -1205,7 +1205,7 @@ switch ($action) {
 			$tags=array();
 			$tags[0]=$fact;
 			InitCalendarPopUp();
-			print "<form method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">\n";
+			print "<form method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"update\" />\n";
 			print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />\n";
 			if ($change_type != "add_media_link") print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
@@ -1560,7 +1560,7 @@ switch ($action) {
 	
 	// NOTE: Done for Genmod 2.0
 	case "addnewfamlink":
-		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
+		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"linknewfamaction\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
@@ -1625,7 +1625,7 @@ switch ($action) {
 	// NOTE: addfamlink 
 	// NOTE: Done for Genmod 2.0
 	case "addfamlink":
-		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
+		print "<form method=\"post\" name=\"addchildform\" action=\"edit_interface.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"linkfamaction\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
@@ -1875,7 +1875,7 @@ switch ($action) {
 	case "addnewsource":
 		$tabkey = 1;
 		?>
-		<form method="post" action="edit_interface.php" onSubmit="return check_ansform(this);" style="display:inline;">
+		<form method="post" action="edit_interface.php" onSubmit="return check_ansform(this);">
 		<input type="hidden" name="action" value="addsourceaction" />
 		<input type="hidden" name="pid" value="newsour" />
 		<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
@@ -1952,7 +1952,7 @@ switch ($action) {
 		<?php
 		$tabkey = 1;
 		?>
-		<form method="post" action="edit_interface.php" onSubmit="return check_form(this);" style="display:inline;">
+		<form method="post" action="edit_interface.php" onSubmit="return check_form(this);">
 			<input type="hidden" name="action" value="addrepoaction" />
 			<input type="hidden" name="pid" value="newrepo" />
 			<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
@@ -2029,7 +2029,7 @@ switch ($action) {
 	case "addnewgnote":
 		$tabkey = 1;
 		 ?>
-		<form method="post" action="edit_interface.php" "style="display:inline;">
+		<form method="post" action="edit_interface.php">
 		<input type="hidden" name="action" value="addgnoteaction" />
 		<input type="hidden" name="pid" value="newgnote" />
 		<input type="hidden" name="pid_type" value="<php print $pid_type; ?>" />
@@ -2072,7 +2072,7 @@ switch ($action) {
 
 		InitCalendarPopUp();
 
-		print "<form name=\"editform\" method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\" style=\"display:inline;\">";
+		print "<form name=\"editform\" method=\"post\" action=\"edit_interface.php\" enctype=\"multipart/form-data\">";
 		print "<input type=\"hidden\" name=\"action\" value=\"update\" />";
 		print "<input type=\"hidden\" name=\"fact\" value=\"".$fact."\" />";
 		print "<input type=\"hidden\" name=\"count\" value=\"".$count."\" />";
@@ -2286,7 +2286,7 @@ switch ($action) {
 		}
 		else {
 			$gedrec = preg_replace(array("/(\r\n)+/", "/\r+/", "/\n+/"), array("\r\n", "\r", "\n"), $gedrec);
-			print "<form method=\"post\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
+			print "<form method=\"post\" action=\"edit_interface.php\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"updateraw\" />\n";
 			print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 			print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
@@ -2351,7 +2351,7 @@ switch ($action) {
 	// NOTE: Done for Genmod 2.0
 	case "linkspouse":
 		InitCalendarPopUp();
-		print "<form method=\"post\" name=\"linkspouseform\" action=\"edit_interface.php\" style=\"display:inline;\">\n";
+		print "<form method=\"post\" name=\"linkspouseform\" action=\"edit_interface.php\">\n";
 		print "<input type=\"hidden\" name=\"action\" value=\"linkspouseaction\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";

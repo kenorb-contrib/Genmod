@@ -5,7 +5,7 @@
  * Provides links for administrators to get to other administrative areas of the site
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,6 +104,7 @@ if ($action=="confighelp") {
 	print "<div class=\"NavBlockHeader AdminNavBlockHeader\"><span class=\"AdminNavBlockTitle\">".Str2Upper(GM_LANG_help_config)."</span></div>";
 	$language_array = array();
 	$language_array = LanguageFunctions::LoadLanguage($LANGUAGE,true, true);
+	$english_array = LanguageFunctions::LoadLanguage("english",true, true);
 	print "<div class=\"NavBlockField GMInfoHelpList\">";
 	
 	print "<ol>";
@@ -111,6 +112,12 @@ if ($action=="confighelp") {
 		if (stristr($text, "~#gm_lang")) {
 			print "<li>";
 			print stripslashes(PrintText($text,0,2)) . "<br /><br /></li>\r\n";
+		}
+		else {
+			if (stristr($english_array[$string], "~#gm_lang")) {
+				print "<li>";
+				print stripslashes(PrintText($english_array[$string],0,2)) . "<br /><br /></li>\r\n";
+			}
 		}
 	}
     print "</ol>";

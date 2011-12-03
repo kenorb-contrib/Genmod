@@ -5,7 +5,7 @@
  * This block will show the top 10 surnames that occur most frequently in the active gedcom
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ function print_block_name_top10($block=true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print str_replace("10", $config["num"], GM_LANG_block_top10_title);
+			print "<div class=\"BlockHeaderText\">".str_replace("10", $config["num"], GM_LANG_block_top10_title)."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">\n";
 				if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

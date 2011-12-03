@@ -3,7 +3,7 @@
  * Allow an admin user to download the entire gedcom	file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,56 +67,56 @@ else {
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php  PrintHelpLink("utf8_ansi_help", "qm"); print GM_LANG_utf8_to_ansi; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php  PrintHelpLink("utf8_ansi_help", "qm"); print "</div>".GM_LANG_utf8_to_ansi; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="convert" value="yes" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("remove_tags_help", "qm"); print GM_LANG_remove_custom_tags; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("remove_tags_help", "qm"); print "</div>".GM_LANG_remove_custom_tags; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="remove" value="yes" checked="checked" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("embedmm_help", "qm"); print GM_LANG_embedmm; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("embedmm_help", "qm"); print "</div>".GM_LANG_embedmm; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="embedmm" value="yes" checked="checked" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("embednote_help", "qm"); print GM_LANG_embednote; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("embednote_help", "qm"); print "</div>".GM_LANG_embednote; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="embednote" value="yes" checked="checked" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("add_action_help", "qm"); print GM_LANG_add_action; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("add_action_help", "qm"); print "</div>".GM_LANG_add_action; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="addaction" value="yes" checked="checked" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("download_zipped_help", "qm"); print GM_LANG_download_zipped; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("download_zipped_help", "qm"); print "</div>".GM_LANG_download_zipped; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<input type="checkbox" name="zip" value="yes" checked="checked" />
 				</td>
 			</tr>
 			<tr>
-				<td class="NavBlockLabel AdimNavBlockLabel">
-					<?php PrintHelpLink("apply_privacy_help", "qm"); print GM_LANG_apply_privacy; ?>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("apply_privacy_help", "qm"); print "</div>".GM_LANG_apply_privacy; ?>
 				</td>
 				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
 					<div><input type="checkbox" name="privatize_export" value="yes" onclick="expand_layer('DownloadPrivacyLevel'); return true;" /></div>

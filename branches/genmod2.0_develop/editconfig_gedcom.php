@@ -3,7 +3,7 @@
  * UI for online updating of the gedcom config file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -623,6 +623,7 @@ if (!isset($themeselect)) $themeselect="";
 	<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_PEDIGREE_ROOT_ID" id="NEW_PEDIGREE_ROOT_ID" value="<?php print GedcomConfig::$PEDIGREE_ROOT_ID?>" size="5" tabindex="<?php $i++; print $i?>" />
 			<?php
 			if ($source == "") {
+				LinkFunctions::PrintFindIndiLink("NEW_PEDIGREE_ROOT_ID","");
 				if (!$person->isempty) {
 					if ($source == "") {
 						print "\n<span class=\"ListItem\">".$person->name;
@@ -635,7 +636,6 @@ if (!isset($themeselect)) $themeselect="";
 					print GM_LANG_unable_to_find_indi;
 					print "</span>";
 				}
-				LinkFunctions::PrintFindIndiLink("NEW_PEDIGREE_ROOT_ID","");
 			}
 		?>
 		</td>

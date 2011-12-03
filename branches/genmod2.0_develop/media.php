@@ -496,10 +496,8 @@ if ($disp1 == "block") {
 			else print "<a href=\"downloadbackup.php?fname=".urlencode($filename)."\" target=\"_blank\">";
 			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".GM_LANG_download_now."\" />";
 			print "</a>";
-//			print "</td>";
 			
 			// Details
-//			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
 				print "\n\t\t<div id=\"I".$counter."D"."links\" class=\"ManageMediaPopup\" ";
 				print "onmouseover=\"keepbox('".$counter."D"."'); return false;\" ";
 				print "onmouseout=\"moveout('".$counter."D"."'); return false;\">";
@@ -520,6 +518,7 @@ if ($disp1 == "block") {
 			if ($cols == 1) $i++;
 			if ($i%2 == 0) print "</tr>";
 		}
+		// Only for cols=2, so not used
 		if ($i%2 != 0) {
 			print "<td style=\"border-bottom:1px solid #493424;border-left:1px solid #493424;\">&nbsp;</td>";
 			for ($j=1;$j<=6;$j++) {

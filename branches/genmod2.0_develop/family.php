@@ -5,7 +5,7 @@
  * You must supply a $famid value with the identifier for the family.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,9 +42,8 @@ $controller->CheckPrivate();
 $controller->CheckRawEdited();
 
 ?>
-<div id="show_changes"></div>
 <?php $controller->PrintDetailJS(); ?>
-<div id="FamHeaderContainer">
+<div class="DetailHeaderSection">
 <?php
 	print "<div class=\"PageTitleName\">".PrintReady($controller->title);
 	print "</div>\r\n";

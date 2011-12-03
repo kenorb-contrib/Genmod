@@ -46,9 +46,12 @@ function sndReq(element, action, mode, param1, val1, param2, val2, param3, val3,
 function handleResponse() {
     if(http.readyState == 4) {
         document.getElementById(element_id).innerHTML = http.responseText;
-        // Fix for IE not rendering the div after AJAX load
+        // Fix for IE not rendering the div after AJAX load. 
+        // We have to preserve the focus because it is reset by switching display
+        el = document.activeElement;
         document.getElementById('GenmodContainer').style.display="none";
         document.getElementById('GenmodContainer').style.display="block";
+        if (el) el.focus();
     }
    	else if (action_value != 'remembertab') document.getElementById(element_id).innerHTML = '<img src="images/ajax-loader.gif" />';
 }

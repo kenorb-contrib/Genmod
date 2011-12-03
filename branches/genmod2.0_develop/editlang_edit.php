@@ -3,7 +3,7 @@
  * Edit a language file
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ if ($action != "save") {
 	print "<input type=\"hidden\" name=\"realtime\" value=\"" . $realtime . "\" />";
 	
 	print "<div class=\"NavBlockHeader\">";
-	PrintText("editlang_help");
+	PrintText("editlang_edit");
 	if (!empty($lang_filename)) print "&nbsp;".$language_settings[$lang_filename]['gm_lang'];
 	print "</div>";
 	
@@ -98,7 +98,7 @@ if ($action != "save") {
 	print "</div>";
 	
 	print "<div class=\"NavBlockField EditLangDestTextArea\">";
-	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\" style=\"color: #FF0000\" >";
+	print "<textarea rows=\"10\" id=\"new_message\" name=\"new_message\" cols=\"75\">";
 	if (strlen($ls02) > 0) print stripslashes(AdminFunctions::Mask_all(LanguageFunctions::GetString($ls02, $lang_filename, $file_type)));
 	print "</textarea>";
 	print "</div>";

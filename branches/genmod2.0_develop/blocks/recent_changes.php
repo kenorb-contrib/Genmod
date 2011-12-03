@@ -5,7 +5,7 @@
  * This block will print a list of recently accepted changes to the various record types
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print GM_LANG_recent_changes;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_recent_changes."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\" >";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
@@ -85,7 +85,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 						PrintText("recent_changes_none");
 					print "</div>";
 				} else {
-					print "<div class=\"RecentChangesMessage\">";
+					print "<div class=\"BlockSubTitle\">";
 						PrintText("recent_changes_some");
 					print "</div>";
 					$ASC = true;
@@ -105,8 +105,8 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 									if ($person->sex == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 									else  if ($person->sex == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 									else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-									print "\" class=\"SexImage\" />";
-									print $person->addxref;
+									print "\" class=\"GenderImage\" />";
+									print "<span class=\"ListItemXref\">".$person->addxref."</span>";
 									print "</a>";
 								print "</div>\n";
 								$lastgid = $person->xref;
@@ -130,7 +130,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 								print "<div class=\"RecentChangesLink\">";
 									print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\"><span class=\"RecentChangesName\">";
 									print PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</span>";
-									print $family->addxref;
+									print "<span class=\"ListItemXref\">".$family->addxref."</span>";
 									print "</a>\n";
 								print "</div>\n";
 								$lastgid = $family->xref;
@@ -154,7 +154,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 								print "<div class=\"RecentChangesLink\">";
 									print "<a href=\"source.php?sid=".$source->xref."&amp;gedid=".$source->gedcomid."\"><span class=\"RecentChangesName\">";
 									print $source->descriptor."</span>";
-									print $source->addxref;
+									print "<span class=\"ListItemXref\">".$source->addxref."</span>";
 									print "</a>\n";
 								print "</div>\n";
 								$lastgid = $source->xref;
@@ -178,7 +178,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 								print "<div class=\"RecentChangesLink\">";
 									print "<a href=\"repo.php?rid=".$repo->xref."&amp;gedid=".$repo->gedcomid."\"><span class=\"RecentChangesName\">";
 									print $repo->descriptor."</span>";
-									print $repo->addxref;
+									print "<span class=\"ListItemXref\">".$repo->addxref."</span>";
 									print "</a>\n";
 								print "</div>\n";
 								$lastgid = $repo->xref;
@@ -201,7 +201,7 @@ function print_recent_changes($block=true, $config="", $side, $index) {
 								print "<div class=\"RecentChangesLink\">";
 									print "<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\"><span class=\"RecentChangesName\">";
 									print $media->title."</span>";
-									print $media->addxref;
+									print "<span class=\"ListItemXref\">".$media->addxref."</span>";
 									print "</a>\n";
 								print "</div>\n";
 								$lastgid = $media->xref;

@@ -3,7 +3,7 @@
  * Searches based on user query.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -274,11 +274,11 @@ if ($search_controller->action == "general") {
 				// empty tabs
 				for (i=0; i<tabid.length; i++) {
 					var elt = document.getElementById('door'+i);
+					elt.className = '';
 					if (document.getElementById('no_tab'+i)) { // empty ?
 						if (<?php if ($gm_user->username != "") echo 'true'; else echo 'false';?>) {
 							elt.style.display='block';
-							elt.style.opacity='0.4';
-							elt.style.filter='alpha(opacity=40)';
+							elt.className='TabDoorEmpty';
 						}
 						else elt.style.display='none'; // empty and not editable ==> hide
 					}
@@ -286,9 +286,9 @@ if ($search_controller->action == "general") {
 				}
 				// current door
 				for (i=0; i<tabid.length; i++) {
-					document.getElementById('door'+i).className='FactRela';
+					if (i != n) document.getElementById('door'+i).className+=' TabDoorUnselected';
+					else document.getElementById('door'+i).className+=' TabDoorSelected';
 				}
-				document.getElementById('door'+n).className='shade1';
 				return false;
 			}
 		}
@@ -338,11 +338,11 @@ if ($search_controller->action == "general") {
 		if (count($search_controller->media_total) > 0) {
 			
 			$ctm = count($search_controller->printmedia);
-			print "\n\t<table class=\"ListTable SearchListTable\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
+			print "\n\t<table class=\"DetailListTable SearchListTable\">\n\t\t<tr><td class=\"DetailListHeader\"";
 			if($ctm > 12) print " colspan=\"2\"";
 			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["media"]["small"]."\" border=\"0\" title=\"".GM_LANG_media."\" alt=\"".GM_LANG_media."\" />&nbsp;&nbsp;";
 			print GM_LANG_media;
-			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
+			print "</td></tr><tr><td class=\"DetaillistContent\"><ul>";
 			$media_private = array();
 			$i=1;
 			foreach ($search_controller->printmedia as $key => $mediakey) {
@@ -353,7 +353,7 @@ if ($search_controller->action == "general") {
 			}
 			print "\n\t\t</ul></td>\n\t\t</tr>";
 			
-			print "<tr><td colspan=\"".($ctm>12 ? 2 : 1)."\"class=\"ListTableColumnFooter\">".GM_LANG_total_media." ".count($search_controller->media_total);
+			print "<tr><td colspan=\"".($ctm>12 ? 2 : 1)."\"class=\"DetailListFooter\">".GM_LANG_total_media." ".count($search_controller->media_total);
 			if (count($search_controller->media_hide) > 0) print "  --  ".GM_LANG_hidden." ".count($search_controller->media_hide);
 			if (count($media_private)>0) print "&nbsp;--&nbsp;".GM_LANG_private." ".count($media_private);
 			if (count($media_private) > 0 || count($search_controller->media_hide) > 0) PrintHelpLink("privacy_error_help", "qm");
@@ -380,15 +380,15 @@ if ($search_controller->action == "soundex") {
 		$ct = count($search_controller->printindiname);
 		if ($ct > 0) {
 			print "<div id=\"SearchSoundexResult\">";
-			print "\n\t<table class=\"ListTable SearchListTable\">\n\t\t<tr>\n\t\t";
+			print "\n\t<table class=\"DetailListTable SearchListTable\">\n\t\t<tr>\n\t\t";
 			$extrafams = false;
 			if (count($search_controller->printfamname) > 0) $extrafams = true;
 			if ($extrafams) {
-				print "<td class=\"ListTableHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
-				print "<td class=\"ListTableHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
+				print "<td class=\"DetailListHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
+				print "<td class=\"DetailListHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_families."</td>";
 			}
-			else print "<td colspan=\"2\" class=\"ListTableHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
-			print "</tr><tr>\n\t\t<td class=\"ListTableContent\"><ul>";
+			else print "<td colspan=\"2\" class=\"DetailListHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"\" /> ".GM_LANG_people."</td>";
+			print "</tr><tr>\n\t\t<td class=\"DetaillistContent\"><ul>";
 
 			$i=1;
 			$indi_private = array();
@@ -403,7 +403,7 @@ if ($search_controller->action == "soundex") {
 
 			// Start printing the associated fams
 			if ($extrafams) {
-				print "\n\t\t<td class=\"ListTableContent\"><ul>";
+				print "\n\t\t<td class=\"DetaillistContent\"><ul>";
 				$fam_private = array();
 				foreach($search_controller->printfamname as $pkey => $pvalue) {
 					$fam = Family::GetInstance($pvalue[1], "", $pvalue[2]);
@@ -415,7 +415,7 @@ if ($search_controller->action == "soundex") {
 
 			// start printing the table footer
 			print "\n\t\t</tr>\n\t";
-			print "<tr><td class=\"ListTableColumnFooter\"";
+			print "<tr><td class=\"DetailListFooter\"";
 			if ((!$extrafams) && ($ct > 9)) print " colspan=\"2\">";
 			else print ">";
 			print GM_LANG_total_indis." ".count($search_controller->indi_total);
@@ -424,7 +424,7 @@ if ($search_controller->action == "soundex") {
 			if (count($indi_private)>0 || count($search_controller->indi_hide)>0) PrintHelpLink("privacy_error_help", "qm");
 			print "</td>";
 			if ($extrafams) {
-				print "<td>".GM_LANG_total_fams." ".count($search_controller->fam_total);
+				print "<td class=\"DetailListFooter\">".GM_LANG_total_fams." ".count($search_controller->fam_total);
 				if (count($fam_private)>0) print "  (".GM_LANG_private." ".count($fam_private).")";
 				if (count($search_controller->fam_hide)>0) print "  --  ".GM_LANG_hidden." ".count($search_controller->fam_hide);
 				if (count($fam_private)>0 || count($search_controller->fam_hide)>0) PrintHelpLink("privacy_error_help", "qm");

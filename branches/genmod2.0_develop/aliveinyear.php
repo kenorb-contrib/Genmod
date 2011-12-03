@@ -49,9 +49,9 @@ if ($view != "preview") {
 	print "\n\t\t<input type=\"hidden\" name=\"show_all\" value=\"".$indilist_controller->show_all."\" />";
 	print "\n\t\t<table class=\"NavBlockTable\">\n\t\t\t<tr>";
 	print "\n\t\t\t<td class=\"NavBlockHeader\" colspan=\"4\">".GM_LANG_choose."</td></tr>";
-	print "<tr><td class=\"NavBlockLabel\" rowspan=\"4\">";
+	print "<tr><td class=\"NavBlockLabel\" rowspan=\"4\"><div class=\"HelpIconContainer\">";
 	PrintHelpLink("year_help", "qm");
-	print GM_LANG_year."</td>";
+	print "</div>".GM_LANG_year."</td>";
 	print "\n\t\t\t<td class=\"NavBlockField\" rowspan=\"4\">";
 	print "\n\t\t\t\t<input class=\"PidInputField\" type=\"text\" name=\"year\" size=\"3\" value=\"".$indilist_controller->year."\" />";
 	print "\n\t\t\t\t";

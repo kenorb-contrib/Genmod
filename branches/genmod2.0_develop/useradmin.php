@@ -3,7 +3,7 @@
  * Administrative User Interface.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -697,7 +697,7 @@ if ($action=="edituser" || $action == "createform") { ?>
 				<td colspan="2" class="NavBlockRowSpacer">&nbsp;</td>
 			</tr>
 			<tr>
-				<td colspan="2" class="NavBlockHeader AdminNavBlockHeader">
+				<td colspan="2" class="NavBlockHeader">
 					<?php print $gedarray["title"]; ?>
 				</td>
 			</tr>
@@ -1002,9 +1002,9 @@ if ($action == "massupdate") {
 	<table class="NavBlockTable AdminNavBlockTable">
 		<tr>
 			<td class="NavBlockHeader AdminNavBlockHeader" colspan="3">
-				<?php print "<span class=\"AdminNavBlockTitle\">".GM_LANG_mass_update."</span>"; ?>
+				<?php print "<div class=\"AdminNavBlockTitle\">".GM_LANG_mass_update."</div>"; ?>
 				<?php if (count($userlist) == 0) { ?>
-					<br /><span class="Error"><?php print GM_LANG_no_users_selected; ?></span>
+					<span class="Error"><?php print GM_LANG_no_users_selected; ?></span>
 				<?php } ?>
 			</td>
 		</tr>
