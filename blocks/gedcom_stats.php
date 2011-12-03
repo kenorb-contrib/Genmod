@@ -5,7 +5,7 @@
  * This block prints statistical information for the currently active gedcom
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ function print_gedcom_stats($block = true, $config="", $side, $index) {
 						print "</a>";
 					}
 				}
-				print GM_LANG_gedcom_stats;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_gedcom_stats."</div>";
 			print "</div>"; // Close BlockHeader
 			print "<div class=\"BlockContent\">";
 				print "<div class=\"GedcomStatsTextBlock\">";

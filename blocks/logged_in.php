@@ -5,7 +5,7 @@
  * This block will print a list of the users who are currently logged in
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,7 +61,7 @@ function print_logged_in_users($block=true, $config="", $side, $index) {
 		print "<div id=\"logged_in_users\" class=\"BlockContainer\">\n";
 			print "<div class=\"BlockHeader\">";
 				PrintHelpLink("index_loggedin_help", "qm", "users_logged_in");
-				print GM_LANG_users_logged_in;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_users_logged_in."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

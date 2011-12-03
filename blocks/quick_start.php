@@ -5,7 +5,7 @@
  * This block prints a form that will allow a user perform a quick search
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print GM_LANG_quickstart;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_quickstart."</div>";
 		print "</div>"; // Close BlockHeader
 		print "<div class=\"BlockContent\">";
 			print "<form method=\"post\" action=\"search.php\" name=\"searchform\">";
@@ -80,9 +80,9 @@ function print_quickstart_block($block = true, $config="", $side, $index) {
 				print "<tr><td class=\"BlockLabel\">".GM_LANG_search_place."</td>";
 				print "<td class=\"BlockField\"><input type=\"text\" name=\"place\" tabindex=\"3\" /></td></tr>";
 	
-				print "<tr><td colspan=\"2\"><b>".GM_LANG_or."</b></td></tr>";
+				print "<tr><td colspan=\"2\" class=\"BlockSubTitle\">".GM_LANG_or."</td></tr>";
 				
-				print "<tr><td colspan=\"2\"><b>".GM_LANG_search_general."</b></td></tr>";
+				print "<tr><td colspan=\"2\" class=\"BlockSubTitle\">".GM_LANG_search_general."</td></tr>";
 				
 				print "<tr><td class=\"BlockLabel\">".GM_LANG_enter_terms."</td>";
 				print "<td class=\"BlockField\"><input tabindex=\"4\" type=\"text\" name=\"query\" value=\"\" /></td></tr>";

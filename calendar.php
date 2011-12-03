@@ -5,7 +5,7 @@
  * Displays events on a daily, monthly, or yearly calendar.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,9 @@ print "<div id=\"CalendarPage\">\n";
 	print "<span class=\"PageTitleName\">".($calendar_controller->action == "today" ? GM_LANG_on_this_day : ($calendar_controller->action == "calendar" ? GM_LANG_in_this_month : GM_LANG_in_this_year))."</span>";
 print "</div>";
 
-print "<div class=\"CalendarOptionBlock\">";
+if ($view!="preview") {
+
+	print "<div class=\"CalendarOptionBlock\">";
 	print "<form name=\"dateform\" method=\"get\" action=\"calendar.php\">";
 	print "<input type=\"hidden\" name=\"action\" value=\"".$calendar_controller->action."\" />";
 	print "<table class=\"NavBlockTable CalendarNavBlockTable\">";
@@ -52,11 +54,10 @@ print "<div class=\"CalendarOptionBlock\">";
 	print $calendar_controller->bartext;
 	print "</td></tr>";
 
-	if ($view!="preview") {
 	// Print calender form
-		print "<tr><td class=\"NavBlockLabel\">";
+		print "<tr><td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 		PrintHelpLink("annivers_date_select_help", "qm", "day");
-		print GM_LANG_day."</td>\n";
+		print "</div>".GM_LANG_day."</td>\n";
 		print "<td colspan=\"7\" class=\"NavBlockField\">";
 		for($i = 1; $i < ($calendar_controller->m_days+1); $i++) {
 			print "<a href=\"calendar.php?link=10&amp;day=".$i."&amp;month=".strtolower($calendar_controller->month)."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."&amp;action=today\">";
@@ -81,9 +82,9 @@ print "<div class=\"CalendarOptionBlock\">";
 		print "</td>\n";
 	
 		print "</tr><tr>";
-		print "<td class=\"NavBlockLabel\">";
+		print "<td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 		PrintHelpLink("annivers_month_select_help", "qm", "month");
-		print GM_LANG_month."</td>\n";
+		print "</div>".GM_LANG_month."</td>\n";
 		print "<td colspan=\"7\" class=\"NavBlockField\">";
 		foreach($monthtonum as $mon=>$num) {
 			if (defined("GM_LANG_".$mon)) {
@@ -99,9 +100,9 @@ print "<div class=\"CalendarOptionBlock\">";
 		print "<a href=\"calendar.php?link=14&amp;month=".strtolower(adodb_date("M"))."&amp;action=calendar&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\"><span class=\"CalendarNavBlockCurDate\">".constant("GM_LANG_".strtolower(adodb_date("M")))." ".strtolower(adodb_date("Y"))."</span></a> | ";
 		print "</td>\n";
 		print "</tr><tr>";
-		print "<td class=\"NavBlockLabel\">";
+		print "<td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 		PrintHelpLink("annivers_year_select_help", "qm", "year");
-		print GM_LANG_year."</td>\n";
+		print "</div>".GM_LANG_year."</td>\n";
 		print "<td class=\"NavBlockField\">";
 		if (strlen($calendar_controller->year) < 5){
 			if ($calendar_controller->year<"AA") print " <a href=\"calendar.php?link=2&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".($calendar_controller->year-1)."&amp;action=".($calendar_controller->action == "calendar" ? "calendar" : "year")."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$calendar_controller->filtersx."\" title=\"".($calendar_controller->year-1)."\" >-1</a> ";
@@ -115,9 +116,9 @@ print "<div class=\"CalendarOptionBlock\">";
 	
 		print "</td>\n ";
 		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
-			print "<td class=\"NavBlockLabel\">";
+			print "<td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 			PrintHelpLink("annivers_show_help", "qm", "show");
-			print GM_LANG_show.":&nbsp;</td>\n";
+			print "</div>".GM_LANG_show.":&nbsp;</td>\n";
 			print "<td class=\"NavBlockField\">";
 	
 			print "<input type=\"hidden\" name=\"filterof\" value=\"".$calendar_controller->filterof."\" />";
@@ -151,40 +152,40 @@ print "<div class=\"CalendarOptionBlock\">";
 	
 		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 			print "</td>\n ";
-			print "<td class=\"NavBlockLabel\">";
+			print "<td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 			PrintHelpLink("annivers_sex_help", "qm", "sex");
-			print GM_LANG_sex.":&nbsp;</td>\n";
+			print "</div>".GM_LANG_sex.":&nbsp;</td>\n";
 			print "<td class=\"NavBlockField\">";
 			if ($calendar_controller->filtersx == ""){
-				print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print " <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" class=\"GenderImageLarge\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" class=\"GenderImageLarge\" align=\"middle\" />";
 				print " | ";
 			}
 			else {
 				$fs="";
 				print " <a href=\"calendar.php?link=7&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" class=\"GenderImage\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_all."\" alt=\"".GM_LANG_all."\" class=\"GenderImage\" border=\"0\" align=\"middle\" />";
 				print "</a>"." | ";
 			}
 			if ($calendar_controller->filtersx == "M"){
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"GenderImageLarge\" align=\"middle\" />";
 				print " | ";
 			}
 			else {
 				$fs = "M";
 				print "<a href=\"calendar.php?link=8&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"GenderImage\" align=\"middle\" />";
 				print "</a>"." | ";
 			}
 			if ($calendar_controller->filtersx == "F"){
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"15\" height=\"15\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"GenderImageLarge\" align=\"middle\" />";
 				print " | ";
 			}
 			else {
 				$fs = "F";
 				print "<a href=\"calendar.php?link=9&amp;day=".$calendar_controller->day."&amp;month=".$calendar_controller->month."&amp;year=".$calendar_controller->year."&amp;filterev=".$calendar_controller->filterev."&amp;filterof=".$calendar_controller->filterof."&amp;filtersx=".$fs."&amp;action=".$calendar_controller->action."\">";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" width=\"9\" height=\"9\" border=\"0\" align=\"middle\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"GenderImage\" align=\"middle\" />";
 				print "</a>"." | ";
 			}
 			
@@ -192,9 +193,9 @@ print "<div class=\"CalendarOptionBlock\">";
 	
 		if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) {
 			print "</td>\n ";
-			print "<td class=\"NavBlockLabel\">";
+			print "<td class=\"NavBlockLabel\"><div class=\"HelpIconContainer\">";
 			PrintHelpLink("annivers_event_help", "qm", "showcal");
-			print GM_LANG_showcal."&nbsp;</td>\n";
+			print "</div>".GM_LANG_showcal."&nbsp;</td>\n";
 			print "<td class=\"NavBlockField\"";
 			if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
 			else print " colspan=\"3\">";
@@ -240,7 +241,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 	if ($calendar_controller->filterev == "bdm") $select = array("BIRT", "DEAT", "MARR");
 	else if ($calendar_controller->filterev == "all") $select = "";
 	else $select = array($calendar_controller->filterev);
- 	//print "selectfacts: ".$select."<br />";
+	//print "selectfacts: ".$select."<br />";
 	foreach($calendar_controller->myindilist as $gid=>$indi) {
 		//print $indi->name.$indi->addxref."<br />";
 		if ((($calendar_controller->filterof == "living" && !$indi->isdead) || $calendar_controller->filterof != "living") && (($calendar_controller->filtersx != "" && $indi->sex == $calendar_controller->filtersx) || $calendar_controller->filtersx == "") && !isset($indi_printed[$indi->key])) {
@@ -268,7 +269,7 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 					$count_unknown++;
 					$text_indi .= $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
 				}
-				$text_indi .= "\" class=\"SexImage\" />";
+				$text_indi .= "\" class=\"GenderImage\" />";
 				$text_indi .= $indi->addxref;
 				$text_indi .= "</a>\n\t\t";
 				$text_indi .= "<div class=\"CalendarFactIndent\">";
@@ -320,6 +321,9 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 	// Print the day/year list(s)
 	if (!empty($text_indi) || !empty($text_fam) || $count_private_indi>0 || $count_private_fam>0) {
 		print "\n\t\t<table class=\"ListTable\">\n\t\t<tr>";
+		if ($view == "preview") {
+			print "<td class=\"ListTableHeader\" colspan=\"2\">".$calendar_controller->bartext."</td></tr><tr>";
+		}
 		if (!empty($text_indi) || ($count_private_indi>0)) {
 			print "<td class=\"ListTableColumnHeader\"><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_individuals."\" alt=\"".GM_LANG_individuals."\" /> ".GM_LANG_individuals."</td>";
 		}
@@ -358,19 +362,19 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			print GM_LANG_total_indis." ".($count_male+$count_female+$count_unknown+$count_private_indi)."<br />&nbsp;&nbsp;";
 			if ($count_male > 0){
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"]."\" ";
-				print "title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"SexImage\" />&nbsp;";
+				print "title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male."\" class=\"GenderImage\" />&nbsp;";
 				print $count_male;
 			}
 			if ($count_male > 0 && $count_female > 0) print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 			if ($count_female > 0) {
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"]."\" ";
-				print "title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"SexImage\"  />&nbsp;";
+				print "title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female."\" class=\"GenderImage\"  />&nbsp;";
 				print $count_female;
 			}
 			if ($count_unknown > 0) {
 				print "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
 				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"]."\" ";
-				print "title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown."\" class=\"SexImage\" />&nbsp;";
+				print "title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown."\" class=\"GenderImage\" />&nbsp;";
 				print $count_unknown;
 			}
 			print "</td>";
@@ -381,7 +385,9 @@ if ($calendar_controller->action == "today" || $calendar_controller->action == "
 			print "&nbsp;&nbsp;".($count_fam+$count_private_fam);
 			print "</td>";
 		}
-		print "</tr></table>";
+		print "</tr>";
+		if ($view=="preview") print "<tr><td class=\"ListTableFooter\" colspan=\"2\">";
+		else print "</table>";
 	}
 	else {
 		print "\n\t<div class=\"Warning CalendarWarning\">";
@@ -396,6 +402,9 @@ else if ($calendar_controller->action == "calendar") {
 	if (empty($WEEK_START)) $WEEK_START="0";                //-- if the starting day for a week was not defined in the language file, then make it Sunday
 	print "<table class=\"ListTable CalendarDayBoxTable\">\n";
 	print "\t<tr>\n";
+	if ($view == "preview") {
+		print "<td class=\"ListTableHeader\" colspan=\"7\">".$calendar_controller->bartext."</td></tr><tr>";
+	}
 	$days = array();
 	$days[0] = "sunday";
 	$days[1] = "monday";
@@ -651,9 +660,9 @@ else if ($calendar_controller->action == "calendar") {
 					$show_not_set = false;
 					$calendar_controller->show_no_day = -1;
 				}
-				print "<div id=\"day$k-$j\" class=\"PersonDetails1 CalendarDayBoxDetails\" style=\"height: ";
-				if ($view=="preview") print "100%;";
-				else print "150px; overflow: auto;";
+				print "<div id=\"day$k-$j\" class=\"PersonDetails1 CalendarDayBoxDetails ";
+				if ($view=="preview") print "CalendarDayBoxDetailsPreview";
+				else print "CalendarDayBoxDetailsHeight";
 				print "\">\n";
 				print $text_day;
 				if ($count_private>0){
@@ -682,14 +691,14 @@ else if ($calendar_controller->action == "calendar") {
 		} //-- end day for loop
 		print "\t</tr>\n";
 	} //-- end week for loop
-	if ($view=="preview") print "<tr><td colspan=\"7\">";
+	if ($view=="preview") print "<tr><td class=\"ListTableFooter\" colspan=\"7\">";
 	else print "</table>";
 
 }
 if ($view=="preview"){
 	if (isset($gid)) {
-		if (isset($calendar_controller->myindilist[$gid]["gedfile"])) $showfile = $calendar_controller->myindilist[$gid]["gedfile"];
-		else $showfile = $calendar_controller->myfamlist[$gid]["gedfile"];
+		if (isset($calendar_controller->myindilist[$gid])) $showfile = $calendar_controller->myindilist[$gid]->gedcomid;
+		else $showfile = $calendar_controller->myfamlist[$gid]->gedcomid;
 	}
 	else $showfile = GedcomConfig::$GEDCOMID;
 	$showfilter="";
@@ -703,7 +712,7 @@ if ($view=="preview"){
 		if (defined("GM_FACT_".$calendar_controller->filterev)) $showfilter .= constant("GM_FACT_".$calendar_controller->filterev);
 		else if (defined("GM_LANG_".$calendar_controller->filterev)) $showfilter .= constant("GM_LANG_".$calendar_controller->filterev);
 	}
-	print "<br />".$showfile." (".GM_LANG_filter.": ";
+	print $GEDCOMS[$showfile]["title"]." (".GM_LANG_filter.": ";
 	if (!empty($showfilter)) print $showfilter.")\n";
 	else print GM_LANG_all.")\n";
 	print "</td></tr>";

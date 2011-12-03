@@ -1,10 +1,10 @@
 <?php
 /**
- * MyGedView page allows a logged in user the abilty
+ * mygenmod page allows a logged in user the abilty
  * to keep bookmarks, see a list of upcoming events, etc.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ $SortedBlocks = array_flip($SortedBlocks);
 if ($command=="user") $ublocks = new Blocks("user", $gm_user->username, $action);
 else $ublocks = new Blocks("gedcom", "", $action);
 
-if ($command=="user") PrintSimpleHeader(GM_LANG_mygedview);
+if ($command=="user") PrintSimpleHeader(GM_LANG_mygenmod);
 else PrintSimpleHeader($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);
 
 $GEDCOM_TITLE = PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);  // needed in GM_LANG_rss_descr

@@ -5,7 +5,7 @@
  * This block prints the active gedcom favorites
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ function print_gedcom_favorites($block = true, $config="", $side, $index) {
 	print "<div id=\"gedcom_favorites\" class=\"BlockContainer\">\n";
 		print "<div class=\"BlockHeader\">";
 			PrintHelpLink("index_favorites_help", "qm", "gedcom_favorites");
-			print GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;";
+			print "<div class=\"BlockHeaderText\">".GM_LANG_gedcom_favorites." &lrm;(".count($userfavs).")&lrm;</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

@@ -5,7 +5,7 @@
  * This block prints basic information about the active gedcom
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 	print "<!-- Start gedcom Block //-->";
 	print "<div id=\"gedcom_welcome\" class=\"BlockContainer\" >\n";
 		print "<div class=\"BlockHeader\">";
-			print PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"]);
+			print "<div class=\"BlockHeaderText\">".PrintReady($GEDCOMS[GedcomConfig::$GEDCOMID]["title"])."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">";
 			print "<div class=\"GedcomBlockTime\">".GetChangedDate(GetCurrentDay()." ".GetCurrentMonth()." ".GetCurrentYear())." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."</div>\n";

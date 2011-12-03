@@ -3,7 +3,7 @@
  * Report Header Parser
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * used by the SAX parser to generate PDF reports from the XML report file.
  *

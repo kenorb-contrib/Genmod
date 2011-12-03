@@ -3,7 +3,7 @@
  * Standard theme
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,10 +24,10 @@
  * @version $Id$
  */
 
-$theme_name = "Standard";		//-- the name of this theme
+$theme_name = "Clear";								//-- the name of this theme
 
 define('GM_STYLESHEET', GedcomConfig::$THEME_DIR."style.css");					//-- CSS level 2 stylesheet to use
-define('GM_RTL_STYLESHEET', GedcomConfig::$THEME_DIR."style_rtl.css");  		//-- CSS level 2 stylesheet to use
+define('GM_RTL_STYLESHEET', GedcomConfig::$THEME_DIR."style_rtl.css");      	//-- CSS level 2 stylesheet to use
 define('GM_MAIL_STYLESHEET', GedcomConfig::$THEME_DIR."style_mail.css");    	//-- CSS level 2 stylesheet to use
 define('GM_PRINT_STYLESHEET', GedcomConfig::$THEME_DIR."print.css");			//-- CSS level 2 print stylesheet to use
 define('GM_MENUBAR', GedcomConfig::$THEME_DIR."menubar.php");					//-- File to display the top menu
@@ -35,8 +35,8 @@ define('GM_FOOTERFILE', GedcomConfig::$THEME_DIR."footer.html");				//-- Footer 
 define('GM_PRINT_FOOTERFILE', GedcomConfig::$THEME_DIR."print_footer.html");	//-- Print Preview Footer information for the site
 define('GM_PRINT_HEADERFILE', GedcomConfig::$THEME_DIR."print_header.html");	//-- Print Preview Header information for the site
 
-define('GM_USE_HELPIMG', true);			// set to true to use image for help questionmark, set to false to use gm_lang["qm"]
-define('GM_IMAGE_DIR', 'images');		//-- directory to look for images
+define('GM_USE_HELPIMG', true);						// set to true to use image for help questionmark, set to false to use gm_lang["qm"]
+define('GM_IMAGE_DIR', 'images');					//-- directory to look for images
 
 //-- variables for image names
 //- GM main icons
@@ -74,7 +74,7 @@ $GM_IMAGES["fanchart"]["small"] = "small/fanchart.gif";
 $GM_IMAGES["gedcom"]["small"] = "small/gedcom.gif";
 $GM_IMAGES["help"]["small"] = "small/help.gif";
 $GM_IMAGES["indis"]["small"] = "small/indis.gif";
-$GM_IMAGES["mygedview"]["small"] = "small/my_gedview.gif";
+$GM_IMAGES["mygenmod"]["small"] = "small/my_genmod.gif";
 $GM_IMAGES["patriarch"]["small"] = "small/patriarch.gif";
 $GM_IMAGES["pedigree"]["small"] = "small/pedigree.gif";
 $GM_IMAGES["search"]["small"] = "small/search.gif";
@@ -125,7 +125,7 @@ $GM_IMAGES["dline2"]["other"] = "dline2.gif";
 $GM_IMAGES["dline"]["other"] = "dline.gif";
 $GM_IMAGES["hline"]["other"] = "hline.gif";
 $GM_IMAGES["spacer"]["other"] = "spacer.gif";
-$GM_IMAGES["gedview"]["other"] = "gedview.gif";
+$GM_IMAGES["genmod"]["other"] = "genmod.gif";
 $GM_IMAGES["larrow2"]["other"] = "larrow2.gif";
 $GM_IMAGES["larrow"]["other"] = "larrow.gif";
 $GM_IMAGES["minus"]["other"] = "minus.gif";
@@ -178,7 +178,7 @@ $bxspacing = 4;		// -- horizontal spacing between boxes on the pedigree chart
 $byspacing = 4;		// -- vertical spacing between boxes on the pedigree chart
 
 // -- global variables for the descendancy chart
-$Dbaseyoffset = 0;	// -- position the entire descendancy tree relative to the top of the page
+$Dbaseyoffset = 0;		// -- position the entire descendancy tree relative to the top of the page
 $Dbasexoffset = 0;		// -- position the entire descendancy tree relative to the left of the page
 $Dbxspacing = 0;		// -- horizontal spacing between boxes
 $Dbyspacing = 1;		// -- vertical spacing between boxes

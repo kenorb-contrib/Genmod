@@ -5,7 +5,7 @@
  * This block will print a users favorites
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,8 @@ function print_user_favorites($block=true, $config="", $side, $index) {
 		print "<!-- Start of user favorites //-->";
 		print "<div id=\"user_favorites\" class=\"BlockContainer\">\n"; // block
 			print "<div class=\"BlockHeader\">";
-				PrintHelpLink("mygedview_favorites_help", "qm", "my_favorites");
-				print GM_LANG_my_favorites." &lrm;(".count($userfavs).")&lrm;";
+				PrintHelpLink("mygenmod_favorites_help", "qm", "my_favorites");
+				print "<div class=\"BlockHeaderText\">".GM_LANG_my_favorites." &lrm;(".count($userfavs).")&lrm;</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

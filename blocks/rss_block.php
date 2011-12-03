@@ -5,7 +5,7 @@
  * This is the RSS block
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ function print_RSS_block($block = true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print GM_LANG_rss_feeds;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_rss_feeds."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">";
 			print "<form method=\"post\" action=\"\" name=\"rssform\" class=\"RSSBlockForm\">\n";

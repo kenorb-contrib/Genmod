@@ -6,7 +6,7 @@
  * @TODO print a message if people are not included due to privacy
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -109,8 +109,8 @@ else {
 		?>
 		<table class="NavBlockTable">
 		<tr><td class="NavBlockHeader" colspan="2"><?php print GM_LANG_choose; ?></td></tr>
-		<tr><td class="NavBlockLabel"><?php print GM_LANG_utf8_to_ansi; PrintHelpLink("utf8_ansi_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="convert" value="yes" /></td></tr>
-		<tr><td class="NavBlockLabel"><?php print GM_LANG_remove_custom_tags; PrintHelpLink("remove_tags_help", "qm"); ?></td><td class="NavBlockField"><input type="checkbox" name="remove" value="yes" checked="checked" /></td></tr>
+		<tr><td class="NavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("utf8_ansi_help", "qm"); print "</div>".GM_LANG_utf8_to_ansi;?></td><td class="NavBlockField"><input type="checkbox" name="convert" value="yes" /></td></tr>
+		<tr><td class="NavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("remove_tags_help", "qm"); print "</div>".GM_LANG_remove_custom_tags; ?></td><td class="NavBlockField"><input type="checkbox" name="remove" value="yes" checked="checked" /></td></tr>
 		<tr><td class="NavBlockFooter" colspan="2"><input type="submit"  value="<?php print GM_LANG_download_now; ?>" />
 		<?php
 		PrintHelpLink("clip_download_help", "qm"); ?>

@@ -3,7 +3,7 @@
  * The menubar that appears at the top of all screens
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,12 +54,14 @@ $favoritesmenu = MenuBar::GetFavoritesMenu();
 $custommenu = MenuBar::GetCustomMenu();
 
 function CreateMenu($menuobject, $level=0, $sub=false) {
-	global $outputmenu;
+	global $outputmenu, $GM_IMAGES;
+	
 	if (!$sub) $outputmenu = array();
 	foreach ($menuobject->submenus as $sublevel => $submenu) {
 		if (count($submenu->submenus) > 0) {
 			foreach ($submenu->submenus as $key => $lowsub) {
 				$tempmenu = CreateMenu($lowsub, $level++, true);
+				if ($lowsub->seperator) $tempmenu->label = "<div class='seperator'>"."</div>";
 				$outputmenu[$submenu->label][$key]["label"] = $tempmenu->label;
 				$outputmenu[$submenu->label][$key]["link"] = $tempmenu->link;
 			}
@@ -129,7 +131,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		$ldir = "right";
 	}
 	?>
-	<div id="HeaderMenuContainer">
+	<div id="HeaderMenuContainer" class="<?php echo $TEXT_DIRECTION; ?>">
 		<?php if (isset($GEDCOMS[GedcomConfig::$GEDCOMID])) { ?>
 			<div id="HeaderLogoLink">
 			<a href="index.php?command=gedcom">
@@ -138,7 +140,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 			</div>
 		<?php } 
 		else { ?>
-			<div id="HeaderLogo" />
+			<div id="HeaderLogo"></div>
 		<?php } ?>
 		<div id="HeaderMenuBar" style="float: <?php print $ldir; ?>;">
 			<?php foreach (array_keys($showmenu) as $number => $name) { 
@@ -188,7 +190,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		// of the actuator from which to measure the offset positions above. Here we are saying we want the 
 		// menu to appear directly below the bottom left corner of the actuator
 		//==================================================================================================
-		var ms = new TransMenuSet(TransMenu.direction.down, 10, 15, TransMenu.reference.bottomLeft);
+		var ms = new TransMenuSet(TransMenu.direction.down, -10, 3, TransMenu.reference.bottomLeft);
 
 		//==================================================================================================
 		// create a dropdown menu

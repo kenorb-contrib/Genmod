@@ -3,7 +3,7 @@
  * Popup window for viewing images
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ if (!SystemConfig::$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filenam
 	print "<br /><br /><div class=\"CloseWindow\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
 else {
-	print "<font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">-</a> </font>";
+	print "<a href=\"#\" onclick=\"zoomin(); return false;\"><span class=\"ZoomButtons\">+</span></a> <a href=\"#\" onclick=\"zoomout();\"><span class=\"ZoomButtons\">-</span></a> ";
 	print "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%\n";
 	print "<input type=\"button\" value=\"".GM_LANG_reset."\" onclick=\"resetimage(); return false;\" />\n";
 	
@@ -209,8 +209,8 @@ else {
 			$imgheight = 50;
 		}
 	}
-	print '<br /><div id="imagecropper" style="position: relative; border: outset white 3px; background-color: black; overflow: auto; vertical-align: middle; text-align: center; width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
-	print "\n<img id=\"theimage\" src=\"$filename\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
+	print '<br /><div id="imagecropper" style="width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
+	print "\n<img id=\"theimage\" src=\"$filename\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
 	print '</div>';
 }
 //	print $imgwidth." ".$imgheight;

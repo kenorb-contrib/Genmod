@@ -5,7 +5,7 @@
  * This block will print a list of today's events
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print GM_LANG_on_this_day;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_on_this_day."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\" >";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";
@@ -111,8 +111,8 @@ function print_todays_events($block=true, $config="", $side, $index) {
 										if ($factarr[5] == "M") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 										else if ($factarr[5] == "F") print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 										else print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-										print "\" class=\"SexImage\" />";
-										print $person->addxref;
+										print "\" class=\"GenderImage\" />";
+										print "<span class=\"ListItemXref\">".$person->addxref."</span>";
 										print "</a>";
 									print "</div>\n";
 									$lastgid = $gid;
@@ -137,7 +137,7 @@ function print_todays_events($block=true, $config="", $side, $index) {
 									print "<div class=\"TodaysEventsLink\">";
 										print "<a href=\"family.php?famid=".$family->xref."&amp;gedid=".$family->gedcomid."\">";
 										print "<span class=\"TodaysEventsName\">".PrintReady($family->sortable_name.($family->sortable_addname == "" ? "" : "(".$family->sortable_addname.")"))."</span>";
-										print $family->addxref;
+										print "<span class=\"ListItemXref\">".$family->addxref."</span>";
 										print "</a>\n";
 									print "</div>";
 									$lastgid=$family->xref;

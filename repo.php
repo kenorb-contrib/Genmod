@@ -4,7 +4,7 @@
  * Also shows how many sources reference this repository.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,7 +43,6 @@ $repository_controller->CheckPrivate();
 $repository_controller->CheckRawEdited();
 
 ?>
-<div id="show_changes"></div>
 <?php $repository_controller->PrintDetailJS(); ?>
 
 <div class="DetailHeaderSection">

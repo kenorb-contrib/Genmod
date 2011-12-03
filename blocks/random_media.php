@@ -5,7 +5,7 @@
  * This block will randomly choose media items and show them in a block
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ function print_random_media($block = true, $config="", $side, $index) {
 		print "<div id=\"random_picture\" class=\"BlockContainer\">\n";
 			print "<div class=\"BlockHeader\">";
 				PrintHelpLink("index_media_help", "qm", "random_picture");
-				print GM_LANG_random_picture;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_random_picture."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				$imgwidth = 300;

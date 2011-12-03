@@ -26,15 +26,15 @@
  * @version $Id$
  */
 
-.person_box {
+.PersonBox {
 	border: solid #9CA3D4 1px;
 	background: none;
 }
-.person_boxF {
+.PersonBoxF {
 	border: solid #9CA3D4 1px;
 	background: none;
 }
-.person_boxNN {
+.PersonBoxNN {
 	border: solid #9CA3D4 1px;
 	background: none;
 }
@@ -44,13 +44,6 @@
 	position: absolute;
 	top: 0px;
 	left: 0px;
-}
-/*-- pedigree chart rtl specific stylesheets --*/
-#pedigree_chart_rtl {
-	position: absolute;
-	float: right;
-	top: 0px;
-	right: 0px;
 }
 /*-- descendancy chart specific stylesheets --*/
 #descendancy_chart ul {
@@ -64,17 +57,13 @@
 	margin: 0px 0px 2px -16px; /* top right bottom left */
 	padding: 0px 0px 0px; /* top right bottom left */
 }
-/*-- descendancy chart rtl specific stylesheets --*/
-#descendancy_chart_rtl ul {
-	margin: 0px 15px 5px 0px; /* top right bottom left */
-	padding: 0px 15px 0px 0px; /* top right bottom left */
-	border-right: thin solid #9CA3D4;
-}
-#descendancy_chart_rtl li {
-	list-style: none;
-	margin: 0px -18px 2px 0px; /* top right bottom left */
-	padding: 0px 2px 0px 0px; /* top right bottom left */
-}
-
 #header, #footer {display:none !important;}
 form {display: none;}
+/*-- pseudo-class for fanchart : used on server-side to draw image --*/
+.fan_chart {
+	/*-- font-family must contain a server TTF file --*/
+	font-family: url(./fonts/LucidaSansRegular.ttf);
+	font-size: 7px;
+	color: #0045BF;
+	background-color : #EEEEEE;
+}

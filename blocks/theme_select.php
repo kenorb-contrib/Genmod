@@ -5,7 +5,7 @@
  * This block will print a form that allows the visitor to change the theme
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ function print_block_theme_select($style=0, $config="", $side, $index) {
 		print "<div id=\"theme_select\" class=\"BlockContainer\">\n";
 			print "<div class=\"BlockHeader\">";
 				PrintHelpLink("change_theme", "qm", "change_theme");
-				print GM_LANG_change_theme;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_change_theme."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				if (!isset($themeformcount)) $themeformcount = 0;

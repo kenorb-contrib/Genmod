@@ -5,7 +5,7 @@
  * This block will show the top 10 records from the Gedcom that have been viewed the most by bots
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 			print "<div id=\"top10\" class=\"BlockContainer\">\n";
 				print "<div class=\"BlockHeader\">";
 					PrintHelpLink("index_top10_pageviews_help", "qm");
-					print GM_LANG_top10_botviews;
+					print "<div class=\"BlockHeaderText\">".GM_LANG_top10_botviews."</div>";
 				print "</div>";
 				print "<div class=\"BlockContent\">\n";
 					print "<span class=\"Warning\">\n".GM_LANG_top10_pageviews_msg."</span>\n";
@@ -77,7 +77,7 @@ function top10_botviews($block=true, $config="", $side, $index) {
 					print "</a>";
 				}
 			}
-			print GM_LANG_top10_botviews;
+			print "<div class=\"BlockHeaderText\">".GM_LANG_top10_botviews."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">\n";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

@@ -5,7 +5,7 @@
  * This block allows users to have their own blog
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@ function print_user_news($block=true, $config="", $side, $index) {
 
 	print "<div id=\"user_news\" class=\"BlockContainer\">\n";
 		print "<div class=\"BlockHeader\">";
-			PrintHelpLink("mygedview_myjournal_help", "qm", "my_journal");
-			print GM_LANG_my_journal;
+			PrintHelpLink("mygenmod_myjournal_help", "qm", "my_journal");
+			print "<div class=\"BlockHeaderText\">".GM_LANG_my_journal."</div>";
 		print "</div>";
 		print "<div class=\"BlockContent\">";
 			if ($block) print "<div class=\"RestrictedBlockHeightRight\">\n";

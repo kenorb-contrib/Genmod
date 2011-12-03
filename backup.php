@@ -3,7 +3,7 @@
  * Backups and restores Genmod related info.
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,7 +134,7 @@ switch ($action) {
 			@set_time_limit($time_limit);
 			// print "Time limit set to ".$time_limit;
 			
-			if ($step == 2 && isset($um_media)) {
+			if ($step == 2 && isset($um_media) && SystemConfig::$MEDIA_IN_DB) {
 				if (isset($um_config)) print "<input type=\"hidden\" name=\"um_config\" value=\"".$um_config."\" />";
 				if (isset($um_lang)) print "<input type=\"hidden\" name=\"um_lang\" value=\"".$um_lang."\" />";
 				if (isset($um_gedcoms)) print "<input type=\"hidden\" name=\"um_gedcoms\" value=\"".$um_gedcoms."\" />";
@@ -211,8 +211,8 @@ switch ($action) {
 				if (isset($_POST["um_media"])) {
 					$mlist = GetMediaFiles(GedcomConfig::$GEDCOMID);
 					foreach ($mlist as $key => $mfile) {
-						$file = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
-						if (file_exists($file)) $flist[] = $file;
+						// While filling the medialist, it was already checked if the file exists. Just add it here
+						$flist[] = RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($mfile));
 					}
 				}
 				
@@ -514,7 +514,7 @@ function GetMediaFiles($gedid="") {
 	$sql .= "ORDER BY m_mfile ASC";
 	$res = NewQuery($sql);
 	while($row = $res->FetchRow()){
-		if (SystemConfig::$MEDIA_IN_DB || file_exists($row[0])) $mlist[] = $row[0];
+		if (SystemConfig::$MEDIA_IN_DB || file_exists(RelativePathFile(GedcomConfig::$MEDIA_DIRECTORY.MediaFS::CheckMediaDepth($row[0])))) $mlist[] = $row[0];
 	}
 	return array_flip(array_flip($mlist));
 }

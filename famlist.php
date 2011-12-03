@@ -3,7 +3,7 @@
  * Family List
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * The Family list shows all families from a chosen gedcom file. The list is
  * setup in two sections. The alphabet bar and the details.

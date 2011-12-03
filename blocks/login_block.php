@@ -5,7 +5,7 @@
  * This block prints a form that will allow a user to login
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 - 2008 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ function print_login_block($block = true, $config="", $side, $index) {
 			print "<div class=\"BlockHeader\">";
 				if (SystemConfig::$USE_REGISTRATION_MODULE) PrintHelpLink("index_login_register_help", "qm");
 				else PrintHelpLink("index_login_help", "qm", "login");
-				print GM_LANG_login;
+				print "<div class=\"BlockHeaderText\">".GM_LANG_login."</div>";
 			print "</div>";
 			print "<div class=\"BlockContent\">";
 				print "<form method=\"post\" action=\"$login\" name=\"loginform\" onsubmit=\"t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;\">\n";
