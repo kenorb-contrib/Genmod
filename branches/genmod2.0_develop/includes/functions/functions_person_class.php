@@ -234,7 +234,7 @@ abstract class PersonFunctions {
 					if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 					else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 					else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-					print "\" class=\"SexImage\" />";
+					print "\" class=\"GenderImage\" />";
 					if (GedcomConfig::$SHOW_ID_NUMBERS) {
 						print "</span><span class=\"PersonDetails$style\">";
 						print $person->addxref;
@@ -302,7 +302,7 @@ abstract class PersonFunctions {
 				if ($isF=="") print $GM_IMAGES["sex"]["small"]."\" title=\"".GM_LANG_male."\" alt=\"".GM_LANG_male;
 				else  if ($isF=="F")print $GM_IMAGES["sexf"]["small"]."\" title=\"".GM_LANG_female."\" alt=\"".GM_LANG_female;
 				else  print $GM_IMAGES["sexn"]["small"]."\" title=\"".GM_LANG_unknown."\" alt=\"".GM_LANG_unknown;
-				print "\" class=\"SexImage\" />";
+				print "\" class=\"GenderImage\" />";
 				print "</span>\r\n";
 				if (GedcomConfig::$SHOW_ID_NUMBERS) {
 					print "<span class=\"PersonDetails$style\">";

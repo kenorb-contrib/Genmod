@@ -966,6 +966,7 @@ if ($action == "massupdate") {
 		if (!isset($$str)) unset($userlist[$key]);
 	}
 	?>
+	<form name="massupdate" id="MassUpdateForm" method="post" action="useradmin.php">
 	<!-- Setup the left box -->
 	<div id="AdminColumnLeft">
 		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
@@ -991,7 +992,6 @@ if ($action == "massupdate") {
 		} ?>
 	</div>
 	<div id="AdminColumnMiddle">
-	<form name="massupdate" method="post" action="useradmin.php">
 	<input type="hidden" name="action" value="massupdate2" />
 	<input type="hidden" name="sort" value="<?php print $sort;?>" />
 	<input type="hidden" name="filter" value="<?php print $filter;?>" />
@@ -1397,8 +1397,8 @@ if ($action == "massupdate") {
 			</td></tr>
 		<?php } ?>
 	</table>
-	</form>
 	</div>
+	</form>
 	<?php
 }
 
@@ -1501,10 +1501,17 @@ if ($action == "massupdate2") {
 			else $newuser->sync_gedcom = "N";
 		}
 		if (UserController::DeleteUser($user->username, "changed")) {
-			if (UserController::AddUser($newuser, "changed")) $update = true;
-			else $update = false;
+			if (UserController::AddUser($newuser, "changed")) {
+				$update = true;
+			}
+			else {
+				$update = false;
+			}
 		}
-		else $update = false;
+		else {
+			$update = false;
+		}
+
 	}
 	if ($update) $message .= GM_LANG_update_users_selected_ok;
 	else $message .= GM_LANG_update_users_selected_nok;

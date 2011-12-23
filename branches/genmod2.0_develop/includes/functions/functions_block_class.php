@@ -373,7 +373,7 @@ abstract class BlockFunctions {
 						}
 						if ($CountSide == "right") {
 							print "<td class=\"Top10RightCounter\">";
-\							print "[".$count."]";
+							print "[".$count."]";
 							print "</td>";
 						}
 						print "</tr>";

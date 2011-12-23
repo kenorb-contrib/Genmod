@@ -65,6 +65,7 @@ function CompareFactsType($arec, $brec, $type) {
 				"NOTE",
 				"OBJE",
 				"REPO",
+				"RESN",
 				"CHAN",
 			));
 		}
@@ -82,6 +83,7 @@ function CompareFactsType($arec, $brec, $type) {
 				"_????_",
 				"NOTE",
 				"OBJE",
+				"RESN",
 				"CHAN",
 			));
 		}
@@ -97,6 +99,7 @@ function CompareFactsType($arec, $brec, $type) {
 				"_????_",
 				"NOTE",
 				"SOUR",
+				"RESN",
 				"CHAN",
 			));
 		}
@@ -156,6 +159,7 @@ function CompareFactsType($arec, $brec, $type) {
 				"SLGC", "BAPL", "CONL", "ENDL", "SLGS",
 				"AFN", "REFN", "_PRMN", "REF", "RIN",
 				"ADDR", "PHON", "EMAIL", "_EMAIL", "EMAL", "FAX", "WWW", "URL", "_URL",
+				"RESN",
 				"CHAN", "_TODO"
 			));
 		}

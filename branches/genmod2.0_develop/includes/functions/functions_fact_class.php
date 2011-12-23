@@ -1027,8 +1027,8 @@ abstract class FactFunctions {
 						if (!$asso->view) {
 							$family =& Family::GetInstance($pid);
 							if (!$family->isempty) {
-								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_husband . "\" alt=\"" . GM_LANG_husband . "\" class=\"SexImage\" />]</a></span>";
-								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_wife . "\" alt=\"" . GM_LANG_wife . "\" class=\"SexImage\" />]</a></span>";
+								if ($family->husb_id != "" && $family->husb_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->husb_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_husband . "\" alt=\"" . GM_LANG_husband . "\" class=\"GenderImage\" />]</a></span>";
+								if ($family->wife_id != "" && $family->wife_id != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$family->wife_id."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_wife . "\" alt=\"" . GM_LANG_wife . "\" class=\"GenderImage\" />]</a></span>";
 							}
 							else if ($pid != $asso->xref) print " - <span class=\"FactAssoLink\"><a href=\"relationship.php?pid1=".$pid."&amp;pid2=".$asso->xref."&amp;followspouse=1&amp;gedid=".$asso->gedcomid."\">[" . GM_LANG_relationship_chart . "]</a></span>";
 						}
