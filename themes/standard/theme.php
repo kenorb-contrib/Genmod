@@ -24,7 +24,7 @@
  * @version $Id$
  */
 
-$theme_name = "Clear";								//-- the name of this theme
+$theme_name = "Standard";														//-- the name of this theme
 
 define('GM_STYLESHEET', GedcomConfig::$THEME_DIR."style.css");					//-- CSS level 2 stylesheet to use
 define('GM_RTL_STYLESHEET', GedcomConfig::$THEME_DIR."style_rtl.css");      	//-- CSS level 2 stylesheet to use

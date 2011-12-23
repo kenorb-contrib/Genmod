@@ -1696,12 +1696,12 @@ class Person extends GedcomRecord {
 				// father
 				if (is_object($childfam->husb)) {
 					$age = ConvertNumber($childfam->husb->GetAge($date, false));
-					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"SexImage\" />".$age;
+					if (10<$age && $age<80) $father_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sex"]["small"] . "\" title=\"" . GM_LANG_father . "\" alt=\"" . GM_LANG_father . "\" class=\"GenderImage\" />".$age;
 				}
 				// mother
 				if (is_object($childfam->wife)) {
 					$age = ConvertNumber($childfam->wife->GetAge($date, false));
-					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"SexImage\" />".$age;
+					if (10 < $age && $age < 80) $mother_text = "<img src=\"".GM_IMAGE_DIR."/" . $GM_IMAGES["sexf"]["small"] . "\" title=\"" . GM_LANG_mother . "\" alt=\"" . GM_LANG_mother . "\" class=\"GenderImage\" />".$age;
 				}
 				if ((!empty($father_text)) || (!empty($mother_text))) print "<span class=\"FactAge\">".$father_text.$mother_text."</span>";
 			}

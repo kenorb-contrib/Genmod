@@ -140,11 +140,11 @@ abstract class DetailController extends BaseController{
 				// empty tabs
 				for (i=0; i<tabid.length; i++) {
 					var elt = document.getElementById('door'+i);
+					elt.className = '';
 					if (document.getElementById('no_tab'+i)) { // empty ? then show it only to users who have edit rights
 						if (<?php if ($gm_user->userCanEdit()) echo 'true'; else echo 'false';?>) {
 							elt.style.display='block';
-							elt.style.opacity='0.4';
-							elt.style.filter='alpha(opacity=40)';
+							elt.className='TabDoorEmpty';
 						}
 						else elt.style.display='none'; // empty and not editable ==> hide
 					}
@@ -152,9 +152,9 @@ abstract class DetailController extends BaseController{
 				}
 				// current door
 				for (i=0; i<tabid.length; i++) {
-					document.getElementById('door'+i).className='shade1 FactRela';
+					if (i != n) document.getElementById('door'+i).className+=' TabDoorUnselected';
+					else document.getElementById('door'+i).className+=' TabDoorSelected';
 				}
-				document.getElementById('door'+n).className='shade1';
 				return false;
 			}
 		}
@@ -571,7 +571,7 @@ abstract class DetailController extends BaseController{
 						}
 					}
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\">".GM_LANG_no_tab5."</div>\n";
+				else print "<div id=\"no_tab".$index."\">".GM_LANG_no_tab5."</div>\n";
 				print "</div>";
 			}
 			if ($tab == "sources") {
@@ -579,7 +579,7 @@ abstract class DetailController extends BaseController{
 				print "<div id=\"sources\" class=\"TabPage\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->sourfacts_count <= 0) {
-					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					print "<div id=\"no_tab".$index."\"></div>\n";
 					$table = false;
 				}
 				else {
@@ -612,7 +612,7 @@ abstract class DetailController extends BaseController{
 				print "<div id=\"media\" class=\"TabPage\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->mediafacts_count <= 0) {
-					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					print "<div id=\"no_tab".$index."\"></div>\n";
 					$table = false;
 				}
 				else {
@@ -645,7 +645,7 @@ abstract class DetailController extends BaseController{
 				print "<div id=\"notes\" class=\"TabPage\" style=\"display:none;\" >";
 				
 				if ($this->$object_name->notefacts_count <= 0) {
-					print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					print "<div id=\"no_tab".$index."\"></div>\n";
 					$table = false;
 				}
 				else {
@@ -689,14 +689,14 @@ abstract class DetailController extends BaseController{
 							$action->PrintThis();
 						}
 					}
-					else print "<tr><td id=\"no_tab".$index."\" class=\"shade1\"></td></tr>\n";
+					else print "<tr><td id=\"no_tab".$index."\"></td></tr>\n";
 					//-- New action Link
 					if (!$this->isPrintPreview() && $this->$object_name->canedit && !$this->$object_name->isdeleted) { 
 						ActionController::PrintAddLink($this->tabtype);
 					}
 					print "</table></form>";
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				else print "<div id=\"no_tab".$index."\"></div>\n";
 				print "</div>";
 			}
 			if ($tab == "relations") {
@@ -776,9 +776,9 @@ abstract class DetailController extends BaseController{
 						print "<div id=\"esearchresults\">";
 						print "</div>";
 					}
-					else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+					else print "<div id=\"no_tab".$index."\"></div>\n";
 				}
-				else print "<div id=\"no_tab".$index."\" class=\"shade1\"></div>\n";
+				else print "<div id=\"no_tab".$index."\"></div>\n";
 				print "</div>";
 			}
 		}	

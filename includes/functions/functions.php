@@ -1180,60 +1180,6 @@ function SumNums($val1, $val2) {
 	return $val1 + $val2;
 }
 
-/**
- * look for and run any hook files found
- *
- * @param string $type		the type of hook requested (login|logout|adduser|updateuser|deleteuser)
- * @param array  $params	array of parameters
- * @return bool				returns true
- */
-function RunHooks($type, $params=array ())
-{
-	// look for core hooks
-	if (file_exists("hooks/{$type}/"))
-	{
-		$dirs = array ("hooks/{$type}/");
-	}
-	else
-	{
-		$dirs = array ();
-	}
-	// look for module hooks
-	$d = dir('modules/');
-	while (false !== ($f = $d->read()))
-	{
-		if ($f === '.' || $f === '..')
-		{
-			continue;
-		}
-		if (file_exists("modules/{$f}/hooks/{$type}"))
-		{
-			$dirs[] = "modules/{$f}/hooks/{$type}/";
-		}
-	}
-	$d->close();
-	// run all found hooks
-	foreach ($dirs as $directory)
-	{
-		$d = @dir($directory);
-		if (is_object($d))
-		{
-			while (false !== ($f = $d->read()))
-			{
-				if (stristr($f, '.php'))
-				{
-					include_once "{$directory}/{$f}";
-					$cl = substr($f, 0, -4);
-					$obj = new $cl();
-					$obj->hook($params);
-				}
-			}
-			$d->close();
-		}
-	}
-	return true;
-}
-
 function GetFileSize($bytes) {
    if ($bytes >= 1099511627776) {
        $return = round($bytes / 1024 / 1024 / 1024 / 1024, 2);

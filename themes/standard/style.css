@@ -2002,6 +2002,9 @@ DIV.ActionListOptionContainer SPAN {
 #UserListing {
      margin-right: 0px;
 }
+#MassUpdateForm {
+	display: inline;
+}
 /* ============================= GMinfo page =========================== */
 .GMInfoTable {
 	width: 100%;
