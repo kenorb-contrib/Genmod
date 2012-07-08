@@ -1064,7 +1064,7 @@ abstract class NameFunctions {
 		while ($pos2 < strlen($name)) {
 			$char = substr($name, $pos1, $pos2 - $pos1 + 1);
 			if (self::HasChinese($char, $import)) {
-				$pyname .= $pinyin[$char];
+				$pyname .= (isset($pinyin[$char]) ? $pinyin[$char] : $char);
 				$pos1 = $pos1 + 3;
 				$pos2 = $pos2 + 3;
 			}

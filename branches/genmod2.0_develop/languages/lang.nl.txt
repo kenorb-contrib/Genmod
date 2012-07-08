@@ -2242,7 +2242,7 @@
 "todo";"Actiepunt"
 "tools_readme";"Zie ook de "tools-section" van het #README.TXT# bestand voor meer informatie."
 "top";"Boven"
-"top10_botviews";"Meest door robots bezochte gegevens"
+"top10_botviews";"Meest door robots bezocht"
 "top10_botviews_descr";"Dit blok toont de gegevens die het meest door zoekrobots zijn bezocht. Hiervoor moet de bezoekteller in de GEDCOM-configuratie zijn aangezet."
 "top10_pageviews";"Meest bekeken gegevens"
 "top10_pageviews_block";"Meest bekeken gegevens"
