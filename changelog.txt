@@ -9,6 +9,8 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Increased default memory limit to 64M (sjouke)
+- Fixed error in PinYin translation if character doesn't exist (sjouke)
 - Fixed confighelp page, print english text if other is absent (sjouke)
 - Fixed backup doesn't include media files in filemode (Sjouke)
 - Fixed religious marriage asso fact (sjouke)

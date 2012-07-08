@@ -65,7 +65,7 @@ abstract class SystemConfig {
 	public static $MAX_VIEW_LOGLEVEL				= 0;		//-- 0 no logging, 1 exceeding treshold, 2 # views when MAX_VIEW_TIME has passed 
 																//-- and reset
 	public static $EXCLUDE_HOSTS					= "";		//-- List of hosts and IP's to exclude from session-IP check
-	public static $GM_MEMORY_LIMIT					= "32M";	//-- the maximum amount of memory that GM should be allowed to consume
+	public static $GM_MEMORY_LIMIT					= "64M";	//-- the maximum amount of memory that GM should be allowed to consume
 	public static $ALLOW_REMEMBER_ME				= true;		//-- whether the users have the option of being remembered on the current computer
 	public static $CONFIG_VERSION					= "1.0";	//-- the version this config file goes to
 	public static $NEWS_TYPE						= "Normal";	//-- Type of news to be retrieved from the Genmod website
