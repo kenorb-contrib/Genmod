@@ -601,10 +601,10 @@ abstract class ChangeFunctions {
 	}
 	
 	
-	public function RetrieveChangedFact($gid, $fact, $oldfactrec) {
+	public function RetrieveChangedFact($gid, $fact, $oldfactrec, $override=false) {
 		global $show_changes, $gm_user;
 		
-		if ($show_changes && $gm_user->UserCanEditOwn($gid) && self::GetChangeData(true, $gid, true)) {
+		if (($show_changes && $gm_user->UserCanEditOwn($gid) && self::GetChangeData(true, $gid, true)) || $override) {
 			$sql = "SELECT ch_cid, ch_id, ch_old, ch_new, ch_type FROM ".TBLPREFIX."changes where ch_gid = '".$gid."' AND ch_fact = '".$fact."' AND ch_file = '".GedcomConfig::$GEDCOMID."' ORDER BY ch_id ASC";
 			$res = NewQuery($sql);
 			$factrec = $oldfactrec;
@@ -615,6 +615,7 @@ abstract class ChangeFunctions {
 				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["new"] = $row["ch_new"];
 				$cidchanges[$row["ch_cid"]][$row["ch_id"]]["type"] = $row["ch_type"];
 			}
+			$break = false;
 			if (count($cidchanges) > 0) {
 				foreach ($cidchanges as $group => $changes) {
 					$reorder = false;
@@ -623,11 +624,15 @@ abstract class ChangeFunctions {
 							// Do not apply a second reorder
 							if (!($reorder && substr($change["type"], 0, 8) == "reorder_")) $factrec = trim($change["new"]);
 							if (substr($change["type"], 0, 8) == "reorder_") $reorder = true;
+							// if the fact is deleted, the fact rec is empty. Because a later add will start with an empty old value, we must stop here.
+							if ($change["type"] == "delete_fact" && empty($factrec)) $break = true;
 						}
+						if ($break) break;
 					}
+				if ($break) break;
 				}
-				return $factrec;
 			}
+			return trim($factrec);
 		}
 		return false;
 	}

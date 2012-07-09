@@ -912,7 +912,7 @@ abstract class FactFunctions {
 			$edit_actions = array("edit_fact", "edit_fact", "copy_fact", "delete_fact");
 			print "</span>";
 		}
-		if ($factobj->canedit && $factobj->style!="ChangeOld" && !$factobj->owner->view && $mayedit) {
+		if ($factobj->canedit && $factobj->style!="ChangeOld" && !$factobj->isdeleted && !$factobj->owner->view && $mayedit) {
 			$menu = array();
 			$menu["label"] = GM_LANG_edit;
 			$menu["labelpos"] = "right";

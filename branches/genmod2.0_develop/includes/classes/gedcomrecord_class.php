@@ -491,6 +491,9 @@ abstract class GedcomRecord {
 				}
 				if (!empty($fact) && (!is_array($selection) || in_array($fact, $selection))&& $typeshow && !PrivacyFunctions::FactViewRestricted($this->xref, $subrecord, 2)) {
 					$factobj = new Fact($this->xref, $this->datatype, $this->gedcomid, $fact, $subrecord, $count[$fact], "");
+					if ($factobj->isdeleted) {
+						$count[$fact]--;
+					}
 					$dispobj = $factobj->show;
 					if (!empty($gid) && $dispobj) {
 						$object =& ConstructObject($gid, $fact, $this->gedcomid, "");
