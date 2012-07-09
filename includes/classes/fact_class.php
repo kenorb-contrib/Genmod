@@ -58,6 +58,7 @@ class Fact {
 	private $style = null;			// Style to print this fact with
 	private $descr = null;			// Fact description
 	private $rela = null;			// If this is a relafact, the person's ID for which the fact is displayed.
+	private $isdeleted = null;		// If the fact is deleted (skipped for further editing)
 		
 	public function __construct($parent, $parent_type, $gedcomid, $fact, $factrec, $count=1, $style = "", $rela = "") {
 		
@@ -137,6 +138,9 @@ class Fact {
 				break;
 			case "descr":
 				return $this->getFactDescription();
+				break;
+			case "isdeleted":
+				return $this->isDeleted();
 				break;
 			default:
 				PrintGetSetError($property, get_class($this), "get");
@@ -551,6 +555,17 @@ class Fact {
 			return $printed;
 		}
 		else return $prtstr;
+	}
+	private function isDeleted() {
+		
+		if (is_null($this->isdeleted)) {
+			$changedrec = ChangeFunctions::RetrieveChangedFact($this->owner, $this->fact, $this->factrec, true);
+			if (empty($changedrec)) {
+				$this->isdeleted = true;
+			}
+			else $this->isdeleted = false;
+		}
+		return $this->isdeleted;
 	}
 }
 ?>
