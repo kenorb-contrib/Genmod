@@ -181,7 +181,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	 	  if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
 	 	  if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
 	 	  if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
-		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.genmod.net\" />\n";
+		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.sourceforge.net/projects/genmod\" />\n";
 		 GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
 		 GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
 		 GedcomConfig::$META_COPYRIGHT = $old_META_COPYRIGHT;
@@ -350,7 +350,7 @@ function PrintSimpleHeader($title) {
 	if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
 	if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
 	if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
-	print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.Genmod.net\" />\n";
+	print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.sourceforge.net/projects/genmod\" />\n";
 	GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
 	GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
 	GedcomConfig::$META_COPYRIGHT = $old_META_COPYRIGHT;
@@ -466,7 +466,7 @@ function PrintSimpleFooter() {
 		PrintContactLinks();
 		print "<div class=\"FooterExecutionStats\">";
 			if (GedcomConfig::$SHOW_STATS) PrintExecutionStats();
-			print "<br />Running <a href=\"http://www.genmod.net/\" target=\"_blank\">Genmod";
+			print "<br />Running <a href=\"http://www.sourceforge.net/projects/genmod/\" target=\"_blank\">Genmod";
 			if (count($CONFIG_PARMS) >1) print " Enterprise";
 			print MediaFS::GetStorageType();
 			print "</a> - Version ".GM_VERSION." ".GM_VERSION_RELEASE;

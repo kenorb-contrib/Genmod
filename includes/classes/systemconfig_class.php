@@ -69,6 +69,7 @@ abstract class SystemConfig {
 	public static $ALLOW_REMEMBER_ME				= true;		//-- whether the users have the option of being remembered on the current computer
 	public static $CONFIG_VERSION					= "1.0";	//-- the version this config file goes to
 	public static $NEWS_TYPE						= "Normal";	//-- Type of news to be retrieved from the Genmod website
+	public static $GM_NEWS_SERVER					= "";		//-- Server URL to get Genmod news from
 	public static $PROXY_ADDRESS					= "";		//-- Allows obtaining GM-News and GEDCOM checking when the server is behind a proxy.	
 																//-- Type either IP address or name (e.g. mywwwproxy.net)
 	public static $PROXY_PORT						= "";		//-- Proxy port to be used

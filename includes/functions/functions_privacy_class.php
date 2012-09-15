@@ -2,7 +2,6 @@
 /**
  * Privacy Functions
  *
- * See http://www.Genmod.net/privacy.php for more information on privacy in Genmod
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2008 Genmod Development Team
