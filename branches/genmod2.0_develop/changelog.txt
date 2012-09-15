@@ -3,12 +3,13 @@
 	Genmod
 
 	This and other information can be found online at
-	http://www.genmod.net/
+	http://www.sourceforge.net/projects/genmod
 
 	# $Id$
 =====================================================================
 
 Version 2.0 beta 2
+- Added news server as config parameter (sjouke)
 - Fixed Edit fact wrong fact if same earlier fact is deleted (sjouke)
 - Increased default memory limit to 64M (sjouke)
 - Fixed error in PinYin translation if character doesn't exist (sjouke)

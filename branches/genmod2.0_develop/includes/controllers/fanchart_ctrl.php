@@ -476,7 +476,7 @@ class FanchartController extends ChartController {
 		print "\r\n".$imagemap;
 	
 		// GM banner ;-)
-		ImageStringUp($image, 1, $fanw-10, $fanh/3, "www.genmod.net", $color);
+		ImageStringUp($image, 1, $fanw-10, $fanh/3, "www.sourceforge.net/projects/genmod", $color);
 	
 		// here we cannot send image to browser ('header already sent')
 		// and we dont want to use a tmp file

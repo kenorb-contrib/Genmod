@@ -98,7 +98,7 @@ for more information.
 For GEDCOMs larger than 2MB, you will likely need to research different
 hosting options and find one that will accept a request to modify the
 default memory and time limits built into PHP.  See the FAQ at
-http://www.genmod.net/faq.php for more information about large GEDCOMs.
+http://www.sourceforge.net/projects/genmod for more information about large GEDCOMs.
 
 -------------------------------------------------------
 PHP SETTINGS
@@ -504,7 +504,7 @@ files.
 Discussion and questions about the multiple language features of Genmod
 including translations, should be posted in the Translations forum 
 available from the Genmod project page here:
-http://www.genmod.net/forum/viewforum.php?f=4
+http://www.sourceforge.net/projects/genmod
 
 To translate Genmod into another language that is not currently 
 supported you must first login to Genmod as an administrator and go to 
@@ -549,7 +549,7 @@ SourceForge project site at http://www.sourceforge.net/projects/Genmod
 NON-STANDARD GEDCOM CODES
 
 The GEDCOM 5.5 standard has a defined set of codes.  You can read the
-specification online at http://www.Genmod.net/ged551-5.pdf  Part of the
+specification online at http://www.sourceforge.net/projects/genmod  Part of the
 standard allows for genealogy software to define their own codes, and 
 requests that they begin with an "_" underscore.  
 

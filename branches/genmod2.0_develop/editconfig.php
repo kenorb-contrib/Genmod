@@ -103,6 +103,7 @@ if ($action == "update") {
 	$CONFIG["PROXY_PORT"] = $_POST["NEW_PROXY_PORT"];
 	$CONFIG["PROXY_USER"] = $_POST["NEW_PROXY_USER"];
 	$CONFIG["PROXY_PASSWORD"] = $_POST["NEW_PROXY_PASSWORD"];
+	$CONFIG["GM_NEWS_SERVER"] = $_POST["NEW_GM_NEWS_SERVER"];
 	$CONFIG["LOCKOUT_TIME"] = $_POST["NEW_LOCKOUT_TIME"];
 	$CONFIG["VISITOR_LANG"] = $_POST["NEW_VISITOR_LANG"];
 	$CONFIG["DEFAULT_PAGE_SIZE"] = $_POST["NEW_DEFAULT_PAGE_SIZE"];
@@ -447,6 +448,19 @@ PrintHeader(GM_LANG_configure_head);
 					<option value="yes" <?php if (SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
 					<option value="no" <?php if (!SystemConfig::$ALLOW_USER_THEMES) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
 				</select>
+			</td>
+		</tr>
+		<tr>
+			<td class="NavBlockLabel">
+				<div class="HelpIconContainer">
+					<?php PrintHelpLink("GM_NEWS_SERVER_help", "qm", "GM_NEWS_SERVER");?>
+				</div>
+				<div class="AdminNavBlockOptionText">
+					<?php print GM_LANG_GM_NEWS_SERVER; ?>
+				</div>
+			</td>
+			<td class="NavBlockField">
+				<input type="text" name="NEW_GM_NEWS_SERVER" value="<?php print SystemConfig::$GM_NEWS_SERVER;?>" dir="ltr" tabindex="<?php $i++; print $i?>" size="40" />
 			</td>
 		</tr>
 		<tr>

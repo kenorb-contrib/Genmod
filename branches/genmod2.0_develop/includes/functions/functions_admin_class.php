@@ -828,6 +828,9 @@ abstract class AdminFunctions {
 	
 		// -- If the news is already retrieved, get it from the session data.
 		if(isset($_SESSION["gmnews"])) return $_SESSION["gmnews"];
+		
+		// -- If no news server is specified, return nothing
+		if (SystemConfig::$GM_NEWS_SERVER == "") return array();
 	
 		// -- Retrieve the news from the website
 		$gmnews = array();
@@ -837,7 +840,7 @@ abstract class AdminFunctions {
 			else $ip = SystemConfig::$PROXY_ADDRESS;
 			$handle = @fsockopen($ip, SystemConfig::$PROXY_PORT);
 			if ($handle!=false) {
-				$com = "GET http://www.genmod.net/gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: ".SystemConfig::$PROXY_ADDRESS.":".SystemConfig::$PROXY_PORT."\r\n";
+				$com = "GET ".SystemConfig::$GM_NEWS_SERVER."gmnews.txt HTTP/1.1\r\nAccept: */*\r\nAccept-Language: de-ch\r\nAccept-Encoding: gzip, deflate\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)\r\nHost: ".SystemConfig::$PROXY_ADDRESS.":".SystemConfig::$PROXY_PORT."\r\n";
 				if (SystemConfig::$PROXY_USER != "") $com .= "Proxy-Authorization: Basic ".base64_encode(SystemConfig::$PROXY_USER.":".SystemConfig::$PROXY_PASSWORD) . "\r\n";
 				$com .= "Connection: Keep-Alive\r\n\r\n";
 				fputs($handle, $com);
@@ -849,7 +852,7 @@ abstract class AdminFunctions {
 		else {
 			@ini_set('user_agent','MSIE 4\.0b2;'); // force a HTTP/1.0 request
 			@ini_set('default_socket_timeout', '5'); // timeout
-			$handle = @fopen("http://www.genmod.net/gmnews.txt", "r");
+			$handle = @fopen(SystemConfig::$GM_NEWS_SERVER."gmnews.txt", "r");
 			if ($handle!=false) {
 				$txt = fread($handle, 65535);
 				fclose($handle);
@@ -880,7 +883,7 @@ abstract class AdminFunctions {
 			$item["date"] = "";
 			$item["type"] = "Urgent";
 			$item["header"] = "Warning: News cannot be retrieved";
-			$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"http://www.genmod.net\">Genmod Help forum</a>";
+			$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"http://www.sourceforge.net/projects/genmod\">Genmod Help forum</a>";
 			$gmnews[] = $item;
 		}
 		// -- Store the news in the session data

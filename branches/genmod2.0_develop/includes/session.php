@@ -55,7 +55,7 @@ $worms = array (
 );
 
 foreach( $worms as $worm ) {
-	if (eregi($worm, $ua)) {
+	if (preg_match("/".$worm."/", $ua)) {
 		print "Worms are not allowed here!";
 		exit;
 	}
@@ -92,7 +92,7 @@ $bots = array(
 );
 $spider = false;
 foreach($bots as $bot) {
-	if (eregi($bot, $ua)) {
+	if (preg_match("/".$bot."/", $ua)) {
 		$spider = $ua;
 		if ($bot == 'Googlebot') {
 			$host = $_SERVER['REMOTE_ADDR'];
@@ -114,7 +114,7 @@ $bots_not_allowed = array(
 );
 if ($spider) {
 	foreach ($bots_not_allowed as $place) {
-		if (eregi($place, $_SERVER['SCRIPT_NAME'])) {
+		if (preg_match("/".$place."/", $_SERVER['SCRIPT_NAME'])) {
 			header("HTTP/1.0 403 Forbidden");
 			print "Sorry, this page is not available for bots";
 			exit;
@@ -141,7 +141,7 @@ if (defined("MB_CASE_TITLE")) {
 }
 else define("MB_FUNCTIONS", false);
 
-set_magic_quotes_runtime(0);
+if (version_compare(phpversion(), "5.3") < 0) set_magic_quotes_runtime(0);
 
 
 if (!empty($_SERVER["SCRIPT_NAME"])) define("SCRIPT_NAME", $_SERVER["SCRIPT_NAME"]);
@@ -256,6 +256,7 @@ $CONFIG_VARS[] = "GM_MEMORY_LIMIT";
 $CONFIG_VARS[] = "ALLOW_REMEMBER_ME";
 $CONFIG_VARS[] = "CONFIG_VERSION";
 $CONFIG_VARS[] = "NEWS_TYPE";
+$CONFIG_VARS[] = "GM_NEWS_SERVER";
 $CONFIG_VARS[] = "PROXY_ADDRESS";
 $CONFIG_VARS[] = "PROXY_PORT";
 $CONFIG_VARS[] = "PROXY_USER";

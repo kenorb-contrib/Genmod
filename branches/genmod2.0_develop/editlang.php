@@ -544,7 +544,7 @@ switch ($el_controller->action) {
 		$menu->AddItem("help_changelanguage.php", "qm", "enable_disable_lang", "changelanguage.php", GM_LANG_enable_disable_lang, "left");
 		$menu->AddItem("edit_lang_utility_help", "qm", "edit_lang_utility", "editlang.php?action=edit", GM_LANG_edit_lang_utility, "right");
 		$menu->AddItem("export_lang_utility_help", "qm", "export_lang_utility", "editlang.php?action=export", GM_LANG_export_lang_utility, "left");
-		$menu->AddItem("translation_forum_desc", "qm", "translation_forum", "http://www.genmod.net/index.php?option=com_kunena&amp;Itemid=2&amp;func=showcat&amp;catid=4\" target=\"_blank", GM_LANG_translation_forum, "right");
+		$menu->AddItem("translation_forum_desc", "qm", "translation_forum", "http://www.sourceforge.net/projects/genmod" target=\"_blank", GM_LANG_translation_forum, "right");
 		$menu->AddItem("compare_lang_utility_help", "qm", "compare_lang_utility", "editlang.php?action=compare", GM_LANG_compare_lang_utility, "left");
 		$menu->AddItem("lang_debug_help", "qm", "lang_debug", "editlang.php?action=debug", GM_LANG_lang_debug, "right");
 		$menu->AddItem("bom_check_help", "qm", "bom_check", "editlang.php?action=bom", GM_LANG_bom_check, "left");

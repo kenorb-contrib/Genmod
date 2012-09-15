@@ -127,7 +127,7 @@ abstract class GedcomConfig {
 															// This is who the user should contact in case of errors
 	public static $SUPPORT_METHOD = "messaging2";			// The method to allow users to contact you. options are: mailto, messaging, messaging2
 	public static $BCC_WEBMASTER = false;					// Send a Bcc of system generated messages to the webmaster
-	public static $HOME_SITE_URL = "http://www.Genmod.net";	// Url for your home page
+	public static $HOME_SITE_URL = "http://www.sourceforge.net/projects/genmod";	// Url for your home page
 	public static $HOME_SITE_TEXT = "About Genmod";			// Name of your site
 	public static $FAVICON = "images/favicon.ico";			// Change to point to your favicon, either relative or absolute
 	public static $THEME_DIR = "themes/standard/";			// Directory where display theme files are kept
