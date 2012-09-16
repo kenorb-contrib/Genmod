@@ -12,6 +12,7 @@ Disallow: /login.php
 Disallow: /login_register.php
 Disallow: /mediadetail.php
 Disallow: /medialist.php
+Disallow: /message.php
 Disallow: /paternals.php
 Disallow: /pedigree.php
 Disallow: /placelist.php
