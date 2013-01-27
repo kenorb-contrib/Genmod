@@ -542,7 +542,7 @@ if (!empty($check_gedcoms)) {
 			$numcf = 0; // check for invalid tags
 			$numcn = 0; // check for note references
 			$rightfacts = array("CONT", "CONC");
-			$non_cits_facts = array("CHAN", "NOTE", "SOUR", "FAMS", "FAMC", "_UID", "OBJE", "NAME", "SEX", "CHIL", "HUSB", "WIFE", "ASSO");
+			$non_cits_facts = array("RESN", "CHAN", "NOTE", "SOUR", "FAMS", "FAMC", "_UID", "OBJE", "NAME", "SEX", "CHIL", "HUSB", "WIFE", "ASSO");
 			
 			// Check for reference to non existing sources for indi's
 			print "<tr><td class=\"NavBlockLabel AdminNavBlockLabel\">";
