@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed RESN should not be checked for source citation (sjouke)
 - Added news server as config parameter (sjouke)
 - Fixed Edit fact wrong fact if same earlier fact is deleted (sjouke)
 - Increased default memory limit to 64M (sjouke)
