@@ -219,7 +219,7 @@ class PaternalsController extends ChartController {
 	}
 	
 	private function PrintLongestLines() {
-		
+
 		foreach($this->rootfams as $key => $fam) {
 			$personsarray[] = $this->GetLine($fam);
 		}
@@ -231,7 +231,7 @@ class PaternalsController extends ChartController {
 			foreach($last as $key2 => $persons) {
 				// Here we have 1 or more arrays of ancestors. ID key2 is the last one per array
 				// We take the first one....
-				$cols[] = $persons;
+				$cols[$key] = $persons; // use $key: if the first array is empty, the 2nd will appear as first
 				break;
 			}
 		}
