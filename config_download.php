@@ -3,7 +3,7 @@
  * Download config files that could not be saved.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: config_download.php,v 1.2 2006/01/09 14:19:29 sjouke Exp $
+ * @version $Id: config_download.php 13 2016-04-27 09:26:01Z Boudewijn $
  * @package Genmod
  * @subpackage Admin
  */
@@ -29,13 +29,7 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the language files
-*/
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
-
-if ((adminUserExists()&&!userIsAdmin($gm_username))&&$CONFIGURED) {
+if ((UserController::AdminUserExists() && !$gm_user->userIsAdmin()) && CONFIGURED) {
 	header("Location: admin.php");
 	exit;
 }

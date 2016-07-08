@@ -1,4 +1,4 @@
-<!-- $Id: USA.txt,v 1.1 2005/10/23 22:08:16 roland-d Exp $ -->
+<!-- $Id: USA.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Alabama
 Alaska
 Arizona

@@ -1,4 +1,4 @@
-<!-- $Id: NOR_Buskerud.txt,v 1.1 2005/10/23 22:06:17 roland-d Exp $ -->
+<!-- $Id: NOR_Buskerud.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Drammen
 Flesberg
 Flå

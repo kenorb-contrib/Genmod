@@ -3,7 +3,7 @@
  * Allow an admin user to download the entire gedcom	file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,89 +21,131 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: downloadgedcom.php,v 1.8 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: downloadgedcom.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
-/**
- * Inclusion of the configuration file
-*/
 require "config.php";
 
-if ((!userGedcomAdmin($gm_username))||(empty($ged))) {
-	header("Location: editgedcoms.php");
-	exit;
-}
-if (!isset($action)) $action="";
-if (!isset($remove)) $remove="no";
-if (!isset($convert)) $convert="no";
-if (!isset($zip)) $zip="no";
-if (!isset($privatize_export)) $privatize_export = "";
+$dl_controller = new DownloadGedcomController();
 
-if ($action=="download" && $zip == "yes") {
-	require "includes/pclzip.lib.php";
-	require "includes/adodb-time.inc.php";
-	$zipname = "dl".adodb_date("YmdHis").".zip";
-	$zipfile = $INDEX_DIRECTORY.$zipname;
-	$gedname = $INDEX_DIRECTORY."DL_".$ged;
-	if (file_exists($gedname)) unlink($gedname);
-	print_gedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, $gedname);
-	$comment = "Created by Genmod ".$VERSION." ".$VERSION_RELEASE." on ".adodb_date("r").".";
-	$archive = new PclZip($zipfile);
-	$v_list = $archive->create($gedname, PCLZIP_OPT_COMMENT, $comment);
-	if ($v_list == 0) print "Error : ".$archive->errorInfo(true);
+if ($dl_controller->action == "download") {
+	if ($dl_controller->zip == "yes") {
+		$dl_controller->DownloadZip();
+	}
 	else {
-		unlink($gedname);
-		header("Location: downloadbackup.php?fname=$zipname");
+		header("Content-Type: text/plain; charset=".GedcomConfig::$CHARACTER_SET);
+		header("Content-Disposition: attachment; filename=DL_".get_gedcom_from_id($dl_controller->gedcomid));
+		AdminFunctions::PrintGedcom($dl_controller->gedcomid, $dl_controller->convert, $dl_controller->remove, $dl_controller->zip, $dl_controller->privatize_export, $dl_controller->privatize_export_level, "", $dl_controller->embedmm, $dl_controller->embednote, $dl_controller->addaction);
 		exit;
 	}
-	exit;
-}
-
-if ($action=="download") {
-	header("Content-Type: text/plain; charset=$CHARACTER_SET");
-	header("Content-Disposition: attachment; filename=$ged; size=".filesize($GEDCOMS[$GEDCOM]["path"]));
-	print_gedcom($ged, $convert, $remove, $zip, $privatize_export, $privatize_export_level, "");
 }
 else {
-	print_header($gm_lang["download_gedcom"]);
+	
+	PrintHeader($dl_controller->pagetitle);
 	?>
-	<div class="center">
-	<h2><?php print $gm_lang["download_gedcom"]; ?></h2>
-	<br />
-	<form name="convertform" method="post">
+	<!-- Setup the left box -->
+	<div id="AdminColumnLeft">
+		<?php AdminFunctions::AdminLink("admin.php", GM_LANG_admin); ?>
+		<?php AdminFunctions::AdminLink("editgedcoms.php", GM_LANG_manage_gedcoms); ?>
+	</div>
+	<!-- Setup the right box -->
+	<div id="AdminColumnRight">
+	</div>
+	<div id="AdminColumnMiddle">
+		<form name="genmodform" method="post" action="<?php print SCRIPT_NAME; ?>">
 		<input type="hidden" name="action" value="download" />
-		<table class="list_table" border="0" align="center" valign="top">
-		<tr><td colspan="2" class="facts_label03" style="text-align:center;">
-		<?php print $gm_lang["options"]; ?>
-		</td></tr>
-		<tr><td class="list_label" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><?php  print_help_link("utf8_ansi_help", "qm"); print $gm_lang["utf8_to_ansi"]; ?></td>
-			<td class="list_value" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><input type="checkbox" name="convert" value="yes" /></td></tr>
-		<tr><td class="list_label" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><?php print print_help_link("remove_tags_help", "qm"); print $gm_lang["remove_custom_tags"]; ?></td>
-			<td class="list_value" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><input type="checkbox" name="remove" value="yes" checked="checked" /></td></tr>
-		<tr><td class="list_label" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><?php print_help_link("download_zipped_help", "qm"); print $gm_lang["download_zipped"]; ?></td>
-			<td class="list_value" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><input type="checkbox" name="zip" value="yes" checked="checked" /></td></tr>
-		<tr><td class="list_label" valign="baseline" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; "><?php print_help_link("apply_privacy_help", "qm"); print $gm_lang["apply_privacy"]; ?>
-			<div id="privtext" style="display: none"></div>
-			</td>
-			<td class="list_value" style="padding: 5px; text-align:<?php if ($TEXT_DIRECTION == "ltr") print "left"; else print "right";?>; ">
-			<input type="checkbox" name="privatize_export" value="yes" onclick="expand_layer('privtext'); expand_layer('privradio');" />
-			<div id="privradio" style="display: none"><br /><?php print $gm_lang["choose_priv"]; ?><br />
-			<input type="radio" name="privatize_export_level" value="visitor" checked="checked" />
-			<?php print $gm_lang["visitor"]; ?><br />
-			<input type="radio" name="privatize_export_level" value="user" /><?php print $gm_lang["user"]; ?><br />
-			<input type="radio" name="privatize_export_level" value="gedadmin" /><?php print $gm_lang["gedadmin"]; ?><br />
-			<input type="radio" name="privatize_export_level" value="admin" /><?php print $gm_lang["siteadmin"]; ?><br />
-		</div></td>
-		</tr>
-		<tr><td class="facts_label03" colspan="2" style="padding: 5px; ">
-		<input type="submit" value="<?php print $gm_lang["download_now"]; ?>" />
-		<input type="button" value="<?php print $gm_lang["back"];?>" onclick="window.location='editgedcoms.php';"/></td></tr>
-		</table><br />
-	<br /><br />
-	</form>
+		<input type="hidden" name="gedid" value="<?php print $dl_controller->gedcomid; ?>" />
+		<table class="NavBlockTable AdminNavBlockTable">
+			<tr>
+				<td class="NavBlockHeader AdminNavBlockHeader" colspan="3">
+					<?php print "<span class=\"AdminNavBlockTitle\">".GM_LANG_download_gedcom."</span>"; ?>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockColumnHeader AdminNavBlockColumnHeader">
+					<?php print GM_LANG_options; ?>
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php  PrintHelpLink("utf8_ansi_help", "qm"); print "</div>".GM_LANG_utf8_to_ansi; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="convert" value="yes" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("remove_tags_help", "qm"); print "</div>".GM_LANG_remove_custom_tags; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="remove" value="yes" checked="checked" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("embedmm_help", "qm"); print "</div>".GM_LANG_embedmm; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="embedmm" value="yes" checked="checked" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("embednote_help", "qm"); print "</div>".GM_LANG_embednote; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="embednote" value="yes" checked="checked" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("add_action_help", "qm"); print "</div>".GM_LANG_add_action; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="addaction" value="yes" checked="checked" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("download_zipped_help", "qm"); print "</div>".GM_LANG_download_zipped; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<input type="checkbox" name="zip" value="yes" checked="checked" />
+				</td>
+			</tr>
+			<tr>
+				<td class="NavBlockLabel AdimNavBlockLabel"><div class="HelpIconContainer">
+					<?php PrintHelpLink("apply_privacy_help", "qm"); print "</div>".GM_LANG_apply_privacy; ?>
+				</td>
+				<td class="NavBlockField AdimNavBlockField NavBlockCheckRadio">
+					<div><input type="checkbox" name="privatize_export" value="yes" onclick="expand_layer('DownloadPrivacyLevel'); return true;" /></div>
+					<div id="DownloadPrivacyLevel" style="display: none">
+						<?php print GM_LANG_choose_priv; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="visitor" checked="checked" /><?php print GM_LANG_visitor; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="user" /><?php print GM_LANG_user; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="gedadmin" /><?php print GM_LANG_gedadmin; ?>
+						<br />
+						<input type="radio" name="privatize_export_level" value="siteadmin" /><?php print GM_LANG_siteadmin; ?>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockFooter">
+					<input type="submit" value="<?php print GM_LANG_download_now; ?>" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" class="NavBlockColumnHeader">
+					<?php print GM_LANG_download_note; ?>
+				</td>
+		</table>
+		</form>
+	</div>
 	<?php
-	print $gm_lang["download_note"]."<br /><br /><br />\n";
-	print "</div>";
-	print_footer();
+	PrintFooter();
 }
 ?>

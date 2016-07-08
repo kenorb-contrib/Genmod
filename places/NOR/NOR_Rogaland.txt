@@ -1,4 +1,4 @@
-<!-- $Id: NOR_Rogaland.txt,v 1.2 2005/12/27 12:17:19 eikland Exp $ -->
+<!-- $Id: NOR_Rogaland.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Bjerkreim
 Bokn
 Eigersund

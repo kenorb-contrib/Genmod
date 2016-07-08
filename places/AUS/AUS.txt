@@ -1,4 +1,4 @@
-﻿<!-- @version $Id: AUS.txt,v 1.1 2005/11/21 15:41:54 roland-d Exp $ -->
+﻿<!-- @version $Id: AUS.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 New South Wales
 Northern Territory
 Queensland

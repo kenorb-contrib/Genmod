@@ -1,11 +1,11 @@
-/**
- * Style for Standard theme
+/*
+ * Style for Clear theme
  *
  * Use this stylesheet to customize the display of your site.
  * To learn more about CSS visit http://www.w3.org/TR/REC-CSS2/
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,506 +23,2590 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: style.css,v 1.30 2006/05/28 13:00:03 roland-d Exp $
+ * @version $Id: style.css 25 2016-05-27 06:47:30Z Boudewijn $
  */
 
 .something {
 	/*empty style to make sure that the BODY style is not ignored */
 }
-#centermenu {
-	margin: 0px auto;
-}
-div.row {
-	clear: both;
-}
-  
-div.row span.label {
-*	clear: both;	/* applied * to hide from other browsers except IE */
-	float: left;
-	text-align: left;
-	background-color: #DFDFDF;
-	height: 1.8em;
-	padding: 0.2em 0em 0em 1em; /* top right bottom left */
+/* The body height must be 99%, to make a less than full page fit with the footer, without the vertical scroll bars.
+   IE is ok with 100% but for FF must be 99% */
+BODY {
+	height: 99%;
 }
 
-div.row span.rowempty {
-*	clear: both;	/* applied * to hide from other browsers except IE */
-	float: left;
-	width: 100%;
-	text-align: left;
-	background-color: #DFDFDF;
-}
-
-div.row span.rowdivide {
-	float: left;
-	width: 100%;
-	height: 0.2em;
-}
-/* A fix for IE since the above class doesn't work */
-.margindivider {
-	 margin-top: 0.2em;
-	 width: 100%;
-	 float: left;
-}
-
-div.row span.option {
-*	clear: both; /* applied * to hide from other browsers except IE */
-	float: right;
-	background-color: #F1F1F1;
-	height: 2em;
-	padding: 0em 0em 0em 0.2em; /* top right bottom left */
-}
-fieldset {
-	border: none;
-}
-fieldset .label{
-	background-color: #DFDFDF;
-	float: left;
-	clear: both;
-	display: block;
-	*height: 1.8em;
-	padding: 0.2em 0em 0em 0.5em; /* top right bottom left */
-	margin-top: 0.2em;
-}
-fieldset .option {
-	float: right;
-	background-color: #F1F1F1;
-	*height: 2em;
-	padding-left: 1em; /* top right bottom left */
-	clear: none;
-	margin-top: 0.2em;
-}
-fieldset .submit {
-	float: right;
-	*height: 2em;
-	padding-left: 1em; /* top right bottom left */
-	clear: none;
-	margin-top: 0.2em;
+IMG {
+	border: 0px;
 }
 HTML {
-	color: #0045BF;
+	color: #0E60EF;
 	background-color: #FFFFFF;
-	font-family: "Trebuchet MS", verdana, arial, helvetica, sans-serif;
-	font-size: 12px;
-	width: 98%;
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 11px;
+	width: 100%;
 	margin-right: auto;
 	margin-left: auto;
+	line-height: 150%;
+	height: 99%;
 }
 A {
 	color: #454B4F;
 	text-decoration: none;
 }
-A:hover	{
+A:hover {
 	color: #616A6F;
 	text-decoration: underline;
 }
 TH {
 	font-weight: 100;
 }
+TD {
+	vertical-align: top;
+	white-space: nowrap;
+	padding: 2px;
+}
 UL {
 	padding-left: 15px;
 	padding-right: 15px;
 	margin: 8px;
 }
-.button {
-	width: 60px
-}
-.gedcom_table {
-	border: 1px solid #000000;
-	margin: 0;
-	width: 99%;
- }
-.person_box {
-	background-color: #DFE5FF;
-	border: solid #000000 1px;
-}
-.person_boxF {
-	background-color: #FEEFFF;
-	border: solid #000000 1px;
-}
-.person_boxNN {
-	background-color: #FFFFFF;
-	border: solid #493424 1px;
-}
-.person_box:target, #gedcom_stats:target {
-	/* background-color: #FFFFCC;*/
-}
-.center {
-	text-align: center;
-	margin-left: auto;
-	margin-right: auto;
-}
-table.center {
-	margin-left: auto;
-	margin-right: auto;
-}
-.list_label {
-	text-align: center;
-	white-space: nowrap;
-}
-.list_label_wrap {
-	color: #DAD1C5;
-	background-color: #907D6B;
-	text-align: center;
-	white-space: normal;
-}
-.list_value {
-	background-color: #CFCFCF;
-	color: #0045BF;
-	border: solid #493424 1px;
-	vertical-align: top;
-	white-space: nowrap;
-	padding: 14px;
-}
-/*
-.list_value_wrap {
-	background-color: #CFCFCF;
-	color: #0045BF;
-	border: solid #493424 1px;
-	font-family: Arial, sans-serif;
-	font-size: 12px;
-	vertical-align: top;
-	white-space: normal;
-}
-*/
-.list_value_wrap_red {
-	background-color: #D6E0EA;
-	color: red;
-	border: solid #493424 1px;
-	vertical-align: top;
-	white-space: normal;
+/* Style form boxes */
+input {
+	/* background-color: #DFD8D1; */
+	/* background-color: #DFDFDF; */
 }
 
-.list_item {
-	font-size: 10px;
-	/* white-space: nowrap; */
+select {
+	/* background-color: #DFDFDF;*/
 }
-.facts_table {
-	width: 99%;
-}
-.facts_label {
-	font-size: 14px;
-	padding: 4px;
-}
-.facts_labelrela {
-	background-color: #8C93C4;
-}
-.facts_label02 {
-	color: #333333;
-	background-color: #C4C9E6;
-	font-size: 14px;
-	padding: 4px;
-	/* width: 20%; */
-	text-align: center;
-	font-weight: bold;
-}
-.facts_label03 {
-	color: #333333;
-	background-color: #9CA3D4;
-	font-size: 14px;
-	padding: 4px;
-	text-align: center;
-	font-weight: bold;
-}
-.facts_value {
-	background-color: #D6E0EA;
-	color: #0045BF;
-	border: solid #493424 1px;
-	font-size: 14px;
-	padding: 4px;
-}
-.facts_valuerela {
-	background-color: #C6D0DA;
-}
-.facts_value02 {
-	background-color: #F2F5F9;
-	color: #0045BF;
-	border: solid #493424 1px;
-	font-size: 14px;
-	padding: 4px;
-}
-.facts_labelred {
-	color: #333333;
-	background-color: #9CA3D4;
-	border: solid red 2px;
-	font-size: 14px;
-	padding: 4px;
-	width: 20%;
-	text-align: center;
-}
-.facts_valuered {
-	background-color: #D6E0EA;
-	color: #0045BF;
-	border: solid red 2px;
-	font-size: 14px;
-	padding: 4px;
-}
-.facts_labelblue {
-	color: #333333;
-	background-color: #9CA3D4;
-	border: solid blue 2px;
-	font-size: 14px;
-	padding: 4px;
-	width: 20%;
-	text-align: center;
-}
-.facts_valueblue {
-	background-color: #D6E0EA;
-	color: #0045BF;
-	border: solid blue 2px;
-	font-size: 14px;
-	padding: 4px;
-}
-.tabs_table {
-	width: 99%;
-}
-.tab_cell_active {
-	background-color: white;
-	border-left: outset #9CA3D4 2px;
-	border-top: outset #9CA3D4 2px;
-	border-right: outset #9CA3D4 2px;
-	text-align: center;
-	font-weight: bold;
-	font-size: 10pt;
-}
-.tab_cell_inactive {
-	background-color: #D6E0EA;
-	border-left: solid #9CA3D4 2px;
-	border-top: solid #9CA3D4 2px;
-	border-right: outset #9CA3D4 2px;
-	text-align: center;
-	font-weight: bold;
-	font-size: 10pt;
-}
-.tab_cell_inactive_empty {
-	background-color: #c6d0dA;
-	border-left: solid #9CA3D4 2px;
-	border-top: solid #9CA3D4 2px;
-	border-right: outset #9CA3D4 2px;
-	text-align: center;
-	font-weight: bold;
-	font-size: 10pt;
-}
-.tab_cell_inactive_empty A {
-	color: #999999;
-}
-.tab_active_bottom {
-	border-top: none;
-	border-bottom: none;
-	border-left: none;
-	border-right: none;
-	height: 5px;
-}
-.tab_inactive_bottom {
-	border-left: none;
-	border-right: none;
-	border-top: outset #9CA3D4 2px;
-	height: 5px;
-}
-.tab_inactive_bottom_right {
-	border-left: none;
-	border-right: none;
-	border-top: outset #9CA3D4 2px;
-	width: 33%;
-	height: 5px;
+textarea {
+	border: 1px solid #493424;
 }
 
-.name1 {
-	color: #333333;
-	font: bold 10px verdana, helvetica, arial, sans-serif;
+/* Container for all page content. Automatically added in Print(Simple)Header and PrintFooter. */
+/* Min-height is set to fill the page and make room for the footer at the bottom */
+#GenmodContainer {
+	position: relative;
+	min-height: 100%;
+	margin: 0px;
 }
-.namered {
-	border: solid red 1px;
+/* Text direction, RTL remainders */
+.ltr, .left {
+	text-align: left;
 }
-.nameblue {
-	border: solid blue 1px;
+.rtl, .right {
+	text-align: right;
 }
-.details1 {
-	font-size: 10px;
-	text-decoration: none;
-	padding: 0.5em;
+
+/* =============================== General styles ======================================= */
+.ClearBoth {
+	clear: both;
 }
-.name2 {
-	/* color: #333333; */
-	font-weight: bold;
-}
-.details2 {
-	text-decoration: none;
-}
-.nameZoom {
-	color: #333333;
-	font: bold 14px tahoma, verdana, arial, helvetica, sans-serif;
-}
-.detailsZoom {
-	font: 14px tahoma, verdana, arial, helvetica, sans-serif;
-	text-decoration: none;
-}
-.details_label {
-	font-weight: bold;
-}
-.name_head {
+/* Used as page title */
+.PageTitleName {
 	color: #000000;
 	font-weight: bold;
 	font-size: 16px;
 	letter-spacing: .2px;
+	line-height: 120%;
 }
-.date {
-	color: #333377;
+/* Style for the page counter on detail pages */
+.PageCounter {
+	margin-left: 2px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	font-weight: bold; 
+	font-size: 11px;
 }
-/*
-.label {
-	font: bold 11px tahoma, verdana, arial, helvetica, sans-serif;
+/* Subheaders on various pages */
+.SubHeader {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 15px;
+	vertical-align: bottom;
 }
-*/
-
-.error {
+/* Style for error messages */
+.Error {
 	color: #DD0000;
 	font-weight: bold;
 }
-.warning {
-	color: red;
+/* Style for warnings */
+.Warning {
+	color: orange;
 	font-weight: bold;
 }
-.indent {
-	padding-left: 7px;
+/* Small edit/delete links on various pages */
+.SmallEditLinks {
+	font-size: 9px;
 }
-.indent_rtl {
-	padding-right: 7px;
+/* Style for input of an ID */
+.PidInputField {
+	width: 45px;
 }
-.image {
-	padding: 5px;
-	border: solid #000000 1px;
+/* Container for the Close Window links */
+.CloseWindow {
+	width: 100%;
+	text-align: center;
+	margin-top: 20px;
 }
-.sex_image {
+/* Date style for non link dates */
+.Date {
+	color: #333377;
+}
+/* Style for the gender image */
+.GenderImage, .GenderImageLarge {
 	height: 9px;
 	width: 9px;
 	margin: 0px 3px;
 	border: none;
 	vertical-align: middle;
 }
-.pedigree_image_portrait {
-	float: left;
-	height: 60px;
-	border: solid black 1px;
-	margin-right: 3px;
+.GenderImageLarge {
+	height: 15px;
+	width: 15px;
 }
-.pedigree_image_portrait_rtl {
-	float: right;
-	height: 60px;
-	border: solid black 1px;
-	margin-left: 3px;
+
+/* Indent, usually for extra info for facts or indent of sub-choices */
+.Indent {
+	padding-left: 7px;
 }
-.pedigree_image_landscape {
-	float: left;
-	width: 60px;
-	border: solid black 1px;
-	margin-right: 3px;
+/* edit_lang_edit_settings, container for the flag */
+#Flag {
+	width: 15px;
+	display: inline; 
+	padding-left: 7px;
 }
-.pedigree_image_landscape_rtl {
-	float: right;
-	width: 60px;
-	border: solid black 1px;
-	margin-left: 3px;
+/* This one is for the flag on vaious admin pages */
+.BrightFlag {
+	margin-top: 2px;
+	margin-right: 10px;
+	height: 15px;
+	border: none;
+	opacity: 1;
 }
-.pedigree_form {
-	width: 45px;
+/* Class for some icons used in Genmod */
+.Icon {
 }
-.thumbnail {
+/* Style for all thumbnails in Genmod*/
+.Thumbnail {
 	height: auto;
 	padding: 3px;
 }
-.icon {
-	border: none;
+
+/* =============================== Header section ======================================= */
+/* Header container */
+#HeaderSection {
+	width: 99%;
 }
-.link {
-	font-size: 11px;
+/* Header logo (with and without home link to current gedcom */
+#HeaderLogoLink {
+	float: left;
+}
+#Headerlogo {
+	background-image: url(header.gif);
+	background-repeat: no-repeat;
+	float: left;
+}
+/* Container for Menu bar and gedcom link and quick search */
+#HeaderMenuContainer {
+}
+/* Menu bar */
+#HeaderMenuBar {
+    background-color: #F5F5F5;
+    line-height: 2em;
+	float: left;
+	padding-bottom: 4px;
+	padding-top: 4px;
+	padding-left: 5px;
+	margin-left: 5px;
+	border: 1px solid #9B9796;
+}
+/* Link to person/user and home page */
+#HeaderLinkBar {
+	float: right;
+    background-color: #F5F5F5;
+    width: 248px;
+    text-align: left;
+	border: 1px solid #9B9796;
+	padding: 2px;
+	margin-bottom: 2px;
+}
+/* Quick Search box. The height/margin also determines the spacing to the content block */
+#HeaderQuickSearch {
+	float: right;
+	height: 24px;
+    background-color: #F5F5F5;
+	border: 1px solid #9B9796;
+	margin-bottom: 8px;
+}
+/* Access keys */
+.HeaderAccessKeys {
+	width : 1px;
+	height: 1px;
+	overflow: auto;
+}
+/* ============================= Footer section =========================== */
+/* Style for the per theme specific footer. */
+#FooterSection {
+	clear: both;
+	color: #0045BF;
+	font-size: 10px;
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	min-height: 0px;
+}
+/* Dummy to create space for the footer section.  Padding-bottom is later reset by JS. */
+/* The space between content and footer is set HERE as padding-top. */
+#FooterSectionDummy {
+	clear: both;
+	padding-top: 10px;
+	padding-bottom: 75px;
+}
+
+/* Contact links in the footer */
+.FooterContactLinks {
 	text-align: center;
+	margin-bottom: 10px;
 }
-.sublinks_table {
-	border: solid #DE0039 1px;
-	/* background-color: #DBD3CA;*/
+/* Link to leave preview mode */
+.FooterPreviewLinkContainer {
+	text-align: center;
+	width: 95%;
 }
-.sublinks_cell {
-	font-size: 12px;
-	border: #DBD3CA solid 1px;
+/* Execution statistics in the footer*/
+.FooterExecutionStats {
+	text-align: center;
+	width: 95%;
 }
-.sublinks_table .icon {
-	width: 25px;
-	height: 25px;
+/* ============================= Admin section =========================== */
+
+/* Admin menu only, content of the left and right columns */
+.AdminGenmodContent {
+	background-color: #DFDFDF;
+	border: solid #9B9796 1px;
+	padding: 3px;
+	white-space: normal;
+	margin-top: 3px;
 }
-.menuitem .icon {
+/* Left column container on all admin menus */
+#AdminColumnLeft {
+     width: 180px; 
+     float: left;
+     margin-top: 5px;
+     margin-left: 10px;
+}
+/* Right column container on all admin menus */
+#AdminColumnRight {  
+     width: 180px; 
+     margin-right: 10px;
+     float: right;
+     margin-top: 5px;
+}
+/* Middle column container on all admin menus */
+/* Userlisting has the same style but is defined later as including the right column */
+#AdminColumnMiddle, #UserListing {
+     margin-left: 200px;
+     margin-right: 200px;
+     margin-top: 5px;
+}
+/* Navigation link blocks in the left column on admin menus */
+.AdminColumnLeftLink {
+	border: 1px solid #DE0036;
+	text-align: center;
+	margin-bottom: 5px;
+	color: #454B4F;
+	font-weight: bold;
+	padding: 5px;
+}
+
+/* =============================== List table styles ======================================= */
+
+/* Basic class for all list tables */
+.ListTable {
+	border-collapse: separate;
+	border-spacing: 1px;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Header row for the table */
+.ListTableHeader, .ListTableFooter {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+/* Header and footer cell for the columns */
+.ListTableColumnHeader, .ListTableColumnFooter {
+	background-color: #CBCBCB;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #9B9796;
+	padding: 4px;
+}
+/* Cells for the content */
+.ListTableContent {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding: 3px;
+	text-align: left;
+}
+/* Style for the whole list item string */
+.ListItem {
+	font-size: 10px;
+}
+/* Name of the object in all PrintList functions */
+.ListItemName {
+	font-weight: bold;
+}
+/* Xref of the object in all PrintList functions */
+.ListItemXref {
+}
+/* Major fact of the object in all PrintList functions */
+.ListItemMajorFact {
+	font-style: italic;
+}
+/* Additional fact of the object in person PrintList function */
+.ListItemAddFact {
+	font-style: italic;
+}
+/* Text for the associate of persons and families */
+.ListItemAssoText {
+}
+/* Associate name */
+.ListItemAssoName {
+	font-weight: bold;
+}
+/* Associate xref */
+.ListItemAssoXref {
+}
+/* Fact associated to */
+.ListItemAssoFact {
+	font-style: italic;
+}
+/* Role of the associate */
+.ListItemAssoRole {
+}
+/* ============================== Person box styles ==================================*/
+/* Outer box for the person box */
+.PersonBoxNN, .PersonBox, .PersonBoxF {
+	border: solid #9B9796 1px;
+	padding: 2px; 
+	overflow: hidden;
+}
+.PersonBoxNN {
+	background-color: #FFFFFF;
+}
+.PersonBox {
+	background-color: #DFE5FF;
+}
+.PersonBoxF {
+	background-color: #FEEFFF;
+}
+/* Style for the outer div in the person box. Only for large style. Above styles are set in the containing TD */
+.PersonBoxLarge {
+	padding: 2px;
+}
+/* Person picture container */
+.PersonBoxImagePortrait {
+	float: left;
+	height: 60px;
+	margin-right: 3px;
+}
+/* Person picture container */
+.PersonBoxImageLandscape {
+	float: left;
+	width: 60px;
+	margin-right: 3px;
+}
+/* Person picture. Container size minus the border */
+.PersonBoxImage {
+	max-height: 58px;
+	max-width: 58px;
+	margin: 0px;
+	border: solid #9B9796 1px;
+}
+/* Link box for charts, fam & indi links */
+.PersonBoxLinkBox {
+	white-space: normal;
+	width: 200px;
+	font-size: 10px;
+	text-decoration: none;
+	padding: 0.5em;
+	line-height: 130%;
+	position:absolute;
+	height:auto;
+	visibility:hidden;
+}
+/* Container for the chart links */
+.PersonBoxLinkBoxChartLinks {
+	font-weight: bold;
+}
+/* Container for the family links */
+.PersonBoxLinkBoxFamLinks {
+	margin-top: 0.8em;
+}
+/* Family links */
+.PersonBoxLinkBoxFamLinksFam {
+	font-weight: bold;
+	color: #000000;
+}
+/* Individual links */
+.PersonBoxLinkBoxFamLinksIndi {
+	font-style: italic;
+}
+/* Indent for the individual links */
+.PersonBoxLinkBoxIndent {
+	padding-left: 8px;
+}
+/* used in personbox for name, birth, death etc.*/
+.PersonBoxDetails {
+	float: left;
+	white-space: normal;
+	overflow: hidden;
+	margin-left: 3px;
+}
+/* Width of personbox if no details are shown (name only) */
+.PersonBoxDetailsNoDetails {
+	width: 100%;
+}
+/* Width of personbox on indipage without thumb */
+.PersonBoxDetailsNoThumb {
+	width: 95%;
+}
+/* Width of personbox on indipage with thumb */
+.PersonBoxDetailsThumb {
+	width: 90%;
+}
+/* Style for printing changed parents (not indipage)*/
+.PersonBoxContainerChanged {
+	background-color: #D6E0EA;
+	color: #0045BF;
+	border: solid blue 2px;
+	font-size: 14px;
+	padding: 4px;
+	vertical-align: middle;
+}
+/* Style for printing changed parents (not indipage)*/
+.PersonBoxContainerDeleted {
+	background-color: #D6E0EA;
+	color: #0045BF;
+	border: solid red 2px;
+	font-size: 14px;
+	padding: 4px;
+	vertical-align: middle;
+}
+/* Person name style if it contains rtl text */
+.PersonNameBold {
+	/* color: #333333; */
+	font-weight: bold;
+}
+/* Person name and details in small person boxes */
+.PersonName1 {
+	color: #333333;
+	font: bold 10px verdana, helvetica, arial, sans-serif;
+}
+.PersonDetails1 {
+	font-size: 10px;
+	text-decoration: none;
+	padding: 0.5em;
+	line-height: 130%;
+}
+/* Person name and details in large person boxes */
+.PersonName2 {
+	color: #333333;
+	font: bold 11px verdana, helvetica, arial, sans-serif;
+}
+.PersonDetails2 {
+	text-decoration: none;
+	font-size: 11px;
+}
+/* Person name and details in zoomed in person box */
+.PersonNameZoom {
+	color: #333333;
+	font: bold 14px tahoma, verdana, arial, helvetica, sans-serif;
+}
+.PersonDetailsZoom {
+	font: 11px verdana, arial, helvetica, sans-serif;
+	text-decoration: none;
+	line-height: 130%;
+}
+/* style for names contained in * */
+.StarredName {
+	text-decoration: underline;
+}
+
+/* =============================== Fact styles ======================================= */
+/* Style for the facts tables */
+.FactsTable {
+	width: 100%;
+}
+/* Style for the fact label cell */
+.FactLabelCell {
+	width: 20%;
+	background-color: #DFDFDF;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	vertical-align: middle;
+	border: 1px solid #9B9796;
+}
+/* Style for the popup with edit functions */
+.FactLabelCellEdit {
+	width:50px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Style for the fact description in the label */
+.FactLabelCellText {
+	font-weight: bold;
+	padding-left: 9px;
+	padding-right: 9px;
+}
+/* Style for the fact image in the label */
+.FactLabelCellImage {
 	width: 50px;
 	height: 50px;
 }
-.submenu .icon {
-	width: 25px;
-	height: 25px;
-}
-.subheaders {
-	font-size: 16px;
-	font-weight: bold;
-	margin-top: 15px;
-	vertical-align: bottom;
-}
-.age {
-	font-size: 9px;
-}
-.source_citations {
-	display: none;
-}
-.lang_form {
-	margin-top: 0px;
-}
-.selected-option {
-	background-color: #D6E0EA;
-}
-.user_links {
+/* Style for the fact content cell */
+.FactDetailCell {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding-left: 6px;
 	white-space: nowrap;
 }
-.contact_links {
+/* Label and field styles for fact details in the detail cell */
+.FactDetailLabel {
+	font-weight: bold;
+}
+.FactDetailField {
+	white-space: normal;
+}
+
+/* Style for the relatives facts in the fact list */
+.FactRela {
+	filter: alpha(opacity=67);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
+	-moz-opacity: 0.67;
+	opacity: 0.67;
+}
+
+/* Style for the display/hide relatives facts links */
+.FactRelaSwitch {
+	background-color: #DFDFDF;
+	border: 1px solid #9B9796;
+}
+/* Style for the source citation details for facts */
+.FactSourceCitationDetails {
+	display: none;
+	margin-left: 15px;
+}
+/* Style for fact dates with a link to the calendar (otherwise use .Date) */
+.FactDate {
+}
+/* Style for fact time. See above. */
+.FactTime {
+}
+/* Style for fact places with a link to the placelist */
+.FactPlace {
+}
+/* Age at event */
+.FactAge {
+	font-size: 9px;
+}
+/* Links from facts to family/individual page for associates and partnerships */
+.FactAssoLink {
+	font-style: italic;
+	font-size: 11px;
+	font-weight: normal;
+}
+/* Indent for associates in fact detail list */
+.AssoIndent {
+	padding-left: 7px;
+}
+ 
+/* =============================== Styles on detail and search pages ======================================= */
+/* Header block on all detail pages (title, counter, picture, etc.) */
+.DetailHeaderSection {
+	float: left;
+	clear: both;
+	width: 100%;
+}
+/* Table for all links to other objects, on the detail and search pages */
+.DetailListTable {
+	border-collapse: separate;
+	border-spacing: 1px;
+}
+.DetailListHeader, .DetailListFooter {
+	background-color: #BFBFBF;
+	text-align: center;
+	font-weight: bold;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}
+.DetailListColumnHeader {
+	background-color: #DFDFDF;
+	text-align: center;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}
+.DetaillistContent {
+    background-color: #F5F5F5;
+	white-space: normal;
+	border: 1px solid #9B9796;
+	padding: 3px;
+}
+/* Styles for tabs on detail and search pages */
+#TabDoor {
+	margin: 0px 0px 0px 0px; 
+	padding: 0px 0px 0px 0px;
+	float: left;
+}
+#TabDoor dd {
+	margin: 2px 2px 2px 2px; 
+	padding: 2px 6px 2px 6px; 
+	height: 100%; 
+	float: left; 
+	font-weight: bold; 
+	border-left: outset #9CA3D4 1px;
+	border-top: outset #9CA3D4 2px;
+	border-right: outset #9CA3D4 3px;
+	display: none;
+	-moz-border-radius-topleft: 0.6em; 
+	-moz-border-radius-topright: 0.6em;
+}
+
+.TabDoorUnselected {
+	filter: alpha(opacity=67);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
+	-moz-opacity: 0.67;
+	opacity: 0.67;
+	background-color: #F5F5F5;
+}
+.TabDoorSelected {
+	background-color: #DFDFDF;
+}
+.TabDoorEmpty {
+	filter: alpha(opacity=40);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=40);
+	-moz-opacity: 0.40;
+	opacity: 0.40;
+	background-color: #F5F5F5;
+}
+
+/* Content of the tab */
+.TabPage {
+	margin-top: 3px;
+}
+
+/* Rela tab containers. Indipage is 2 small tables, fampage is 1 large table*/
+.RelaTabContainerIndi {
+	float: left;
+	max-width: 50%;
+}
+.RelaTabContainerFam {
+	float: left;
+	max-width: 80%;
+}
+
+/* =============================== Styles for navigation blocks ======================================= */
+/* Navigation block styles */
+.NavBlockTable {
+	border-collapse: separate;
+	border-spacing: 1px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.NavBlockHeader {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+.NavBlockColumnHeader {
+	background-color: #CBCBCB;
+	border: 1px solid #9B9796;
+	vertical-align: middle;
+	text-align: left;
+	font-weight: bold;
+	padding: 4px;
+}
+.NavBlockLabel {
+	background-color: #DFDFDF;
+	border: solid #9B9796 1px;
+	white-space: normal;
+	vertical-align: middle;
+	padding-right: 4px;
+	padding-left: 4px;
+	text-align: left;
+	white-space: normal;
+}
+.NavBlockField {
+    background-color: #F5F5F5;
+	border: solid #9B9796 1px;
+	vertical-align: middle;
+	padding-right: 4px;
+	padding-left: 4px;
+	text-align: left;
+	white-space: normal;
+}
+.NavBlockFooter {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	padding: 4px;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	font-weight: bold;
+}
+/* Empty whitespace */
+.NavBlockRowSpacer {
+	line-height: 3px;
+	empty-cells: show;
+}
+.AdminNavBlockHeader {
+	min-height: 51px;
+	height: 51px;  /* Height and overflow are a hack for FF which doesn't support min-height */
+	overflow: visible;
+}
+.AdminNavBlockTable {
+	margin-top: -1px;
+	min-height: 3em;
+	width: 100%;
+}
+.AdminNavBlockTitle {
+	font-size: 14px;
+	font-weight: bold;
+	line-height: 120%;
+	padding-top: 10px;
+}
+.AdminNavBlockLabel, .AdminNavBlockField {
+	margin-top: 1px;
+	margin-bottom: 1px;
+	text-align: left;
+	vertical-align: top;
+}
+.AdminNavBlockColumnHeader {
+	text-align: center;
+	white-space: normal;
+}
+.AdminNavBlockOption {
+	line-height: 2em;
+	width: 50%;
+}
+.AdminNavBlockOptionText {
+	margin-left: 16px;
+	padding-left: 1px;
+}
+.ConfigNavBlockHeader {
+	text-align: left;
+	margin-left: 1px;
+	margin-right: 1px;
+}
+.ConfigNavBlockFooter {
+	margin-left: 1px;
+	margin-right: 1px;
+}
+.ConfigNavBlockSubbar {
+	border: dotted #DE0036 1px;
+	font-size: 11px;
+	vertical-align: top;
+	white-space: nowrap;
+	padding: 3px;
+	margin-left: 2px;
+}
+.NavBlockCheckRadio {
 	text-align: center;
 }
-/* This is the original.
- * It's not used, but it's left in in case you want to go back to it. */
-.flag {
+.NavBlockCheckRadioHeader {
+	width: 1%;
+}
+
+/* =============================== Fanchart page ======================================= */
+#content_fanchart {
+}
+/*-- pseudo-class for fanchart : used on server-side to draw image --*/
+.fan_chart {
+	/*-- font-family must contain a server TTF file --*/
+	font-family: url(/fonts/LucidaSansRegular.ttf);
+	font-size: 7px;
+	color: #0045BF;
+	background-color : #EEEEEE;
+}
+.fan_chart_box {
+	background-color: #B1CFF0;
+}
+.fan_chart_boxF {
+	background-color: #E9DAF1;
+}
+/* =============================== Familybook page ======================================= */
+#content_familybook {
+}
+.FamilyBookFamilyHeader {
+	font-size: 12px;
+	font-weight: bold;
+	text-align: center;
+}
+.FamilyBookFamilyDivider {
+}
+.FamilyBookContentTable {
+	vertical-align: middle;
+	border-spacing: 0;
+	padding: 0;
+	border: 0;
+}
+.FamilyBookContentTableShowEmpty {
+	vertical-align: middle;
+	border-spacing: 0;
+	padding: 0;
+	border: 0;
+	empty-cells: show;
+}
+.FamilyBookContentTableShowEmpty TD, .FamilyBookContentTable TD {
+	vertical-align: middle;
+}
+/* =============================== Hourglass page ======================================= */
+#content_hourglass {
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+/* =============================== Timeline page ======================================= */
+#timeline_chart {
+	position: relative;
+	top: 0px;
+	left: 0px;
+}
+#timeline_chart #line {
+	position: absolute;
+}
+#timeline_chart .TimelineScale {
+	font-family: Arial; 
+	position: absolute;
+	font-size: 7pt;
+}
+.TimelinePerson {
+	vertical-align: top;
+	padding: 5px;
+}
+.TimelinePerson0 {
+	background-color: #AAAAFF;
+	border: outset #AAAAFF 1px;
+}
+.TimelinePerson1 {
+	background-color: #AAFFAA;
+	border: outset #AAFFAA 1px;
+}
+.TimelinePerson2 {
+	background-color: #FFAAAA;
+	border: outset #FFAAAA 1px;
+}
+.TimelinePerson3 {
+	background-color: #5555FF;
+	border: outset #5555FF 1px;
+	color: white;
+}
+.TimelinePerson4 {
+	background-color: #FF5555;
+	border: outset #FF5555 1px;
+}
+.TimelinePerson5 {
+	background-color: #55FF55;
+	border: outset #55FF55 1px;
+}
+.TimelineShowButton {
+	text-align: center;
+}
+/* =============================== Descendancy page ======================================= */
+#content_descendancy {
+}
+#descendancy_chart {
+	display: block;
+}
+#descendancy_chart ul {
+	background-image: url(../../images/vline.gif);
+	background-repeat: repeat-y;
+	background-position: left top;
+	list-style: none;
+	margin: 0px 0px 5px 15px; /* top right bottom left */
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+#descendancy_chart li {
+	list-style: none;
+	margin: 0px 0px 0px -13px; /* top right bottom left */
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+
+/* =============================== Ancestry page ======================================= */
+#content_ancestry {
+}
+#ancestry_chart {
+	display: block;
+}
+#ancestry_chart ul {
+	background-image: url(../../images/vline.gif);
+	background-repeat: repeat-y;
+	background-position: left top;
+	list-style: none;
+	margin: 0px 0px 0px 15px; /* top right bottom left */
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+#ancestry_chart li {
+	list-style: none;
+	margin: 0px 0px 2px -13px; /* top right bottom left */
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+}
+.AncestryListMarrBlock, .DescendancyListMarrBlock {
+	padding-top: 6px;
+	padding-bottom: 3px;
+	white-space: nowrap;
+}
+/* =============================== Pedigree page ======================================= */
+/* Used to adjust the page height, leave it here */
+#content_pedigree {
+}
+#pedigree_chart {
+	position: relative;
+	top: -250px;
+	left: 0px;
+}
+.PedigreeChart {
+	position: relative;
+	z-index:0;
+}
+/* =============================== Statistics page ======================================= */
+.StatisticsPageTitle {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 8px;
+}
+.StatisticsPlotBackButton {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* =============================== Report pages ======================================= */
+#ReportEngineContent {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+.ReportEngineNavBlockTable {
+	margin-top: 12px;
+	min-width: 40%;
+}
+
+/* =============================== Chart pages Nav blocks ======================================= */
+.DescendancyNavBlockTable, .AncestryNavBlockTable {
+	margin-right:0;
+}
+.HourglassNavBlockTable, .PaternalsNavBlockTable, .PedigreeNavBlockTable, .FanChartNavBlockTable {
+	margin-left: 0;
+}
+.DescendancyNavBlock, .AncestryNavBlock, .RelationNavBlock {
+	float: right;
+	z-index:10;
+	margin-right: 20px;
+}
+.HourglassNavBlock, .PaternalsNavBlock, .PedigreeNavBlock .FanChartNavBlock {
+	float: left;
+	z-index: 2;
+	position: absolute;
+}
+ .FanChartNavBlock {
+	 float: left;
+}
+/* ============================== Relationship page ================*/
+#relationship_chart {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	clear: both;
+}
+.RelationshipPageTitle {
+	float: left;
+	max-width: 50%;
+}
+/* =============================== Paternals page ======================================= */
+#content_paternals {
+	min-width:100%;
+}
+.PaternalsContent {
+	min-width:100%; 
+	margin-top: 20px;
+	text-align: center;
+}
+/* This applies the text-align to the boxes and centers them */
+.PaternalsContent .PersonBox, .PaternalsContent .PersonBoxF, .PaternalsContent .PersonBoxNN {
+	display: inline-block;
+}
+.PaternalsVlineContainer {
+	width: 49.9%; 
+	float: left;
+}
+.PaternalsVline {
+	width: 6px; 
+	height: 20px; 
+	margin: 5px 0px 5px 0px; 
+	vertical-align: middle; 
+}
+.PaternalsUpArrow {
+	width:51%;
+	float:right;
+	text-align: left;
+}
+
+/* =============================== Individual page ======================================= */
+.IndiHeaderBlock {
+	float: left;
+	margin-right: 10px;
+	margin-left: 2px;
+}
+.IndiHeaderLabel {
+	font-weight: bold;
+}
+.IndiHeaderField {
+}
+/* Indi page */
+#IndiPictureContainer {
+	margin: 3px;
+	float: left;
+}
+.IndiPicture {
+	border: 1px solid #9B9796;
+	padding: 5px;
+}
+/* Relatives tab title for families */
+.IndiSubHeader {
+	font-size: 14px;
+	font-weight: bold;
+	margin-top: 6px;
+	margin-bottom: 3px;
+}
+.IndiSubHeader IMG {
+	vertical-align: bottom;
+}
+.IndiSubHeaderLabel {
+	vertical-align: 30%;
+	margin-left: 10px;
+}
+.IndiSubHeaderAssoLink {
+	font-style: italic;
+	font-size: 11px;
+	font-weight: normal;
+	vertical-align: 30%;
+}
+/* External search tab, option block */
+#esearchform {
+	float: left;
+	width: 30%
+}
+.ESearchFormTable {
+	width: 100%;
+	margin-left: 1px;
+	margin-right: 1px;
+	margin-top: -1px;
+}
+/* External search tab, results block */
+#esearchresults {
+	float: left;
+	width: 68%;
+	margin-left: 20px;
+	overflow: hidden;
+}
+/* External search results spacing between top bar and results */
+#esearchresults .ListTableContent {
+	margin-top: 2px;
+}
+/* Relatives tab on the indi page. Overrides TabPage */
+.IndiRelaTabPage {
+	width: 100%;
+}
+
+/* =============================== Family page ======================================= */
+#FamParents {
+	clear: both;
+	margin-top: 20px;
+}
+/* The padding aligns the title with the group details title */
+#FamChildren {
+	padding-top: 13px;
+}
+#FamGroupDetails {
+}
+#FamLowerBlock {
+	width: 100%;
+	margin-bottom: 20px;
+}
+/* =============================== Unlinked page ======================================= */
+#UnlinkedContent {
+	text-align: center;
+}
+/* =============================== Statistics(plot) pages ======================================= */
+.StatsContainer {
+	width: 60%;
+	margin-left: auto;
+	margin-right: auto;
+}
+IMG.StatsPlot {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+	margin-top: 20px;
+}
+/* =============================== Login and register pages ======================================= */
+/* Container for the entire content */
+.LoginPageContainer {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+.LoginPageText {
+	text-align: left;
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+}
+.LoginPageTable {
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+}
+.LoginPageTableTextWidth {
+	width: 40%;
+}
+.RegisterPageTable {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* =============================== Custom page ======================================= */
+#ContentCustomPage {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+.CustomPageNavTable {
+	width: 60%;
+	text-align: left;
+	padding-top: 20px;
+}
+.CustomPageTableOptionLabel {
+	width: 85px;
+}
+.CustomPageTableOptionLabel A {
+	text-decoration: none;
+}
+.CustomPageTitleLabel {
+	width: 15%;
+}
+/* =============================== Edit user page ======================================= */
+#EditUserContent {
+}
+.EditUserTable {
+	width: 60%;
+	min-width: 700px;
+}
+/* =============================== Index and index edit page ======================================= */
+
+/* Text above blocks on MyGedcom page */
+#IndexMyGenmodBlock {
+	padding-bottom: 10px;
+}
+.MyGenmodHeader {
+	font-weight: bold;
+	font-size: 14px;
+}
+/* Left, large blocks container */
+#IndexMainBlocksContainer {
+	clear: none;
+	width: 74%;
+	float: left;
+	margin-right: 3px;
+}
+/* Right, small blocks container */
+#IndexSmallBlocksContainer {
+	clear: none;
+	width: 25%;
+	float: left;
+}
+/* Full page blocks */
+#IndexFullBlocksContainer {
+	clear: none;
+	width: 100%;
+}
+
+/* Customize welcome page */
+#IndexEditContainer {
+	width: 85%;
+	margin-left: auto;
+	margin-right: auto;
+}
+#IndexEditLeftArrow {
+	float: left;
+	width: 20px;
+	margin-top: 55px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+#IndexEditLeft {
+	float: left;
+	margin-top: 5px;
+	font-weight: bold;
+	text-align: center;
+}
+#IndexEditLeftRightArrow {
+	float: left;
+	width: 20px;
+	margin-top: 55px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+#IndexEditContent {
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 1px;
+	margin-bottom: 1px;
+	padding-top: 5px;
+	background-color: #DFDFDF;
+	border: 1px solid #9B9796;
+	font-weight: bold;
+	text-align: center;
+}
+#IndexEditRightLeftArrow {  
+	float: right;
+	width: 20px;
+	margin-top: 55px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+#IndexEditRight {  
+	float: right;
+	margin-top: 5px;
+	font-weight: bold;
+	text-align: center;
+}
+#IndexEditRightArrow {  
+	float: right;
+	width: 20px;
+	margin-top: 55px;
+	margin-left: 5px;
+	margin-right: 5px;
+}
+#IndexEditAdvice {
+	text-align: center;
+	white-space: normal;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+#IndexEditSetDefault {
+	padding-bottom: 10px;
+}
+#IndexEditConfigure {
+	position:absolute;
+	display:block;
+	top:auto;
+	left:auto;
+	z-index: 1;
+	width: 99%;
+}
+#IndexEditConfigureHelp {
+	position: absolute;
+	display: none;
+	top: auto;
+	left: auto;
+	z-index: 2;
+}
+
+/* =============================== Action List page and action related ======================================= */
+/* Positions the option box */
+.ActionListOptionContainer {
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 25px;
+	text-align: center;
+}
+/* Positions the action list*/
+.ActionListListContainer {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+/* Spacing between page title and option block */
+DIV.ActionListOptionContainer SPAN {
+	line-height: 3em;
+}
+.OpenAction {
+	color: green;
+	font-weight: bold;
+}
+.ClosedAction {
+	color: #DD0000;
+	font-weight: bold;
+}
+/* =============================== Clippings Page ======================================= */
+/* Override for the page title on this page */
+.ClippingsPageTitle {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+.ClippingsMessage {
+	margin-top: 40px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+.ClippingsDownloadTable {
+	margin-bottom: 20px;
+	margin-top: 30px;
+}
+/* =============================== Search Page ======================================= */
+
+#SearchPageTitle {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	padding-bottom: 8px;
+}
+#SearchGeneralResult {
+	text-align: center;
+	width: 100%;
+	display: inline-block;
+}
+#SearchGeneralResultContent {
+	clear:both;
+	text-align: left;
+}
+#SearchOptions {
+	width: 33%; 
+	float: left;
+}
+#SearchGeneral {
+	width: 66%; 
+	float: right;
+}
+#SearchSoundex {
+	width: 66%; 
+	float: right;
+}
+.SearchSoundexNavBlockTable {
+	height: 100%;
+}
+.SearchListTable {
+	margin-left: 0px;
+	border-collapse: separate;
+	border-spacing: 1px;
+	margin-right: auto;
+}
+.SearchListTableHeader {
+	margin-top: 8px;
+}
+.SearchWarning {
+	color: red;
+	font-weight: bold;
+	clear: both;
+	width: 100%;
+	text-align: center;
+	font-style: italic;
+	padding-top: 24px;
+}
+#SearchSoundexResult {
+	padding-top: 20px;
+	width: 100%;
+	clear:both;
+}
+.SearchHit {
+	background-color: #FFFF00;
+}
+
+/* =============================== Find Page ======================================= */
+.FindHeaderTable {
+	margin-left: auto;
+	margin-right: auto;
+}
+#FindContent {
+	text-align: center;
+}
+.FindEnlargeLink {
+	text-align: center;
+}
+.FindMediaImage {
+}
+.FindMediaText {
+	text-align: left;
+}
+.FindMediaFileDirs {
+	text-align: left;
+	font-weight: normal;
+}
+.FindMediaFileLabel {
+	font-weight: bold;
+}
+.FindMediaFileName {
+	font-weight: normal;
+}
+.FindMediaFileXref {
+	font-weight: normal;
+}
+.FindChar {
+	width: 80%;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 10px;
+    background-color: #F5F5F5;
+	border: 1px solid #9B9796;
+	padding: 6px;
+	text-align: center;
+	letter-spacing: 0.5em;
+}
+.FindSmallChars {
+	font-size: 10px;
+}
+.FindLargeChars {
+	font-size: 18px;
+}
+/* =============================== Calendar Page ======================================= */
+/* container for the page */
+#CalendarPage {
+	text-align: center;
+}
+.CalendarPageTitle {
+	width: 100%;
+	text-align: center;
+}
+.CalendarOptionBlock {
+	padding-top: 8px;
+}
+.CalendarNavBlockTable {
+	width: 100%;
+}
+.CalendarNavBlockCurDate {
+	font-weight: bold;
+}
+.CalendarNavBlockSelDate {
+	font-weight: bold;
+	color: red;
+}
+.CalendarResultContainer {
+	padding-top: 8px;
+}
+.CalendarWarning {
+	color: red;
+	font-weight: bold;
+	clear: both;
+	width: 100%;
+	text-align: center;
+	font-style: italic;
+	padding-top: 24px;
+}
+.CalendarDayListTableContent {
+	text-align: left;
+	padding-left: 1px;
+	padding-right: 1px;
+	margin-top: 1px;
+}
+.CalendarDYListTableContent UL {
+	margin: 4px;
+}
+.CalendarDYListTableContent UL LI {
+	text-align: left;
+	padding-bottom: 6px;
+}
+.CalendarDayBoxTable {
+	width: 90%;
+	table-layout: fixed;
+}
+.CalendarDayBoxDay {
+}
+.CalendarDay {
+	font-weight: bold;
+	padding-left: 5px;
+}
+.CalendarDayCurrentDay {
+	font-weight: bold;
+	font-size: 16px;
+	color: red;
+}
+.CalendarDayBoxDetails {
+	width: 95%;
+}
+.CalendarDayBoxDetailsHeight {
+	height: 150px;
+	overflow: auto;
+}
+.CalendarDayBoxDetailsPreview {
+	height: 100%;
+}
+.CalendarFactIndent {
+	margin-left: 7px;
+}
+.CalendarDayFactName {
+	font-weight: bold;
+}
+.CalendarDayRtl {
+	direction: rtl;
+	float: right;
+	color: blue;
+	font-weight: bold;
+}
+
+/* =============================== Individual List, Family List, Unlinked and Alive in Year Page ====================== */
+#IndividualListPage, #AliveInYearPage, #FamListPage {
+	text-align: center;
+}
+/* Positions the option box */
+.AliveInYearOptionContainer {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 12px;
+	text-align: center;
+}
+.IndiFamLetterBar {
+	display: inline-block;
+	background-color: #F5F5F5;
+	border: solid #9B9796 1px;
+	vertical-align: middle;
+	padding-right: 3px;
+	padding-left: 3px;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	margin-top: 12px;
+	text-align: center;
+}
+.IndiFamSurnameListTable {
+	margin-top: 12px;
+}
+.IndiFamSurnameLink {
+	text-align: left;
+	margin-left: 8px;
+}
+.IndiFamListTable {
+	max-width: 80%;
+	margin-top: 12px;
+}
+.IndiFamListTableContent UL {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+.IndiFamShowHideSurnameList {
+	text-align: center;
+	margin-top: 8px;
+}
+
+/* =============================== Source, General Note, Repo List ================================================ */
+#SourceListPage, #RepoListPage, #NoteListPage {
+	text-align: center;
+}
+.SourceListTable, .RepoListTable, .NoteListTable {
+	max-width: 90%;
+	margin-top: 12px;
+}
+
+/* =============================== Media List ================================================ */
+#MediaListPage {
+	text-align: center;
+}
+.MediaListResult {
+	width: 98%;
+	clear: both;
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+.MediaListTable {
+	width: 100%;
+}
+.MediaListTableContent {
+	width: 50%;
+	padding: 0px;
+}
+.MediaListImage {
+	width: 100px;
+}
+.MediaListObjectTable {
+	width: 100%;
+	border: 0px;
+	margin: 0px;
+}
+.MediaListText {
+	white-space: normal;
+}
+.MediaListArrowContainer {
+	width: 100%;
+	height: 15px;
+}
+.MediaListLeftArrow {
+	float: left;
+	margin-left: 15px;
+}
+.MediaListRightArrow {
+	float: right;
+	margin-right: 15px;
+}
+/* =============================== Place List ======================================= */
+#PlaceListPage {
+	text-align: center;
+}
+.PlaceListNavContainer {
+	padding-top: 12px;
+	clear: both;
+}
+.PlaceListTableContainer {
+	clear: both;
+	padding-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 95%;
+}
+.PlaceListBreadCrumb {
+	width: 100%;
+}
+.PlaceListTable {
+	padding-top: 20px;
+	max-width: 95%;
+}
+.PlaceListTable UL {
+	margin-left: 5px;
+	margin-right: 5px;
+}
+.PlaceListMap {
+	width: 50%;
+	float: left;
+	padding-top: 20px;
+}
+/* If a map is displayed */
+.PlaceListMapNavRight {
+	width: 50%;
+	float: right;
+	padding-top: 20px;
+	text-align: center;
+}
+/* If no map is displayed */
+.PlaceListMapNavCenter {
+	width: 100%;
+	padding-top: 20px;
+	text-align: center;
+}
+.PlaceListBottomLinks {
+	text-align: center;
+	padding-top: 10px;
+	display: inline-block;
+}
+#PLAC_CTRY_flag {
+	padding-right: 5px;
+}
+/* =============================== Image viewer styles ======================================= */
+#imagecropper {
+	position: relative;
+	border: outset white 3px;
+	background-color: black;
+	overflow: auto;
+	vertical-align: middle;
+	text-align: center;
+	clear: both;
+}
+#theimage {
+	position: absolute;
+	left: 1px;
+	top: 1px;
+	cursor: move;
+}
+.ZoomButtons {
+	font-size: 24px;
+}
+/* =============================== Generic Block styles ======================================= */
+/* Restricts the main blocks to the specified height */
+.RestrictedBlockHeightMain {
+	max-height: 400px;
+	overflow: auto;
+}
+/* Restricts the right blocks to the specified height */
+.RestrictedBlockHeightRight {
+	max-height: 250px;
+	overflow: auto;
+}
+/* Container for the block content */
+.BlockContainer {
+    background-color: #F5F5F5;
+	vertical-align: top;
+	margin-bottom: 3px;
+	padding: 5px;
+	border: 1px solid #9B9796;
+	clear: both;
+}
+/* Block header line */
+.BlockHeader {
+	font-weight: bold;
+	padding-left: 10px;
+	background-color: #bfbfbf;
+	text-align: left;
+	font-size: 11px;
+	height: 21px;
+}
+/* Help/admin image container in the headerline*/
+.BlockHeader IMG {
+	padding-top: 3px;
+	display-style: block;
+	float: left;
+	margin-right: 5px;
+}
+/* Title container in the headerline */
+.BlockHeaderText {
+	padding-top: 2px;
+}
+/* Content section of the block */
+.BlockContent {
+	margin-top: 3px;
+	font-size: 10px;
+	text-decoration: none;
+}
+/* Tables used in the blocks */
+.BlockTable {
+	width: 100%;
+	border-spacing: 0px;
+	border-collapse: collapse;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+/* Labelcell in block tables */
+.BlockLabel {
+	text-align: left;
+	white-space: normal;
+}	
+/* Fieldcell in block tables */
+.BlockField {
+	text-align: left;
+}
+/* Bottom row in block tables */
+.BlockFooter {
+	text-align: center;
+}
+/* Usually first line in the block content, acting as additional header */
+.BlockSubTitle {
+	font-weight: bold;
+	color: #454b4f;
+	padding-bottom: 8px;
+}
+.BlockAdminIcon {
 	width: 15px;
-	border: solid black 1px;
-}
-/* This one is for the currently active language.  It's different in Opera!! */
-.activeflag {
 	height: 15px;
-	border: none;
-	opacity: 1;		/* Opera,IE does not yet support this (booo!) */
+	border: 0px;
 }
-/* This one is for an inactive language when the mouse is hovering over it */
-.brightflag {
-	height: 15px;
-	border: none;
-	opacity: 1;		/* Opera,IE does not yet support this (booo!) */
+.BlockAdminLinkBottom {
 }
-/* This one is for an inactive language when the mouse is not hovering over it */
-.dimflag {
-	height: 15px;
-	border: none;
-	opacity: 0.4;	/* Opera,IE does not yet support this (booo!) */
-}
-.header_select {
+.BlockSelectField {
 	font-size: 9pt;
 }
-.favorites_form {
-	margin-top: 0px;
+
+/* =============================== Block related Block styles ======================================= */
+/* Blocks with larger font content */
+#quickstart_block .BlockContent, #gedcom_stats .BlockContent,#gedcom_favorites .BlockContent, #user_favorites .BlockContent, #gedcom_welcome .BlockContent, #user_welcome .BlockContent, #user_news .BlockContent, #logged_in_users .BlockContent, #login_block .BlockContent, #gedcom_news .BlockContent, #recent_changes .BlockContent, #pinyin_block .BlockContent {
+	font-size: 11px;
 }
-.help {
+/* Blocks with centered content */
+#gedcom_welcome .BlockContent, #random_picture .BlockContent,  #rss_block .BlockContent, #user_welcome .BlockContent, #login_block .BlockContent, #theme_select .BlockContent, #pinyin_block .BlockContent {
+	text-align: center;
+}
+.FavoriteNotePadding {
+	padding-left: 0.5em;
+}
+/* The News styles apply to both user_blog and gedcom_news blocks */
+.NewsBlockItem {
+}
+.NewsBlockTitle {
+	color: #000000;
+	font-size: 14px;
+	font-weight: bold;
+	padding-bottom: 8px;
+}
+.NewsBlockDate {
+	color: #000000;
+	padding-bottom: 6px;
+}
+.NewsBlockText {
+	padding-bottom: 8px;
+}
+.GedcomStatsTextBlock {
+	width: 100%;
+	clear: both;
+}
+.GedcomStatsLeftData {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	width: 20%;
+	float: left;
+}
+.GedcomStatsRightData {
+	padding-top: 8px;
+	padding-bottom: 8px;
+	width: 75%;
+	float: right;
+}
+/* Additional style for the stats second column data */
+.GedcomStatsBlockField {
+	font-weight: bold;
+	padding-right: 10px;
+}
+/* Gedcom and User welcome */
+.GedcomBlockTime, .GedcomBlockCounter, .UserBlockPediLink, .UserBlockIndiLink, .UserBlockTimeLink {
+	margin-top: 8px;
+}
+.GedcomBlockCustLink, .GedcomBlockFavLink, .UserBlockOwnLink  {
+}
+
+.TodaysEventsName, .UpcomingEventsName, .Top10Name, .RecentChangesName {
+	font-weight: bold;
+}
+.TodaysEventsLink, .UpcomingEventsLink {
+	font-size: 10px;
+	padding-top: 8px;
+}
+.TodaysEventsFact, .UpcomingEventsFact {
+	padding-left: 6px;
+}
+.RecentChangesChan {
+	font-size: 10px;
+	margin-bottom: 8px;
+	padding-left: 6px;
+}
+.RecentChangesLink {
+	font-size: 10px;
+}
+.LoggedInBlockMessage, .RecentChangesMessage, .ReviewChangesMessage, .TodaysEventsMessage, .UpcomingEventsMessage, .NewsMessage, .UserMessagesMessage {
+	font-weight: bold;
+}
+.LoggedInBlockUser {
+	font-style: italic;
+}
+.RandomMediaBlockLinks {
+}
+.RandomMediaBlockImageLink {
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+.RandomMediaBlockNotes {
+	margin-top: 8px;
+}
+.ReviewChangesLink {
+	margin-bottom: 8px;
+}
+.ReviewChangesShowLink {
+	clear:both;
+	width: 20%;
+	float:left;
+	margin-bottom: 8px;
+}
+.ReviewChangesObject {
+	float:left;
+	margin-bottom: 8px;
+}
+.ReviewChangesObjectName {
+	font-weight: bold;
+}
+.RSSBlockForm {
+	margin-top: 16px;
+	margin-bottom: 8px;
+}
+.RSSBlockButton {
+	margin-top: 8px;
+}
+.ThemeSelectForm {
+	margin-top: 12px;
+	margin-bottom: 8px;
+}
+/* The user message container is hidden until the + is clicked */
+.UserMessageMessageContainer {
+	border: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+/* The content must have the layout style, as the container is only used to hide/show */
+.UserMessageMessageContent {
+	border: 1px solid #9B9796;
+	padding: 3px;
+	font-size: 11px;
+}
+.QSLeftBlock, .AddFavLeftBlock {
+	width: 50%;
+	float: left;
+}
+.QSRightBlock, .AddFavRightBlock {
+	width: 50%;
+	float: right;
+}
+/* The Top10 styles are applied to all top10 blocks */
+.Top10BlockTable {
+	width: 90%;
+	text-align: left;
+}
+.Top10LeftCounter {
+	text-align: right;
+	width: 30px;
+}
+.Top10RightCounter {
+	text-align: left;
+	width: 30px;
+}
+.Top10BlockLink {
+	white-space: normal;
+}
+#top10surnames .Top10BlockLink {
+	font-weight: bold;
+}
+.Top10BlockTableWide {
+	width: 100%;
+	text-align: left;
+}
+.PinYinBlockText {
+}
+.PinYinInputLabel, #PinYinResult {
+	font-weight: bold;
+	margin-top: 10px;
+}
+/* ============================= User related pages =========================== */
+.UserListDateColumn {
+	white-space: nowrap;
+}
+.UserListRightsColumn {
+	text-align: left;
+}
+.UserListMassUsers {
+	margin-top: 1px;
+}
+#UserListing {
+     margin-right: 0px;
+}
+#MassUpdateForm {
+	display: inline;
+}
+/* ============================= GMinfo page =========================== */
+.GMInfoTable {
+	width: 100%;
+	text-align: left;
+	margin-top: -2px;
+}
+.GMInfoTable P {
+	white-space: normal;
+}
+.GMInfoLabel {
+}
+.GMInfoField {
+	white-space: normal;
+}
+.GMInfoHelpList {
+	white-space: normal;
+	margin-top: 1px;
+}
+.GMInfoPHPList {
+	margin-top: -1px;
+}
+/* ============================= Merge page =========================== */
+/* The inner table containing the facts */
+.MergeFactsTable {
+	border: 0px;
+}
+/* The cell containing the table above */
+.MergeFactsBlock {
+	vertical-align: top;
+}
+/* Checkbox to select the fact*/
+.MergeFactSelect {
+}
+/* Fact data*/
+.MergeFactData {
+	white-space: normal;
+}
+/* ============================= EditConfig page =========================== */
+.EditConfigLangColumn {
+	float: left;
+	margin-left: 0.3em;
+	margin-right: 0.3em;
+	width: 30%;
+}
+
+/* ============================= EditGedcoms page =========================== */
+.EditGedcomsAdminNavBlockLabel {
+	margin-top: 1px;
+	margin-bottom: 1px;
+	text-align: center;
+}
+
+/* ============================= Edit Privacy page =========================== */
+
+/* ============================= Edit Language page =========================== */
+.EditLangTranOrgText {
+	font-style: italic;
+	overflow-x: hidden;
+/*	word-break: break-all; *//* Fix for IE*/
+}
+.EditLangTranDestText {
+	font-style: italic;
+/*	word-break: break-all; *//* Fix for IE*/
+}
+.EditLangNoTranDestText {
+	color: #FF0000;
+}
+.EditLangOrgTextArea TEXTAREA {
+	background-color: #DFDFDF;
+}
+.EditLangDestTextArea, .EditLangOrgTextArea {
+	text-align: center;
+	padding: 8px;
+}
+.EditLangDestTextArea TEXTAREA {
+	color: #FF0000;
+}
+.EditLangNavBlockField {
+	text-align: center;
+}
+.EditLangContainer DIV {
+	margin: 1px;
+}
+#EditLangContent {
+     margin-left: 100px;
+     margin-right: 100px;
+     margin-top: 5px;
+}
+
+/* ============================= Download Gedcom page =========================== */
+#DownloadPrivacyLevel {
+	float: left;
+	text-align: left;
+	padding: 0.2em 0em 0.2em 0em; /* top right bottom left */
+}
+
+/* ============================= Debug collector =========================== */
+#DebugOutput {
+    float:left;
+    width:100%;
+    background:#DAE0D2 url("../../images/tab_background.jpg")
+      repeat-x bottom;
+    font-size:93%;
+    line-height:normal;
+    font-weight: bold;
+    }
+#DebugOutput ul {
+    margin:0;
+    list-style:none;
+    padding:10px 10px 0;
+    }
+#DebugOutput a {
+    display:block;
+    padding:5px 15px 4px;
+    text-decoration: none;
+    }
+#DebugOutput li {
+    float:left;
+    background:url("../../images/tab_right_off.jpg")
+      no-repeat right top;
+    margin:0;
+    padding:0;
+    }
+#DebugOutput a {
+    display:block;
+    background:url("../../images/tab_left_off.jpg")
+      no-repeat left top;
+    padding:5px 15px;
+}
+#DebugOutput .current {
+    background-image:url("../../images/tab_right_on.jpg");
+}
+#DebugOutput .current a {
+    background-image:url("../../images/tab_left_on.jpg");
+    padding-bottom:5px;
+    color: #1d83e0;
+}
+
+/* ===================================== FAQ related styles =============================*/
+.FAQPageHeader {
+	margin: 1px;
+}
+.FAQItem {
+	margin: 1px;
+	overflow: hidden;
+	border: solid #9B9796 1px;
+    background-color: #F5F5F5;
+}
+/* FAQ header in edit mode */
+.FAQEditHeaderText {
+	text-align: center;
+	margin-left: 271px;
+	border: 0;
+	padding-top: 0;
+}
+/* FAQ body in edit mode */
+.FAQEditBodyText {
+	text-align: left;
+	margin-left: 271px;
+	border: 0;
+}
+.FAQItemOptions {
+	float: left;
+	width: 265px;
+	border: 0;
+	border-right: 1px solid #9B9796;
+	padding: 3px;
+	clear: both;
+}
+.FAQItemOption {
+	float: left;
+	min-width: 20%;
+	margin-right: 4px;
+	margin-left: 4px;
+}
+/* FAQ title in view mode */
+.FAQHeaderText {
+	text-align: center;
+	margin: 1px;
+	border: 0;
+}
+/* FAQ body in view mode */
+.FAQBodyText {
+	margin: 1px;
+	border: 0;
+}
+/* Margin -1 to top-align with other columns */
+.FAQEditTable {
+	width: 100%;
+	margin-top: -1px;
+}
+/* ===================================== Help related styles =============================*/
+#SearchHelpPage {
+	text-align: left;
+	width: 100%;
+}
+/* Tables for navblock and output */
+.SearchHelpTable {
+	padding-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+}
+#HelpPage {
+}
+/* Style for the title of each help topic */
+.HelpContentHeader {
+	color: #0000FF;
+	font-size: 14px;
+	font-weight : bold;
+	text-decoration : none;
+}
+/* Used in helptexts. Should be altered. <======================================================= */
+.name_head {
+	color: #000000;
+	font-weight: bold;
+	font-size: 16px;
+	letter-spacing: .2px;
+}
+/* Header and footer for the list */
+.HelpHeader, .HelpFooter {
+	border: 1px solid #DE0036;
+	padding: 4px;
+	text-align: center;
+	color: #000000;
+	font-size: 14px;
+	font-weight: bold;
+	clear: both;
+}
+.HelpFooter {
+	font-size: 11px;
+}
+/* Style for the 3 links in the footer */
+.HelpFooterLink {
+	width: 33%;
+	float: left;
+}
+/* Style for the middle part containing all help subjects */
+.HelpContent {
+	border: solid #9B9796 1px;
+	clear: both;
+	padding: 4px;
+    background-color: #F5F5F5;
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+/* Style for the inner table containing the bullets with actual subjects */
+.HelpContentList {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+/* Space for help icon. Used in menu's to line up options with/without help link  */
+.HelpIconContainer {
+	width: 15px;
+	float: left;
+	margin-right: 3px;
+}
+/* Style for the help link */
+.HelpImage {
 	font-weight: bold;
 	cursor: help;
 }
+
+/* ===================================== Editing related styles =============================*/
+.EditHeader {
+	padding-left: 0;
+	padding-right: 0;
+	margin-right: 1px;
+	margin-left: 1px;
+}
+.EditTable {
+	width: 100%;
+}
+.EditTableColumnHeader {
+	text-align: center;
+}
+.EditMessageSuccess {
+	color: #333333;
+	border: 1px solid;
+	border-color: #009933;
+	background-color: #99FF99;
+	padding: 4px;
+	text-align: center;
+	margin-left: 1px;
+	margin-right: 1px;
+	font-weight: bold;
+}
+.EditMessageFail {
+	color: #333333;
+	border: 1px solid;
+	border-color: #DE0036;
+	background-color: #FF9966;
+	padding: 4px;
+	text-align: center;
+	margin-left: 1px;
+	margin-right: 1px;
+	font-weight: bold;
+	margin-top: 8px;
+}
+.EditChangesLabel {
+	font-style: italic;
+}
+.EditChangesColumnHeader {
+	color: #454b4f;
+}
+.EditChangesLinkAccept {
+	float: left;
+	margin-left: 20px;
+}
+.EditChangesLinkReject {
+	float: right;
+	margin-right: 20px;
+}
+.EditChangesLinkTable {
+	margin-top: 20px;
+}
+
+/* ===================================== EditGedcoms styles =============================*/
+.GedcomTable {
+	border: 1px solid #9B9796;
+	margin: 0;
+	width: 100%;
+}
+.UploadGedcomSubHeader {
+	margin-bottom: 1px;
+	text-align: left;
+}
+.UploadGedcomNavBlockLabel, .UploadGedcomNavBlockHeader {
+	margin-bottom: 1px;
+}
+.UploadGedcomErrorBox {
+	margin: 12px;
+	padding: 5px;
+}
+.UploadGedcomNavBlockTable {
+	margin-left: -1px;
+	margin-right: -1px;
+}
+td.UploadGedcomNavBlockLabel {
+	white-space: nowrap;
+}
+.UploadGedcomNavBlockField {
+	width: 100%;
+}
+/* ######### Style for Progress Bar ######### */
+
+.UploadGedcomTProgressBox, .UploadGedcomGProgressBox {
+	background-color: #DFE5FF;
+	border: solid #000000 1px;
+	width: 350px; 
+	text-align: center;
+	margin-top: 20px;
+}
+.UploadGedcomTProgressBox {
+	float: left;
+	margin-left: 20px;
+}
+.UploadGedcomGProgressBox {
+	float: right;
+	margin-right: 20px;
+}
+.UploadGedcomProgressBar {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: #DFE5FF;
+	border: solid #000000 1px;
+	width: 1%; 
+	height: 18px; 
+	overflow: hidden;
+}
+.UploadGedcomInnerProgressBar {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	left: 10px; 
+	right: 10px; 
+	width: 300px; 
+	height: 20px; 
+	border: inset #CCCCCC 3px; 
+	background-color: #000000;
+}
+.UploadGedcomProgressLinks {
+	text-align: center;
+	padding-top: 10px;
+	clear: both;
+}
+.UploadGedcomImportStats {
+	margin: 10px;
+}
+
+/* ===================================== Media management styles =============================*/
+.Current {
+	font-weight: bold;
+}
+.ReadOnly {
+	color: #DD0000;
+}
+.ManageMediaBlockContainer {
+	background-color: #DFDFDF;
+}
+.ManageMediaBlockHeader, .ManageMediaBlockContent {
+	font-size: 11px;
+	padding-top: 3px;
+}
+.ManageMediaBlockContent {
+	line-height: 1.6em;
+}
+#ManageMediaFilterBlock {
+	text-align: center;
+}
+.ManageMediaActionBlockLinks {
+	text-align: center;
+	margin-bottom: 8px;
+}
+.ManageMediaBlockDirList {
+	margin-top: 4px;
+	margin-bottom: 8px;
+	overflow-x: scroll; 
+	width: 99%; 
+	overflow: -moz-scrollbars-horizontal;
+}
+.ManageMediaBlockButton {
+	text-align: center;
+	margin-top: 6px;
+}
+#managemedia {
+	display: inline;
+}
+.ManageMediaSelectColumn {
+	width: 1%;
+}
+.ManageMediaLeftColumn {
+	border-right: solid #9B9796 5px;
+}
+.ManageMediaRightColumn {
+	border-left: solid #9B9796 5px;
+}
+.ManageMediaSizeColumn {
+	text-align: right;
+	width: 1%;
+	white-space: nowrap;
+}
+.ManageMediaLinkColumn {
+	text-align: center;
+	padding-top: 8px;
+	width: 1%;
+}
+.ManageMediaFileLinksColumn IMG, .ManageMediaLinkColumn IMG {
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-top: 3px;
+	cursor: pointer;
+}
+.ManageMediaFileLinksColumn {
+	text-align: center;
+	white-space: nowrap;
+	width: 1%;
+}
+.ManageMediaPopup {
+	position:absolute; 
+	height:auto;
+	width:auto;
+	visibility: hidden;
+	background-color: #DFDFDF;
+	border: 1px solid #9B9796;
+	overflow: hidden;
+	font-size: 10px;
+	text-decoration: none;
+	padding: 0.5em;
+	line-height: 130%;
+}
+.ManageMediaPopupTitle {
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+.ManageMediaFactDetailField, .ManageMediaFactDetailLabel {
+	white-space: nowrap;
+}
+.ManageMediaUIEBlock {
+	text-align: center;
+	padding: 8px;
+}
+.ManageMediaUIEBlockHeader {
+	text-align: center;
+	font-size: 11px;
+	font-weight: bold;
+	margin-bottom: 12px;
+}
+.ManageMediaUIEBlockContent {
+	display: inline-block;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+}
+ /*****************************TRANSMENU**********************************/
+ /* this is the clipping region for the menu. it's width and height get set by script, depending on the size of the items table */
+.transMenu {
+	position:absolute;
+	overflow:hidden;
+	left:-1000px;
+	top:-1000px;
+	}
+
+/* this is the main container for the menu itself. it's width and height get set by script, depending on the size of the items table */
+.transMenu .content {
+	position:absolute;
+	}
+
+/* this table comprises all menu items. each TR is one item. It is relatively positioned so that the shadow and background transparent divs can be positioned underneath it */
+/* padding-left prevents the border to be overwritten on hovering the items, for level 2 menu's */
+.transMenu .items {
+	position:relative;
+	left:0px; top:0px;
+	z-index:2;
+	padding-left: 1px;
+	}
+/* padding-left prevents the border to be overwritten on hovering the items, for level 1 menu's */
+.transMenu.top .items {
+	border-top:none;
+	padding-left: 1px;
+	}
+/* each TR.item is one menu item */
+.transMenu .item {
+    color:#336;
+    font-size:10px;
+    font-family:verdana;
+    text-decoration:none;
+	/* this is a hack for mac/ie5, whom incorrectly cascades the border properties of the parent table to each row */
+	border: none;
+	cursor:pointer;
+	cursor:hand;
+	}
+
+/* this DIV is the semi-transparent white background of each menu. the -moz-opacity is a proprietary way to get transparency in mozilla, the filter is for IE/windows 5.0+. */
+/* we set the background color in script because ie mac does not use it; that browser only uses a semi-transparent white PNG that the spacer gif inside this DIV is replaced by */
+.transMenu .background {
+	border: 1px solid #9B9796;
+	position: absolute;
+	left:0px; top:0px;
+	z-index:1;
+	-moz-opacity:1;
+	filter:alpha(opacity=100);
+	}
+
+/* same concept as .background, but this is the sliver of shadow on the right of the menu. It's left, height, and background are set by script. In IE5/mac, it uses a PNG */
+.transMenu .shadowRight {
+	position:absolute;
+	z-index:3;
+	top:3px; width:2px;
+	-moz-opacity:0.8;
+	filter:alpha(opacity=40);
+	}
+
+/* same concept as .background, but this is the sliver of shadow on the bottom of the menu. It's top, width, and background are set by script. In IE5/mac, it uses a PNG */
+.transMenu .shadowBottom {
+	position:absolute;
+	z-index:1;
+	left:3px; height:2px;
+	-moz-opacity:.4;
+	filter:alpha(opacity=40);
+	}
+
+/* this is the class that is used when the mouse is over an item. script sets the row to this class when required. */
+.transMenu .item.hover {
+	background:#fdfdfd;
+	color:black;
+	}
+
+/* this is either the dingbat that indicates there is a submenu, or a spacer gif in it's place. We give it extra margin to create some space between the text and the dingbat */
+.transMenu .item IMG {
+	margin-left: 0px;
+	margin-right: 2px;
+	width: 15px;
+	height: 15px;
+}
+
+/* This is the separator line to separate menu item groups in the same menu */
+.seperator {
+	clear: both;
+	width: 100%;
+	height: 5px;
+	background-image: url(../../images/hline.gif);
+	background-repeat: repeat-x;
+	margin-top: 5px;
+}
+.MenuChecked {
+	font-style: italic;
+}
+.MenuUnchecked {
+}
+/* END TRANSMENU*/
+
+/* ========================== Styles for the fact edit/copy/delete box on detail pages ============================ */
 .menuitem {
 	color: #555555;
 	text-decoration: none;
 	text-align: center;
 	padding: 1px;
 }
-.menuitem_hover	{
+.menuitem_hover {
 	color: #0045BF;
 	text-decoration: none;
 	text-align: center;
@@ -535,6 +2619,10 @@ table.center {
 	border: 1px #DE0036 solid;
 	white-space: nowrap;
 	margin-top: 5px;
+}
+.submenu .Icon {
+	width: 25px;
+	height: 25px;
 }
 .submenu_rtl {
 	color: #0045BF;
@@ -574,672 +2662,21 @@ table.center {
 	text-align: right;
 	padding: 1px;
 }
-.news_title {
-	color: #000000;
-	font-size: 14px;
-	font-weight: bold;
-}
-.news_date {
-	color: #000000;
-}
-.current_day {
-	font-weight: bold;
-	font-size: 16px;
-}
-.cal_day {
-	float: left;
-	font-weight: bold;
-}
-.rtl_cal_day {
-	direction: rtl;
-	float: right;
-	color: blue;
-	font-weight: bold;
-}
-.helpheader {
-	color: #000000;
-	font-size: 16px;
-	font-weight: bold;
-}
-.helpstart {
-	color: #0000FF;
-	font-size: 14px;
-	font-weight : bold;
-	text-decoration : none;
-}
-.left {
-     text-align: left;
-}
-
-#footer {
-	clear: both;
-	color: #0045BF;
-	font-size: 10px;
-	width: 99%;
-}
-
-/*-- index.php specific style sheets -- */
-.small_inner_block {
-/*	height: auto;   */
-	max-height: 215px;
-	overflow: auto;
-	font-size: 10px;
-	text-decoration: none;
-}
-
-.block {
-	background-color: #F1F1F1;
-	color: #0045BF;
-	border: solid #000000 1px;
-	vertical-align: top;
-	margin: 1px;
-	padding: 5px;
-}
-
-#index_main_blocks {
-	clear: none;
-	width: 74%;
-	float: left;
-}
-
-#index_small_blocks {
-	clear: none;
-	width: 25%;
-	float: right;
-}
-
-#index_full_blocks {
-	clear: none;
-	width: 100%;
-}
-
-#random_picture {
-	text-align: center;
-}
-
-
-/*-- pedigree chart specific stylesheets --*/
-#pedigree_chart {
-	position: relative;
-	top: -250px;
-	left: 0px;
-}
-/*-- pedigree chart rtl specific stylesheets --*/
-#pedigree_chart_rtl {
-	position: relative;
-	top: -250px;
-	right: 10px;
-}
-
-/*-- descendancy chart specific stylesheets --*/
-#descendancy_chart ul {
-	background-image: url(../../images/vline.gif);
-	background-repeat: repeat-y;
-	background-position: left top;
-	list-style: none;
-	margin: 0px 0px 5px 15px; /* top right bottom left */
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-}
-#descendancy_chart li {
-	list-style: none;
-	margin: 0px 0px 0px -13px; /* top right bottom left */
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-}
-/*-- descendancy chart rtl specific stylesheets --*/
-#descendancy_chart_rtl ul {
-	background-image: url(../../images/vline.gif);
-	background-repeat: repeat-y;
-	background-position: right top;
-	list-style: none;
-	margin: 0px 15px 5px 0px; /* top right bottom left */
-	padding-top: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-}
-#descendancy_chart_rtl li {
-	list-style: none;
-	margin: 0px -17px 0px 0px; /* top right bottom left */
-	padding: 0px 2px 0px 0px; /* top right bottom left */
-}
-
-/*-- relationship chart specific stylesheets --*/
-#relationship_chart {
-	position: relative;
-	top: -40px;
-	left: 0px;
-}
-#relationship_chart_rtl {
-	position: relative;
-	top: -40px;
-	right: 10px;
-}
-
-/*-- ancestry chart specific stylesheets --*/
-#ancestry_chart ul {
-	background-image: url(../../images/vline.gif);
-	background-repeat: repeat-y;
-	background-position: left top;
-	list-style: none;
-	margin: 0px 0px 0px 15px; /* top right bottom left */
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-}
-#ancestry_chart li {
-	list-style: none;
-	margin: 0px 0px 2px -13px; /* top right bottom left */
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-}
-/*-- ancestry chart rtl specific stylesheets --*/
-#ancestry_chart_rtl ul {
-	background-image: url(../../images/vline.gif);
-	background-repeat: repeat-y;
-	background-position: right top;
-	list-style: none;
-	margin: 0px 15px 0px 0px; /* top right bottom left */
-	padding-top: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-}
-#ancestry_chart_rtl li {
-	list-style: none;
-	margin: 0px -15px 2px 0px; /* top right bottom left */
-	padding: 0px 2px 0px 0px; /* top right bottom left */
-}
-
-/*-- relationship chart specific stylesheets --*/
-#relationship_chart {
-	position: relative;
-	top: -40px;
-	left: 0px;
-}
-
-#relationship_chart_rtl {
-	position: relative;
-	top: -40px;
-	right: 0px;
-}
-
-/*-- timeline chart specific styles --*/
-#timeline_chart {
-	position: relative;
-	top: 0px;
-	left: 0px;
-}
-.timeline_table {
-}
-.person0 {
-	background-color: #AAAAFF;
-	border: outset #AAAAFF 1px;
-	vertical-align: top;
-}
-.person1 {
-	background-color: #AAFFAA;
-	border: outset #AAFFAA 1px;
-	vertical-align: top;
-}
-.person2 {
-	background-color: #FFAAAA;
-	border: outset #FFAAAA 1px;
-	vertical-align: top;
-}
-.person3 {
-	background-color: #5555FF;
-	border: outset #5555FF 1px;
-	vertical-align: top;
-}
-.person4 {
-	background-color: #FF5555;
-	border: outset #FF5555 1px;
-	vertical-align: top;
-}
-.person5 {
-	background-color: #55FF55;
-	border: outset #55FF55 1px;
-	vertical-align: top;
-}
-.listlog {
-	line-height: 20pt;
-	color: #555555;
-}
-/*-- pseudo-class for fanchart : used on server-side to draw image --*/
-.fan_chart {
-	/*-- font-family must contain a server TTF file --*/
-	font-family: url(./fonts/LucidaSansRegular.ttf);
-	font-size: 7px;
-	color: #0045BF;
-	background-color : #EEEEEE;
-}
-.fan_chart_box {
-	background-color: #B1CFF0;
-}
-.fan_chart_boxF {
-	background-color: #E9DAF1;
-}
-
-.starredname {
-	text-decoration: underline;
-}
-.search_hit {
-	background-color: #FFFF00;
-}
-.nowrap {
-	white-space: nowrap;
-}
-.title {
-	font-size: 20px;
-}
-.accesskeys{
-	width : 1px;
-	height: 1px;
-	overflow: auto;
-}
-/* Styles for the option boxes */
-
-/* Style for the top and bottom bar */
-.topbottombar {
-	color: #333333;
-	border: 1px solid;
-	border-color: #DE0036;
-	padding: 4px;
-	text-align: center;
-	margin-left: auto;
-	margin-right: auto;
-	font-weight: bold;
-}
-/* Style for the subbar in  */
-/* facts_value */
-.subbar {
-	border: solid #DE0036 1px;
-	font-size: 11px;
-	vertical-align: top;
-	white-space: nowrap;
-	padding: 3px;
-}
-/* Style for the descriptionbox */
-TD {
-	vertical-align: top;
-	white-space: nowrap;
-	padding: 2px;
-}
-.wrap {
-	white-space: normal;
-}
-.vmiddle {
-	vertical-align: middle
-}
-
-/* Colors */
-.red {
-	color: #FF0000;
-}
-.rela {
-	filter: alpha(opacity=67);
-	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=67);
-	-moz-opacity: 0.67;
-	opacity: 0.67;
-}
-/* Text direction */
-.ltr {
-	text-align: left;
-}
-.rtl {
-	text-align: right;
-}
-
-/* Width settings */
-.width5 {
-	width: 5%;
-}
-.width10 {
-	width: 10%;
-}
-.width20 {
-	width: 20%;
-}
-.width25 {
-	width: 25%;
-}
-.width30 {
-	width: 30%;
-}
-.width35 {
-	width: 35%;
-}
-.width40 {
-	width: 40%;
-}
-.width50 {
-	width: 50%;
-}
-.width55 {
-	width: 55%;
-}
-.width60 {
-	width: 60%;
-}
-.width65 {
-	width: 65%;
-}
-.width70 {
-	width: 70%;
-}
-.width75 {
-	width: 75%;
-}
-.width80 {
-	width: 80%;
-}
-.width90 {
-	width: 90%;
-}
-.width95 {
-	width: 95%;
-}
-.width100 {
-	width: 100%;
-}
-
-/* Width settings in em */
-.width2em {
-	width: 2em
-}
-
-/* Font sizes */
-.font11 {
-	font-size: 11px;
-}
-.font9 {
-	font-size: 9px;
-}
-
-/* Chart styles */
-.pedigree_table {
-	margin: 0;
-}
-
-/* Message box */
-.messagebox {
-	background-color: #C2CEEF;
-	border: solid #493424 1px;
-}
-
+/* ======================================= Change related styles =========================== */
 /* Change indicators */
-.change_new {
+.ChangeNew {
 	border: solid #0000FF 2px;
 }
 
-.change_old {
+.ChangeOld {
 	border: solid #FF0000 2px;
 }
-.locked {
-	background-color: #FF0000;
-	text-align: center;
-	color: #000000;
-}
-
-/* Style form boxes */
-input {
-	/* background-color: #DFD8D1; */
-	/* background-color: #DFDFDF; */
-}
-
-select {
-	/* background-color: #DFDFDF;*/
-}
-
-/* Admin menu */
-.admin_genmod_content {
-	background-color: #DFDFDF;
-	vertical-align: top;
-	padding: 3px;
-	white-space: normal;
-	margin-top: 3px;
-}
-#admin_genmod_left {
-     width: 180px; 
-     float: left;
-     margin-top: 5px;
-}
-#admin_genmod_right {  
-     width: 180px; 
-     right: 10px;
-     float: right;
-     margin-top: 5px;
-}
-.admin_topbottombar {
-	color: #333333;
-	border: 0.1em solid;
-	border-color: #DE0036;
-	padding: 0.4em;
-	text-align: center;
-	font-weight: bold;
-	margin-bottom: 0.5em;
-}
-.topbar {
-	color: #333333;
-	border: 1px solid;
-	border-color: #DE0036;
-	padding: 4px;
-	text-align: center;
-	font-weight: bold;
-}
-.admin_optionbox {
-	background-color: #F1F1F1;
-}
-#content {
-     margin-left: 200px;
-     margin-right: 200px;
-     margin-top: 5px;
-}
-#content_pedigree {
-}
-.seperator {
-     clear: both;
-     background-color: #F1F1F1;
-}
-/* lighter shade */
-.shade1 {
-     background-color: #F1F1F1;
-}
-/* darker shade */
-.shade2 {
-	background-color: #DFDFDF;
-}
-/* top shade */
-.shade3 {
-	background-color: #BFBFBF;
-}
-/* Help icon */
-.helpicon {
-	width: 10%;
-	float: left;
-}
-/* Description */
-.description {
-	width: 89%; 
-	float: right;
-}
-
-/* block styles */
-.blockhc {
-	font-weight: bold;
-	margin-left: 10px;
-}
-.blockcontent {
-	margin-top: 3px;
-}
-
-/* Indi page */
-#indi_picture {
-	margin: 3px;
-	float: left;
-}
-
-#indi_menu {
-	float: right;
-	margin: 3px;
-}
-#indi_content {
-     margin-top: 5px;
-     height: 150px;
-}
-.indi_spacer {
-	float: left;
-	margin-right: 5px;
-	margin-left: 2px;
-}
-.indilist {
-	padding-left: 2em;
-	padding-right: 2em;
-	vertical-align: top;
-	white-space: normal;
-}
-.door {
-	margin: 0px 0px 0px 0px; 
-	padding: 0px 0px 0px 0px;
-}
-.door dd {
-	margin: 2px 2px 2px 2px; 
-	padding: 2px 6px 2px 6px; 
-	height: 100%; 
-	float: left; 
-	font-weight: bold; 
-	display: none;
-	-moz-border-radius-topleft: 0.6em; 
-	-moz-border-radius-topright: 0.6em;
-}
-#sanity_content {
-	margin-right: auto;
-	margin-left: auto;
-}
-#search_content {
-	position: relative;
-	margin-right: auto;
-	margin-left: auto;
-	border: 0.1em solid;
-}
-#search_header {
-	padding: 1em;
-	text-align: center;
-	font-size: 2em;
-	font-weight: bold;
-}
-#search_options {
-	width: 35%; 
-     float: left;
-     margin-top: 0.5em;
-	margin-left: 5%;
-	clear: none;
-}
-#gsearch {
-	width: 40%; 
-     float: right;
-     margin-top: 0.5em;
-	margin-right: 5%;
-	clear: none;
-}
-#ssearch {
-	width: 40%; 
-     float: right;
-     margin-top: 0.5em;
-	margin-right: 5%;
-	clear: none;
-}
-.search_results {
-	margin-top: 2.5em;
-	width: 100%;
-	float: left;
-}
-#backup_header {
-	padding: 10px;
-	text-align: center;
-	font-size: 2em;
-	font-weight: bold;
-}
-.noborder {
-	border-style: none;
-}
-.label_form {
-	text-align: left;
-	width: 160px;
-	padding-right: 20px;
+/* ======================================= Install related styles =========================== */
+.InstallLabelForm {
 	display: block;
 	float: left;
+	width: 75px;
 	margin-bottom: 10px;
 }
-.input_form {
-	display: block;
-	width: 140px;
-	float: left;
-	margin-bottom: 10px;
-}
-.label_form_remember {
-	text-align: left;
-	width: 120px;
-	padding-right: 20px;
-	display: block;
-	float: left;
-	margin-bottom: 10px;
-}
-.input_form_remember {
-	text-align: left;
-	display: block;
-	float: left;
-	margin-bottom: 10px;
-}
-
-/* Customize welcome page */
-.label_form_index_edit {
-	text-align: center;
-	padding-right: 20px;
-	display: block;
-	margin-left: auto;
-	margin-right: auto;
-	margin-bottom: 10px;
-}
-#index_edit_container {
-	width: 70%;
-	margin-left: auto;
-	margin-right: auto;
-}
-#index_edit_left_arrow {
-     float: left;
-     margin-top: 55px;
-}
-#index_edit_left {
-     width: 180px; 
-     float: left;
-     margin-top: 5px;
-}
-#index_edit_left_right_arrow {
-     float: left;
-     margin-top: 55px;
-}
-#index_edit_content {
-     margin-left: auto;
-     margin-right: auto;
-     margin-top: 5px;
-}
-#index_edit_right_left_arrow {  
-     float: right;
-     margin-top: 55px;
-}
-#index_edit_right {  
-     width: 180px; 
-     float: right;
-     margin-top: 5px;
-}
-#index_edit_right_arrow {  
-     float: right;
-     margin-top: 55px;
-}
-#index_edit_advice {
-	margin-top: 5px;
+.InstallInputForm {
 }

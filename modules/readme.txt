@@ -7,7 +7,7 @@
     This and other information can be found online at
     http://www.Genmod.net
 
-    # $Id: readme.txt,v 1.1 2005/10/23 21:49:11 roland-d Exp $
+    # $Id: readme.txt 13 2016-04-27 09:26:01Z Boudewijn $
 =======================================================
 
 CONTENTS

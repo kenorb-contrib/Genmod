@@ -1,4 +1,4 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- $Id: FRA_Corse.txt,v 1.1 2005/10/23 21:59:29 roland-d Exp $ -->
+<!-- $Id: FRA_Corse.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Corse-du-Sud
 Haute-Corse

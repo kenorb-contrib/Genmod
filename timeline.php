@@ -5,7 +5,7 @@
  * Use the $pids array to set which individuals to show on the chart
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,18 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: timeline.php,v 1.3 2006/01/10 18:31:39 roland-d Exp $
+ * @version $Id: timeline.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 /**
  * Inclusion of the timeline controller
 */
-require_once("includes/controllers/timeline_ctrl.php");
+require("config.php");
 
-print_header($gm_lang["timeline_title"]);
+$controller = new TimelineController();
+
+PrintHeader($controller->pagetitle);
+
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -139,8 +142,8 @@ function MM(e) {
 			}
 			yearform = document.getElementById('yearform'+personnum);
 			ageform = document.getElementById('ageform'+personnum);
-			yearform.innerHTML = year+"      "+month+" <?php print get_first_letter($gm_lang["month"]);?>   "+day+" <?php print get_first_letter($gm_lang["day"]);?>";
-			ageform.innerHTML = (ba*yage)+" <?php print get_first_letter($gm_lang["year"]);?>   "+(ba*mage)+" <?php print get_first_letter($gm_lang["month"]);?>   "+(ba*dage)+" <?php print get_first_letter($gm_lang["day"]);?>";
+			yearform.innerHTML = year+"      "+month+" <?php print NameFunctions::GetFirstLetter(GM_LANG_month);?>   "+day+" <?php print NameFunctions::GetFirstLetter(GM_LANG_day);?>";
+			ageform.innerHTML = (ba*yage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_year);?>   "+(ba*mage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_month);?>   "+(ba*dage)+" <?php print NameFunctions::GetFirstLetter(GM_LANG_day);?>";
 			var line = document.getElementById('ageline'+personnum);
 			temp = newx-oldx;
 			if (textDirection=='rtl') temp = temp * -1;
@@ -178,11 +181,11 @@ function MM(e) {
 			// check if we are above the starting point and switch the background image
 			if (newy < boxmean) {
 				if (textDirection=='ltr') {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
 				}
 				else {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
 				}
 				dy = (-1)*dy;
@@ -191,11 +194,11 @@ function MM(e) {
 			}
 			else {
 				if (textDirection=='ltr') {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline2"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 0%";
 				}
 				else {
-					dbox.style.backgroundImage = "url('<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
+					dbox.style.backgroundImage = "url('<?php print GM_IMAGE_DIR."/".$GM_IMAGES["dline"]["other"]; ?>')";
 					dbox.style.backgroundPosition = "0% 100%";
 				}
 
@@ -240,7 +243,7 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 //-->
 </script>
-<h2><?php print $gm_lang["timeline_chart"]; ?></h2>
+<span class="PageTitleName"><?php print GM_LANG_timeline_chart; ?></span>
 <form name="people" action="timeline.php">
 <?php
 $controller->checkPrivacy();
@@ -254,50 +257,50 @@ $controller->checkPrivacy();
 	if ($count>5) $half = ceil($count/2);
 	if (!$controller->isPrintPreview()) $half++;
 	foreach($controller->people as $p=>$indi) {
-		$sex = $indi->getSex();
-		$pid = $indi->getXref();
+		$sex = $indi->sex;
+		$pid = $indi->xref;
 		$col = $p % 6;
 		if ($i==$half) print "</tr><tr>";
 		$i++;
 		?>
-		<td class="person<?php print $col; ?>" style="padding: 5px;">
+		<td class="TimelinePerson TimelinePerson<?php print $col; ?>">
 		<?php
-		if ((!is_null($indi))&&($indi->canDisplayDetails())) {
+		if ((!is_null($indi))&&($indi->disp)) {
 			switch($sex) {
 			case "M":
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sex"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["male"]; ?>" alt="<?php print $gm_lang["male"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_male; ?>" alt="<?php print GM_LANG_male; ?>" vspace="0" hspace="0" class="GenderImage" border="0" />
 				<?php
 				break;
 			case "F":
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexf"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["female"]; ?>" alt="<?php print $gm_lang["female"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_female; ?>" alt="<?php print GM_LANG_female; ?>" vspace="0" hspace="0" class="GenderImage" border="0" />
 				<?php
 				break;
 			default:
-				$seximage = $GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
+				$seximage = GM_IMAGE_DIR."/".$GM_IMAGES["sexn"]["small"];
 				?>
-				<img src="<?php print $seximage; ?>" title="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" alt="<?php print $gm_lang["sex"]." ".$gm_lang["unknown"]; ?>" vspace="0" hspace="0" class="sex_image" border="0" />
+				<img src="<?php print $seximage; ?>" title="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" alt="<?php print GM_LANG_sex." ".GM_LANG_unknown; ?>" vspace="0" hspace="0" class="GenderImage" border="0" />
 				<?php
 				break;
 			}
 		?>
- 			<a href="individual.php?pid=<?php print $pid; ?>">&nbsp;<?php print PrintReady($indi->getName()); ?><br />
- 			<?php $addname = $indi->getAddName(); if (strlen($addname) > 0) print PrintReady($addname); ?> 
+ 			<a href="individual.php?pid=<?php print $indi->xref; ?>&amp;gedid=<?php print $indi->gedcomid; ?>">&nbsp;<?php print PrintReady($indi->name); ?><br />
+ 			<?php $addname = $indi->addname; if (strlen($addname) > 0) print PrintReady($addname); ?> 
 			</a>
-			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
+			<input type="hidden" name="pids<?php print $p; ?>" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
 				print "<br />";
-				print_help_link("remove_person_help", "qm");
+				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
-			<?php if (!empty($controller->birthyears[$pid])) { ?>
-				<span class="details1"><br />
-				<?php print_help_link("show_age_marker_help", "qm"); ?>
-				<?php print $gm_lang["show_age"]; ?>
+				<span class="PersonDetails1"><?php print GM_LANG_remove_person; ?></span></a>
+			<?php if ($indi->brec != "") { ?>
+				<span class="PersonDetails1"><br />
+				<?php PrintHelpLink("show_age_marker_help", "qm"); ?>
+				<?php print GM_LANG_show_age; ?>
 				<input type="checkbox" name="agebar<?php print $p; ?>" value="ON" onclick="showhide('agebox<?php print $p; ?>', this);" />
 				</span>
 			<?php }
@@ -306,15 +309,15 @@ $controller->checkPrivacy();
 		<?php
 		}
 		else {
-			print_privacy_error($CONTACT_EMAIL);
+			PrintPrivacyError(GedcomConfig::$CONTACT_EMAIL);
 			?>
 			<input type="hidden" name="pids[<?php print $p; ?>]" value="<?php print $pid; ?>" />
 			<?php if (!$controller->isPrintPreview()) {
 				print "<br />";
-				print_help_link("remove_person_help", "qm");
+				PrintHelpLink("remove_person_help", "qm");
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
-				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
+				<span class="PersonDetails1"><?php print GM_LANG_remove_person; ?></span></a>
 			<?php } ?>
 			<br />
 		<?php } ?>
@@ -323,21 +326,21 @@ $controller->checkPrivacy();
 	if (!$controller->isPrintPreview()) {
 		if (!isset($col)) $col = 0;
 		?>
-		<td class="person<?php print $col; ?>" style="padding: 5px" valign="top">
-			<?php print_help_link("add_person_help", "qm"); ?>
-			<?php print $gm_lang["add_another"];?>&nbsp;
-			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
-			<?php print_findindi_link("newpid","");?>
+		<td class="TimelinePerson<?php print ($col+1); ?>" valign="top">
+			<?php PrintHelpLink("add_person_help", "qm"); ?>
+			<?php print GM_LANG_add_another;?>&nbsp;
+			<input class="PidInputField" type="text" size="5" id="newpid" name="newpid" />&nbsp;
+			<?php LinkFunctions::PrintFindIndiLink("newpid","");?>
 			<br />
 			<br />
-			<div style="text-align: center"><input type="submit" value="<?php print $gm_lang["show"]; ?>" /></div>
+			<div class="TimelineShowButton"><input type="submit" value="<?php print GM_LANG_show; ?>" /></div>
 		</td>
 	<?php }
 	if ((count($controller->people)>0)&&(!$controller->isPrintPreview())) {
 		?>
-		<td class="list_value" style="padding: 5px">
-			<a href="<?php print $SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+2); ?>"><?php print $gm_lang["zoom_in"]; ?></a><br />
-			<a href="<?php print $SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-2); ?>"><?php print $gm_lang["zoom_out"]; ?></a>
+		<td class="NavBlockLabel">
+			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale+2); ?>"><?php print GM_LANG_zoom_in; ?></a><br />
+			<a href="<?php print SCRIPT_NAME."?".$controller->pidlinks."scale=".($controller->scale-2); ?>"><?php print GM_LANG_zoom_out; ?></a>
 		</td>
 	<?php } ?>
 	</tr>
@@ -346,45 +349,45 @@ $controller->checkPrivacy();
 <?php
 if (count($controller->people)>0) {
 	?>
-	<?php if ($controller->isPrintPreview()) print "\n\t".$gm_lang['timeline_instructions']."<br /><br />"; ?>
+	<?php if ($controller->isPrintPreview()) print "\n\t".GM_LANG_timeline_instructions."<br /><br />"; ?>
 <div id="timeline_chart">
 	<!-- print the timeline line image -->
-	<div id="line" style="position:absolute; <?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20); ?>px; top: <?php print $baseyoffset; ?>px; ">
-		<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]; ?>" width="3" height="<?php print ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>" alt="" />
+	<div id="line" style="<?php print $TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+22):"right: ".($basexoffset+22); ?>px; top: <?php print $baseyoffset; ?>px; ">
+		<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["vline"]["other"]; ?>" width="3" height="<?php print ($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale)); ?>" alt="" />
 	</div>
 	<!-- print divs for the grid -->
-	<div id="scale<?php print $controller->baseyear; ?>" style="font-family: Arial; position:absolute; <?php print ($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset"); ?>px; top: <?php print ($baseyoffset-5); ?>px; font-size: 7pt; text-align: <?php print ($TEXT_DIRECTION =="ltr"?"left":"right"); ?>;">
+	<div id="scale<?php print $controller->baseyear; ?>" class="TimelineScale" style="<?php print ($TEXT_DIRECTION =="ltr" ? "left: ".$basexoffset : "right: ".$basexoffset); ?>px; top: <?php print ($baseyoffset-5); ?>px; text-align: <?php print ($TEXT_DIRECTION =="ltr"?"left":"right"); ?>;">
 	<?php print $controller->baseyear."--"; ?>
 	</div>
 	<?php
-	for($i=$controller->baseyear+1; $i<$controller->topyear; $i++) {
-		if ($i % (25/$controller->scale)==0)  {
-			print "\n\t\t<div id=\"scale$i\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
+	for($i = $controller->baseyear+1; $i < $controller->topyear; $i++) {
+		if ($i % (25/$controller->scale < 1 ? 1 : 25/$controller->scale) == 0)  {
+			print "\n\t\t<div id=\"scale$i\" class=\"TimelineScale\" style=\"".($TEXT_DIRECTION =="ltr" ? "left: ".$basexoffset : "right: ".$basexoffset)."px; top:".floor($baseyoffset+(($i-$controller->baseyear)*$controller->scale)-$controller->scale/2)."px; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
 			print $i."--";
 			print "</div>";
 		}
 	}
-	print "\n\t\t<div id=\"scale{$controller->topyear}\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
+	print "\n\t\t<div id=\"scale{$controller->topyear}\" class=\"TimelineScale\" style=\"".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
 	print $controller->topyear."--";
 	print "</div>";
-	usort($controller->indifacts, "compare_facts");
+//	SortFacts($controller->indifacts);
 	$factcount=0;
 	foreach($controller->indifacts as $indexval => $fact) {
-		$controller->print_time_fact($fact);
+		$controller->PrintTimeFact($fact);
 		$factcount++;
 	}
 
 	// print the age boxes
 	foreach($controller->people as $p=>$indi) {
-		$pid = $indi->getXref();
+		$pid = $indi->xref;
 		$ageyoffset = $baseyoffset + ($controller->bheight*$p);
 		$col = $p % 6;
 		?>
-		<div id="agebox<?php print $p; ?>" style="position:absolute; <?php print ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+20):"right: ".($basexoffset+20)); ?>px; top:<?php print $ageyoffset; ?>px; height:<?php print $controller->bheight; ?>px; visibility: hidden;" onmousedown="ageMD(this, <?php print $p; ?>);">
+		<div id="agebox<?php print $p; ?>" style="position:absolute; <?php print ($TEXT_DIRECTION =="ltr"?"left: ".($basexoffset+22):"right: ".($basexoffset+22)); ?>px; top:<?php print $ageyoffset; ?>px; height:<?php print $controller->bheight; ?>px; visibility: hidden;" onmousedown="ageMD(this, <?php print $p; ?>);">
 			<table cellspacing="0" cellpadding="0">
 				<tr>
-					<td>
-						<img src="<?php print $GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" name="ageline<?php print $p; ?>" id="ageline<?php print $p; ?>" align="left" hspace="0" vspace="0" width="25" height="3" alt="" />
+					<td style="vertical-align: middle; padding-left: 6px;">
+						<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]; ?>" name="ageline<?php print $p; ?>" id="ageline<?php print $p; ?>" align="left" hspace="0" vspace="0" width="25" height="3" alt="" />
 					</td>
 					<td valign="top">
 						<?php 
@@ -392,15 +395,15 @@ if (count($controller->people)>0) {
 						if (!empty($controller->birthyears[$pid])) {
 						$tage = $tyear-$controller->birthyears[$pid];
 						?>
-						<table class="person<?php print $col; ?>" style="cursor: hand;">
+						<table class="TimelinePerson<?php print $col; ?>" style="cursor: hand;">
 							<tr>
-								<td valign="top" width="120"><?php print $gm_lang["year"]; ?>  
-									<span id="yearform<?php print $p; ?>" class="field">
+								<td valign="top" width="140"><?php print GM_LANG_year; ?>  
+									<span id="yearform<?php print $p; ?>" class="FactDetailField">
 									<?php print $tyear; ?>
 									</span>
 								</td>
-								<td valign="top" width="130">(<?php print $gm_lang["age"];?>  
-									<span id="ageform<?php print $p; ?>" class="field"><?php print $tage; ?></span>) 
+								<td valign="top" width="150">(<?php print GM_LANG_age;?>  
+									<span id="ageform<?php print $p; ?>" class="FactDetailField"><?php print $tage; ?></span>) 
 								</td>
 							</tr>
 						</table>
@@ -420,7 +423,7 @@ if (count($controller->people)>0) {
 	var birthdays = new Array();
 	<?php
 	foreach($controller->people as $c=>$indi) {
-		$pid = $indi->getXref();
+		$pid = $indi->xref;
 		if (!empty($controller->birthyears[$pid])) print "\nbirthyears[".$c."]=".$controller->birthyears[$pid].";";
 		if (!empty($controller->birthmonths[$pid])) print "\nbirthmonths[".$c."]=".$controller->birthmonths[$pid].";";
 		if (!empty($controller->birthdays[$pid])) print "\nbirthdays[".$c."]=".$controller->birthdays[$pid].";";
@@ -432,14 +435,14 @@ if (count($controller->people)>0) {
 	//-->
 	</script>
 </div>
-<?php } ?>
+<?php } 
+?>
 <script language="JavaScript" type="text/javascript">
 <!--
 	timeline_chart_div = document.getElementById("timeline_chart");
-	if (!timeline_chart_div) timeline_chart_div = document.getElementById("timeline_chart_rtl");
 	if (timeline_chart_div) timeline_chart_div.style.height = '<?php print $baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale*1.1); ?>px';
 //-->
 </script>
 <?php
-print_footer();
+PrintFooter();
 ?>

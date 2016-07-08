@@ -1,5 +1,5 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- $Id: FIN_Lapplands-lan_Lappland.txt,v 1.1 2005/10/23 21:59:29 roland-d Exp $ -->
+<!-- $Id: FIN_Lapplands-lan_Lappland.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Kemi
 Kemijärvi
 Rovaniemi

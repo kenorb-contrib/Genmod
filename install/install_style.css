@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: install_style.css,v 1.1 2006/05/28 13:00:03 roland-d Exp $
+ * @version $Id: install_style.css 23 2016-05-26 06:23:04Z Boudewijn $
  */
 
 .something {
@@ -42,7 +42,7 @@ HTML {
 	color: #DD0000;
 	font-weight: bold;
 }
-.label_form {
+.InstallLabelForm {
 	text-align: left;
 	width: 160px;
 	padding-right: 20px;
@@ -50,7 +50,7 @@ HTML {
 	float: left;
 	margin-bottom: 10px;
 }
-.input_form {
+.InstallInputForm {
 	display: block;
 	width: 140px;
 	float: left;

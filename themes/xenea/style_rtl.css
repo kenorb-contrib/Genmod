@@ -1,7 +1,0 @@
-/* styles for rtl
-will be needed to fix some of the RTL theme problems
-*/
-body { 
-	direction: rtl;
-	text-align: right; 
-}

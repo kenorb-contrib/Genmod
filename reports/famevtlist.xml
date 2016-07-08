@@ -1,0 +1,96 @@
+<GMReport access="PRIV_PUBLIC" icon="sfamily" type="general">
+	<!-- $Id: famevtlist.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<GMRTitle><GMRvar var="GM_LANG_fam_evt_report" /></GMRTitle>
+	<GMRDescription>Prints a list of families matching specific name and/or family event criteria</GMRDescription>
+	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="GM_LANG_name" /></GMRInput>
+	<GMRInput name="eventplace" lookup="PLAC" type="text"><GMRvar var="GM_LANG_famevtplace" /> </GMRInput>
+	<GMRInput name="eventdate1" lookup="DATE" type="text"><GMRvar var="GM_LANG_famevtdate1" /></GMRInput>
+	<GMRInput name="eventdate2" lookup="DATE" type="text"><GMRvar var="GM_LANG_famevtdate2" /></GMRInput>
+	<GMRInput name="selevent" options="MARR,CENS,DIV" type="select"><GMRvar var="GM_FACT_EVEN" /></GMRInput>
+	<GMRInput name="sortby" options="NAME,DATE,ID" type="select"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="spouse" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="8" style="" />
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="GM_FACT_$selevent" /> <GMRvar var="GM_LANG_fam_evt_report" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="200" height="12" border="1" fill="#DDDDDD">
+				<GMRText style="label"><GMRvar var="GM_LANG_name" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="100" height="12" border="1" fill="#DDDDDD">
+				<GMRText style="label"><GMRvar var="GM_LANG_date" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="225" height="12" border="1" fill="#DDDDDD">
+				<GMRText style="label"><GMRvar var="GM_FACT_PLAC" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="225" height="12" border="1" fill="#DDDDDD" newline="1">
+				<GMRText style="label"><GMRvar var="GM_FACT_SOUR" /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRSetVar name="printedFamilies" value="0" />
+			<GMRSetVar name="filter1" value="$selevent:PLAC CONTAINS $eventplace" />
+			<GMRSetVar name="filter2" value="$selevent:DATE GTE $eventdate1" />
+			<GMRSetVar name="filter3" value="$selevent:DATE LTE $eventdate2" />
+			
+			<GMRList list="family" filter1="$filter1" filter2="$filter2" filter3="$filter3" sortby="$sortby">
+			<!-- filter4 should be: filter4="NAME CONTAINS $name", but the family name doesn't exist as a field in the database,
+					so we can't use that. -->
+				<GMRSetVar name="skipFamily" value="no" />
+				<GMRif condition="$name!=''">
+					<GMRSetVar name="skipFamily" value="yes" />
+					<GMRGedcom id="@HUSB">
+						<GMRif condition="stristr(@NAME,$name)!==false">
+							<GMRSetVar name="skipFamily" value="no" />
+						</GMRif>
+					</GMRGedcom>
+					<GMRGedcom id="@WIFE">
+						<GMRif condition="stristr(@NAME,$name)!==false">
+							<GMRSetVar name="skipFamily" value="no" />
+						</GMRif>
+					</GMRGedcom>
+				</GMRif>
+				<GMRif condition="$skipFamily=='no'">
+					<GMRSetVar name="printedFamilies" value="$printedFamilies+1" />
+					<GMRTextBox width="200" height="12" border="0">
+						<GMRText style="text"><GMRGetPersonName id="@HUSB" hideID="true" /></GMRText>
+						<GMRText style="spouse"><br />   <GMRGetPersonName id="@WIFE" hideID="true" /></GMRText>
+						<GMRif condition="$showFamID"><GMRText style="text"> (<GMRGedcomValue tag="@id" />)</GMRText></GMRif>
+					</GMRTextBox>
+					<GMRTextBox width="100" height="12" border="0">
+						<GMRText style="text"><GMRGedcomValue tag="$selevent:DATE" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="220" height="12" border="0">
+						<GMRText style="text"><GMRGedcomValue tag="$selevent:PLAC" /></GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="5" height="12" border="0">
+						<GMRText style="text"> </GMRText>
+					</GMRTextBox>
+i					<GMRTextBox width="220" height="12" border="0">
+						<GMRText style="text"><GMRGedcomValue tag="$selevent:@SOUR" /></GMRText>
+						<GMRGedcom id="$selevent:@SOUR">
+							<GMRText style="text"><GMRGedcomValue tag="TITL" /></GMRText>
+						</GMRGedcom>
+					</GMRTextBox>
+					<GMRTextBox width="5" height="12" border="0" newline="1">
+						<GMRText style="text"> </GMRText>
+					</GMRTextBox>
+				</GMRif>
+			</GMRList>
+			<GMRCell width="0" height="24" border="0" align="right" style="label">
+				<GMRvar var="GM_LANG_total_fams" />: <GMRvar var="printedFamilies" />
+			</GMRCell>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

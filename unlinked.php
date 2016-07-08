@@ -2,13 +2,16 @@
 /**
  * Individual List
  *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2012 Genmod Development Team
+ *
  * The individual list shows all individuals from a chosen gedcom file. The list is
  * setup in two sections. The alphabet bar and the details.
  *
  * The alphabet bar shows all the available letters users can click. The bar is built
  * up from the lastnames first letter. Added to this bar is the symbol @, which is
  * shown as a translated version of the variable <var>gm_lang["NN"]</var>, and a
- * translated version of the word ALL by means of variable <var>$gm_lang["all"]</var>.
+ * translated version of the word ALL by means of variable <var>GM_LANG_allGM_LANG_</var>.
  *
  * The details can be shown in two ways, with surnames or without surnames. By default
  * the user first sees a list of surnames of the chosen letter and by clicking on a
@@ -19,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: unlinked.php,v 1.1 2006/05/07 11:35:56 roland-d Exp $
+ * @version $Id: unlinked.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 /**
@@ -27,15 +30,17 @@
 */
 require("config.php");
 
-print_header($gm_lang["unlink_list"]);
-print "<div class=\"center\"><h2>".$gm_lang["unlink_list"]."</h2></div>\n";
-global $GEDCOM;
-$indis = GetUnlinked();
-print "<div id=\"content\">";
-foreach ($indis as $id => $pid) {
-	print_list_person($pid, array(get_person_name($pid), $GEDCOM));
-}
-print "</div>";
-print_footer();
+$unlinkedlist_controller = new IndilistController();
 
+PrintHeader($unlinkedlist_controller->pagetitle);
+print "<div id=\"UnlinkedContent\">";
+print "<div class=\"PageTitleName\">".GM_LANG_unlink_list."</div>\n";
+$indis = ListFunctions::GetIndiList("no", "unlinked");
+
+if (count($indis) == 0) {
+	print "<div class=\"Error\">".GM_LANG_sc_ged_nounlink."</div>";
+}
+else $unlinkedlist_controller->PrintPersonList($indis);
+print "</div>";
+PrintFooter();
 ?>

@@ -1,70 +1,114 @@
-<GMReport access="GM_USER" icon="indis">
-	<!-- $Id: addresslabels.xml,v 1.1 2005/10/23 22:06:23 roland-d Exp $ -->
-	<GMRTitle><GMRvar var="gm_lang[address_labels]" /></GMRTitle>
+<GMReport access="PRIV_USER" icon="place" type="general">
+	<!-- $Id: addresslabels.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<GMRTitle><GMRvar var="GM_LANG_address_labels" /></GMRTitle>
 	<GMRDescription>Prints address labels</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
-	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
-	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
-	<GMRInput name="address" type="text"><GMRvar var="gm_lang[filter_address]" /> </GMRInput>
-	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="gm_lang[include]"/> </GMRInput>
-	<GMRDoc pageSize="A4" orientation="P" margin="24">
+	<GMRStyle name="text" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="8" style="b" />
+	<GMRStyle name="idstyle" font="LucidaSansUnicode" size="6" style="" />
+	<GMRInput name="address" type="text"><GMRvar var="GM_LANG_filter_address" /> </GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,ID"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="email_in" type="select" options="all,noemail,onlyemail"><GMRvar var="GM_LANG_include"/> </GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="1" showGeneratedBy="0">
 		<GMRHeader>
-			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[address_labels]" /></GMRCell>
-			<GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRCell>
 		</GMRHeader>
 		<GMRBody>
 			<GMRSetVar name="email" value="" />
+			<GMRSetVar name="addrfilter" value="ADDR CONTAINS ." />
+			<GMRSetVar name="addrfilter2" value="" />
+			<GMRif condition="$address != ''">
+				<GMRSetVar name="addrfilter2" value="ADDR SUBCONTAINS $address" />
+			</GMRif>
 			<GMRif condition="$email_in=='noemail'">
 				<GMRSetVar name="email" value="EMAIL EQUALS ''" />
 			</GMRif>
 			<GMRif condition="$email_in=='onlyemail'">
 				<GMRSetVar name="email" value="EMAIL CONTAINS ." />
+				<!-- GMRif condition="$address==''">
+					<GMRSetVar name="addrfilter" value="EMAIL CONTAINS ." />
+					<GMRSetVar name="email" value="" />
+				</GMRif -->
 			</GMRif>
 			<GMRSetVar name="newline" value="0" />
 			<GMRSetVar name="count" value="1" />
-			<GMRList list="individual" filter1="ADDR CONTAINS ." filter2="ADDR SUBCONTAINS $address" filter3="$email" sortby="NAME">
-				<GMRSetVar name="newline" value="0" />
-				<GMRSetVar name="count" value="$count+1" />
-				<GMRif condition="$count>3">
-					<GMRSetVar name="count" value="1" />
-					<GMRSetVar name="newline" value="1" />
-				</GMRif>
-				<GMRTextBox width="185" height="60" border="1" newline="$newline">
-					<GMRText style="label"><GMRGetPersonName id="" /></GMRText>
-					<GMRText style="text"><br /><GMRGedcomValue tag="ADDR" /></GMRText>
+			<GMRSetVar name="Xstart" value="1" />
+			<GMRSetVar name="Ystart" value="30" />
+			<GMRSetVar name="width" value="200" />
+			<GMRSetVar name="height" value="74" />
+			<GMRSetVar name="Xspace" value="3" />
+			<GMRSetVar name="Yspace" value="1" />
+			<GMRif condition="$pageSize=='letter'">
+				<GMRSetVar name="Xstart" value="5" />
+				<GMRSetVar name="Ystart" value="25" />
+				<GMRSetVar name="width" value="194" />
+				<GMRSetVar name="height" value="76" />
+				<GMRSetVar name="Xspace" value="15" />
+				<GMRSetVar name="Yspace" value="1" />
+			</GMRif>
+			<GMRSetVar name="X" value="$Xstart" />
+			<GMRSetVar name="Y" value="$Ystart" />
+			<GMRList list="individual" filter1="$addrfilter" filter2="$addrfilter2" filter3="$email" sortby="$sortby">
+				<GMRTextBox top="$Y" left="$X" width="$width" height="$height" border="0" newline="$newline" pagecheck="false">
+					<GMRText style="label">
+						<GMRif condition="@ADDR:_NAME == ''"><GMRGetPersonName id="" hideID="true" /></GMRif>
+						<GMRif condition="@ADDR:_NAME != ''"><GMRGedcomValue tag="ADDR:_NAME" /></GMRif>
+					</GMRText>
+					<GMRif condition="@ADDR != ''">
+						<GMRText style="text"><br /><GMRGedcomValue tag="ADDR" /><!-- GMRGedcomValue tag="RESI:ADDR" / --></GMRText>
+					</GMRif>
 					<GMRif condition="@ADDR:ADR1 != ''">
 						<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:ADR1" /></GMRText>
 					</GMRif>
+					<GMRif condition="@ADDR:ADR2 != ''">
+						<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:ADR2" /></GMRText>
+					</GMRif>
 					<GMRif condition="@ADDR:CITY != ''">
-					<GMRif condition="$POSTAL_CODE==false">
+						<GMRif condition="$POSTAL_CODE==false">
 							<GMRif condition="@ADDR:STAE != ''">
 								<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:POST" /> <GMRGedcomValue tag="ADDR:CITY" />, <GMRGedcomValue tag="ADDR:STAE" /> </GMRText>
-							</GMRif>		
+							</GMRif>
 							<GMRif condition="@ADDR:STAE == ''">
 								<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:POST" /> <GMRGedcomValue tag="ADDR:CITY" /></GMRText>
-							</GMRif>		
+							</GMRif>
 						</GMRif>
 						<GMRif condition="$POSTAL_CODE==true">
 							<GMRif condition="@ADDR:STAE != ''">
 								<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:CITY" />, <GMRGedcomValue tag="ADDR:STAE" /> <GMRGedcomValue tag="ADDR:POST" /></GMRText>
-					    	</GMRif>
+							</GMRif>
 							<GMRif condition="@ADDR:STAE == ''">
 								<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:CITY" /> <GMRGedcomValue tag="ADDR:POST" /></GMRText>
-					    	</GMRif>
-					    </GMRif>  
+							</GMRif>
+						</GMRif>
 					</GMRif>
 					<GMRif condition="@ADDR:CTRY != ''">
 						<GMRText style="text"><br /><GMRGedcomValue tag="ADDR:CTRY" /></GMRText>
 					</GMRif>
+					<GMRif condition="$showIndID">
+						<GMRText style="idstyle"><br />                                                                       <GMRGedcomValue tag="@id" /></GMRText>
+					</GMRif>
 				</GMRTextBox>
+				<GMRSetVar name="count" value="$count+1" />
+				<GMRSetVar name="X" value="$X+$Xspace" />
+				<GMRSetVar name="X" value="$X+$width" />
+				<GMRif condition="$count==4">
+					<GMRSetVar name="Y" value="$Y+$Yspace" />
+					<GMRSetVar name="Y" value="$Y+$height" />
+				</GMRif>
+				<GMRif condition="$Y>$pageHeight">
+					<GMRSetVar name="Y" value="$Ystart" />
+					<GMRSetVar name="X" value="$Xstart" />
+					<GMRNewPage />
+				</GMRif>
+				<GMRif condition="$count>3">
+					<GMRSetVar name="count" value="1" />
+					<GMRSetVar name="X" value="$Xstart" />
+				</GMRif>
 			</GMRList>
-			<GMRCell width="0" height="12" border="0" align="right" style="label">
-				<br /><GMRvar var="gm_lang[total_indis]" />: <GMRListTotal />
-			</GMRCell>
 		</GMRBody>
 		<GMRFooter>
-			<GMRCell width="0" height="10"><GMRNow /></GMRCell>
 		</GMRFooter>
 	</GMRDoc>
 </GMReport>

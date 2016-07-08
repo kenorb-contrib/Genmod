@@ -36,7 +36,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.fi.php,v 1.1 2005/10/23 21:54:42 roland-d Exp $
+ * @version $Id: countries.fi.php 13 2016-04-27 09:26:01Z Boudewijn $
 */
 
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {

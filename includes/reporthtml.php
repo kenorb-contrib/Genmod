@@ -2,6 +2,9 @@
 /**
  * HTML Report Generator
  *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2012 Genmod Development Team
+ *
  * used by the SAX parser to generate HTML reports from the XML report file.
  * @package Genmod
  * @subpackage Reports
@@ -102,7 +105,7 @@ function characterData($parser, $data)
 function GMRDocSHandler($attrs) {
 	global $pageSizes;
 	
-	$CHARACTER_SET = "UTF-8";
+	GedcomConfig::$CHARACTER_SET = "UTF-8";
 	$pageSize = $attrs["pageSize"];
 	$orientation = $attrs["orientation"];
 
@@ -118,10 +121,10 @@ function GMRDocSHandler($attrs) {
 	$margin = "1cm";
 	
 	//-- start html
-	header("Content-Type: text/html; charset=$CHARACTER_SET");
+	header("Content-Type: text/html; charset=".GedcomConfig::$CHARACTER_SET);
 	print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 	print "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n\t<head>\n\t\t";
-	print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$CHARACTER_SET\" />\n\t\t";
+	print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".GedcomConfig::$CHARACTER_SET."\" />\n\t\t";
 	print "<style>\n";
 	print "@page { size: $pagew $pageh; margin: $margin; }\n";
 	print ".page { page-break-before: always; }\n";

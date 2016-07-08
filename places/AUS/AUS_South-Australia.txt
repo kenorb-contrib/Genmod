@@ -1,4 +1,4 @@
-<!-- @version $Id: AUS_South-Australia.txt,v 1.1 2005/11/21 15:41:54 roland-d Exp $ -->
+<!-- @version $Id: AUS_South-Australia.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 Adelaide
 Adelaide Hills
 Barossa

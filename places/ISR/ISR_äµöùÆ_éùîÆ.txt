@@ -1,5 +1,5 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- @version $Id: ISR_����_����.txt,v 1.1 2005/10/23 22:06:17 roland-d Exp $ -->
+<!-- @version $Id: ISR_äµöùÆ_éùîÆ.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
 גולן דרומי **
 גולן צפוני **
 גולן תיכון **

@@ -3,7 +3,7 @@
  * Allow an admin user to download the backup file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: downloadbackup.php,v 1.2 2006/01/09 14:19:29 sjouke Exp $
+ * @version $Id: downloadbackup.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 /**
@@ -29,18 +29,30 @@
 */
 require "config.php";
 
-if ((!userIsAdmin($gm_username))||(empty($fname))) exit;
+// Check if the extension is legal and if the user has rights to download this
+$fname = urldecode($fname);
+$legal = array_merge(array("zip", "ged"), MediaFS::$MEDIATYPE);
+$et = preg_match("/(\.\w+)$/", $fname, $ematch);
+if ($et>0) $ext = substr(trim($ematch[1]),1);
+else $ext = "";
+if (!in_array(strtolower($ext), $legal) || !$gm_user->userGedcomAdmin() || empty($fname)) {
+	WriteToLog("DownloadBackup-&gt; Illegal download attempt. File: ".$fname, "W", "S");
+	header("HTTP/1.1 403 Forbidden");
+	exit;
+}
 
-if(ini_get('zlib.output_compression')) ini_set('zlib.output_compression', 'Off');
 
-header("Pragma: public"); // required
+if(ini_get('zlib.output_compression')) @ini_set('zlib.output_compression', 'Off');
+
+header("Pragma: private"); // required
 header("Expires: 0");
-header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+header("Cache-Control: no-cache, must-revalidate, post-check=0, pre-check=0");
 header("Cache-Control: private",false); // required for certain browsers 
-header("Content-Type: application/zip");
-header("Content-Disposition: attachment; filename=$fname");
-header("Content-length: ".filesize($INDEX_DIRECTORY.$fname));
-header("Content-Transfer-Encoding: binary");
-readfile($INDEX_DIRECTORY.basename($fname));
-exit();
+header("Content-Type: application/octet-stream");
+header("Content-Disposition: attachment; filename=\"".basename($fname)."\"");
+$s = @filesize($fname);
+if ($s) header("Content-length: ".$s);
+header("Content-Transfer-Encoding: binary\n");
+readfile($fname);
+exit;
 ?>

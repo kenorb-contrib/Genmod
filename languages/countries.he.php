@@ -36,7 +36,7 @@
  * @author Meliza
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.he.php,v 1.1.2.5 2005/08/09 04:34:43 kosherjava Exp $
+ * @version $Id: countries.he.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {

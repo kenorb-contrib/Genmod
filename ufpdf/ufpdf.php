@@ -11,10 +11,10 @@
  * @package UFPDF
  * @see fpdf.php
  * @see reportpdf.php
- * @version $Id: ufpdf.php,v 1.2 2006/04/09 15:53:28 roland-d Exp $
+ * @version $Id: ufpdf.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
-if(!class_exists('UFPDF'))
+if(!class_exists('UFPDF', false))
 {
 define('UFPDF_VERSION','0.1');
 

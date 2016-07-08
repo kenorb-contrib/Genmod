@@ -3,7 +3,7 @@
  * Popup window for viewing images
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Media
- * @version $Id: imageview.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: imageview.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 /**
@@ -31,8 +31,14 @@
 require("config.php");
 
 if (!isset($filename)) $filename = "";
+// Check if the extension is legal
+$filename = urldecode($filename);
+if (!MediaFS::IsValidMedia($filename)) {
+	WriteToLog("ImageView-&gt; Illegal display attempt. File: ".$filename, "W", "S");
+	exit;
+}
 
-print_simple_header($gm_lang["imageview"]);
+PrintSimpleHeader(GM_LANG_imageview);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -58,9 +64,10 @@ print_simple_header($gm_lang["imageview"]);
 		if (zoom<10) zoom=10;
 		i.style.width=Math.round((zoom/100)*imgwidth)+"px";
 		i.style.height=null;
+		document.getElementById('zoomval').value=Math.round(zoom);
 	}
 	function resetimage() {
-		setzoom('100');
+		setzoom(initzoom);
 		document.getElementById('zoomval').value=zoom;
 		i = document.getElementById('theimage');
 		i.style.left='0px';
@@ -111,8 +118,8 @@ print_simple_header($gm_lang["imageview"]);
 	 function resizeWindow() { 
 		if (document.images) { 
 			if (document.images.length == 3) { 
-				height=document.images[0].height+80; 
-				width=document.images[0].width+20; 
+				height=(document.images[0].height * 100 / initzoom)+80; 
+				width=(document.images[0].width * 100 / initzoom)+20; 
 				if(width > screen.width-100) width = screen.width-100; 
 				if(height > screen.height-110) height = screen.height-110; 
 				if (document.layers) window.resizeTo(width+20,height+20) 
@@ -122,21 +129,22 @@ print_simple_header($gm_lang["imageview"]);
 			else setTimeout('resizeWindow()',1000); 
 		} 
 		resizeViewport(); 
-		resetimage(); 
+		//resetimage(); 
 	} 
 
 	function resizeViewport() {
 		if (IE) {
 			pagewidth = document.documentElement.offsetWidth;
-			pageheight = document.documentElement.offsetHeight;
+			pageheight = document.documentElement.offsetHeight-140;
 		}
 		else {
 			pagewidth = window.outerWidth-25;
-			pageheight = window.outerHeight-25;
+			pageheight = window.outerHeight-25-140;
 		}
-		viewport = document.getElementById("imagecropper");
+		viewport = document.getElementById('imagecropper');
 		viewport.style.width=(pagewidth-35)+"px";
-		viewport.style.height=(pageheight-60)+"px";
+		viewport.style.height=(pageheight-100)+"px"; // The page must hold the viewport AND the page footer
+		return;
 		i = document.getElementById('theimage');
 		i.style.left="0px";
 		i.style.top="0px";
@@ -158,41 +166,73 @@ print_simple_header($gm_lang["imageview"]);
 	document.onmousemove = getMouseXY;
 	document.onmouseup = releaseimage;
 
-	window.onresize = resizeViewport;
-	//window.onload = resizeWindow;
--->
+//-->
 </script>
 <?php
+//$filename = FilenameDecode($filename);
 print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
-if ((empty($filename))||(!@fclose(@fopen(filename_decode($filename),"r")))) {
-	print "<span class=\"error\">".$gm_lang["file_not_found"]."&nbsp;".$filename."</span>";
-	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
+if (!SystemConfig::$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
+	print "<span class=\"Error\">".GM_LANG_file_not_found."&nbsp;".$filename."</span>";
+	print "<br /><br /><div class=\"CloseWindow\"><a href=\"javascript:// ".GM_LANG_close_window."\" onclick=\"self.close();\">".GM_LANG_close_window."</a></div>\n";
 }
 else {
-	print "<font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">-</a> </font>";
+	print "<a href=\"#\" onclick=\"zoomin(); return false;\"><span class=\"ZoomButtons\">+</span></a> <a href=\"#\" onclick=\"zoomout();\"><span class=\"ZoomButtons\">-</span></a> ";
 	print "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%\n";
-	print "<input type=\"button\" value=\"".$gm_lang["reset"]."\" onclick=\"resetimage(); return false;\" />\n";
-	$imgsize = @getimagesize(filename_decode($filename));
-	if ($imgsize) {
-		$imgwidth = $imgsize[0]+2;
-		$imgheight = $imgsize[1]+2;
+	print "<input type=\"button\" value=\"".GM_LANG_reset."\" onclick=\"resetimage(); return false;\" />\n";
+	
+	if (!strstr($filename, "://")) {
+		if (!SystemConfig::$MEDIA_IN_DB) $details = MediaFS::GetFileDetails($filename, false);
+		else {
+			// we must strip showblob?file= from the filename, to get the real file
+			$fn = preg_replace("/showblob.php\?file=/", "", $filename);
+			$fn = preg_replace("/&.*/", "", $fn);
+			$details = MediaFS::GetFileDetails($fn, true);
+		}
+		if (!empty($details["width"]) && !empty($details["height"])) {
+			$imgwidth = $details["width"]+2;
+			$imgheight = $details["height"]+2;
+		}
+		else {
+			$imgwidth = 50;
+			$imgheight = 50;
+		}
 	}
 	else {
-		$imgwidth = 50;
-		$imgheight = 50;
+		$details = @getimagesize($filename);
+		if (!empty($details[0]) && !empty($details[1])) {
+			$imgwidth = $details[0]+2;
+			$imgheight = $details[1]+2;
+		}
+		else {
+			$imgwidth = 50;
+			$imgheight = 50;
+		}
 	}
-	print "<script language=\"JavaScript\" type=\"text/javascript\">\n";
-	print "var imgwidth = $imgwidth-5;\n var imgheight = $imgheight-5;\n";
-	print "var landscape = false;\n";
-	print "if (imgwidth > imgheight) landscape = true;\n";
-	print "</script>\n";
-	print '<br /><div id="imagecropper" style="position: relative; border: outset white 3px; background-color: black; overflow: auto; vertical-align: middle; text-align: center; width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
-	print "\n<img id=\"theimage\" src=\"$filename\" style=\"position: absolute; left: 1px; top: 1px; cursor: move;\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
+	print '<br /><div id="imagecropper" style="width: '.$imgwidth.'px; height: '.$imgheight.'px; ">';
+	print "\n<img id=\"theimage\" src=\"$filename\" onmousedown=\"panimage(); return false;\" alt=\"\" />\n";
 	print '</div>';
 }
+//	print $imgwidth." ".$imgheight;
+	?>
+	<script language="JavaScript" type="text/javascript">
+	<!--
+	var height = document.documentElement.clientHeight;
+	var imgheight = <?php print $imgheight; ?>;
+	var imgwidth = <?php print $imgwidth; ?>;
+	if (height < imgheight) {
+		zoom = zoom * height / imgheight;
+		setzoom(zoom);
+	}
+	var landscape = false;
+	var initzoom = zoom;
+	if (imgwidth > imgheight) landscape = true;
+	window.onload = resizeWindow; // Use without () as it throws errors in IE
+	window.onresize = resizeViewport;  // Use without () as it throws errors in IE
+	//-->
+	</script><?php
 print "</form>\n";
-print "<div style=\"position: relative; \">\n";
-print_simple_footer();
+print "<div style=\"position: relative; bottom: 0; \">\n";
 print "</div>\n";
+PrintSimpleFooter();
 ?>

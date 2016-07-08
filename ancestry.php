@@ -6,7 +6,7 @@
  * ($rootid=1, father=2, mother=3 ...)
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,138 +26,36 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: ancestry.php,v 1.2 2006/02/19 18:40:23 roland-d Exp $
+ * @version $Id: ancestry.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
  
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
-
-/**
- * Inclusion of the chart functions
-*/
-require("includes/functions_charts.php");
-
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY . $factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
-
-/**
- * print a child ascendancy
- *
- * @param string $pid individual Gedcom Id
- * @param int $sosa child sosa number
- * @param int $depth the ascendancy depth to show
- */
-function print_child_ascendancy($pid, $sosa, $depth) {
-	global $gm_lang, $view, $show_full, $OLD_PGENS, $box_width, $chart_style;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $Dindent;
-	global $SHOW_EMPTY_BOXES, $pidarr;
-
-	// child
-	print "<li>";
-	print "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><a name=\"sosa".$sosa."\"></a>";
-	$new=($pid=="" or !isset($pidarr["$pid"]));
-	if ($sosa==1) print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>\n";
-	else print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" alt=\"\" /></td><td>\n";
-	print_pedigree_person($pid, 1, $view!="preview");
-	print "</td>";
-	print "<td>";
-	if ($sosa>1) print_url_arrow($pid, "?rootid=$pid&amp;PEDIGREE_GENERATIONS=$OLD_PGENS&amp;show_full=$show_full&amp;box_width=$box_width&amp;chart_style=$chart_style", $gm_lang["ancestry_chart"], 3);
-	print "</td>";
-	print "<td class=\"details1\">&nbsp;<span class=\"person_box". (($sosa==1) ? "NN" : (($sosa%2) ? "F" : "")) . "\">&nbsp;$sosa&nbsp;</span>&nbsp;";
-	print "</td><td class=\"details1\">";
-	$relation ="";
-	if (!$new) $relation = "<br />[=<a href=\"#sosa".$pidarr["$pid"]."\">".$pidarr["$pid"]."</a> - ".get_sosa_name($pidarr["$pid"])."]";
-	else $pidarr["$pid"]=$sosa;
-	print get_sosa_name($sosa).$relation;
-	print "</td>";
-	print "</tr></table>";
-
-	// parents
-	$famids = find_family_ids($pid);
-	$famid = @$famids[0];
-	$famrec = find_family_record($famid);
-	$parents = @find_parents($famid);
-	if (($parents or $SHOW_EMPTY_BOXES) and $new and $depth>0) {
-		// print marriage info
-		print "<span class=\"details1\" style=\"white-space: nowrap;\" >";
-		print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["spacer"]["other"]."\" height=\"2\" width=\"$Dindent\" border=\"0\" align=\"middle\" alt=\"\" /><a href=\"javascript: ".$gm_lang["view_family"]."\" onclick=\"expand_layer('sosa_".$sosa."'); return false;\" class=\"top\"><img id=\"sosa_".$sosa."_img\" src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["minus"]["other"]."\" align=\"middle\" hspace=\"0\" vspace=\"3\" border=\"0\" alt=\"".$gm_lang["view_family"]."\" /></a> ";
-		print "&nbsp;<span class=\"person_box\">&nbsp;".($sosa*2)."&nbsp;</span>&nbsp;".$gm_lang["and"];
- 		print "&nbsp;<span class=\"person_boxF\">&nbsp;".($sosa*2+1)." </span>&nbsp;";
-		if (showFact("MARR", $famid)) print_simple_fact($famrec, "MARR", $parents["WIFE"]); else print $gm_lang["private"];
-		print "</span>";
-		// display parents recursively
-		print "<ul style=\"list-style: none; display: block;\" id=\"sosa_$sosa\">";
-		print_child_ascendancy($parents["HUSB"], $sosa*2, $depth-1);
-		print_child_ascendancy($parents["WIFE"], $sosa*2+1, $depth-1);
-		print "</ul>\r\n";
-	}
-	print "</li>\r\n";
-}
-
-// -- args
-
-if (!isset($show_full)) $show_full = $PEDIGREE_FULL_DETAILS;
-if ($show_full == "") $show_full = 0;
-if (!isset($chart_style)) $chart_style = 0;
-if ($chart_style=="") $chart_style = 0;
-if (!isset($show_cousins)) $show_cousins = 0;
-if ($show_cousins == "") $show_cousins = 0;
-if ((!isset($PEDIGREE_GENERATIONS)) || ($PEDIGREE_GENERATIONS == "")) $PEDIGREE_GENERATIONS = $DEFAULT_PEDIGREE_GENERATIONS;
-
-if ($PEDIGREE_GENERATIONS > $MAX_PEDIGREE_GENERATIONS) {
-	$PEDIGREE_GENERATIONS = $MAX_PEDIGREE_GENERATIONS;
-	$max_generation = true;
-}
-
-if ($PEDIGREE_GENERATIONS < 2) {
-	$PEDIGREE_GENERATIONS = 2;
-	$min_generation = true;
-}
-$OLD_PGENS = $PEDIGREE_GENERATIONS;
-
-if (!isset($rootid)) $rootid = "";
-$rootid = clean_input($rootid);
-$rootid = check_rootid($rootid);
+$ancestry_controller = new AncestryController();
 
 // -- size of the boxes
-if (!isset($box_width)) $box_width = "100";
-if (empty($box_width)) $box_width = "100";
-$box_width=max($box_width, 50);
-$box_width=min($box_width, 300);
-$Dbwidth*=$box_width/100;
-if (!$show_full) $Dbheight=25;
+$Dbwidth *= $ancestry_controller->box_width/100;
+if (!$ancestry_controller->show_full) $Dbheight=25;
 $bwidth=$Dbwidth;
 $bheight=$Dbheight;
 $pbwidth = $bwidth+12;
 $pbheight = $bheight+14;
 
-if ((DisplayDetailsByID($rootid)) || (showLivingNameByID($rootid))) {
-	$name = get_person_name($rootid);
-	$addname = get_add_person_name($rootid);
-}
-else {
-	$name = $gm_lang["private"];
-	$addname = "";
-}
+
 // -- print html header information
-print_header($name . " " . $gm_lang["ancestry_chart"]);
-if (strlen($name)<30) $cellwidth="420";
-else $cellwidth=(strlen($name)*14);
-print "\n\t<table class=\"list_table $TEXT_DIRECTION\"><tr><td width=\"${cellwidth}px\" valign=\"top\">\n\t\t";
-if ($view == "preview") print "<h2>" . str_replace("#PEDIGREE_GENERATIONS#", convert_number($PEDIGREE_GENERATIONS), $gm_lang["gen_ancestry_chart"]) . ":";
-else print "<h2>" . $gm_lang["ancestry_chart"] . ":";
-print "<br />".PrintReady($name);
-if ($addname != "") print "<br />" . PrintReady($addname);
-print "</h2>";
+PrintHeader($ancestry_controller->pagetitle);
+print "<div id=\"content_ancestry\">";
+
+if ($ancestry_controller->view == "preview") print "<span class=\"PageTitleName\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_gen_ancestry_chart) . ":";
+else print "<span class=\"PageTitleName\">" . GM_LANG_ancestry_chart . ":";
+print "&nbsp;".PrintReady($ancestry_controller->root->name);
+if ($ancestry_controller->root->addname != "") print "&nbsp;" . PrintReady($ancestry_controller->root->addname);
+print "</span>";
+
 // -- print the form to change the number of displayed generations
-if ($view != "preview") {
+if ($ancestry_controller->view != "preview") {
 	$show_famlink = true;
 	?>
 	<script language="JavaScript" type="text/javascript">
@@ -169,132 +67,75 @@ if ($view != "preview") {
 	//-->
 	</script>
 	<?php
-	if (isset($max_generation) == true) print "<span class=\"error\">" . str_replace("#PEDIGREE_GENERATIONS#", convert_number($PEDIGREE_GENERATIONS), $gm_lang["max_generation"]) . "</span>";
-	if (isset($min_generation) == true) print "<span class=\"error\">" . $gm_lang["min_generation"] . "</span>";
-	print "\n\t</td><td><form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
-	print "<input type=\"hidden\" name=\"chart_style\" value=\"$chart_style\" />";
-	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
-	print "<input type=\"hidden\" name=\"show_cousins\" value=\"$show_cousins\" />";
-	print "\n\t\t<table class=\"list_table $TEXT_DIRECTION\">\n\t\t";
-
-	// NOTE: Root ID
-	print "<tr><td class=\"shade2\">";
-	print_help_link("rootid_help", "qm");
-	print $gm_lang["root_person"]."&nbsp;</td>";
-	print "<td class=\"shade1 vmiddle\">";
-	print "<input class=\"pedigree_form\" type=\"text\" name=\"rootid\" id=\"rootid\" size=\"3\" value=\"$rootid\" />";
-	print_findindi_link("rootid","");
-	print "</td>";
-
-	// NOTE: Box width
-	print "<td class=\"shade2\">";
-	print_help_link("box_width_help", "qm");
-	print $gm_lang["box_width"] . "&nbsp;</td>";
-	print "<td class=\"shade1 vmiddle\"><input type=\"text\" size=\"3\" name=\"box_width\" value=\"$box_width\" /> <b>%</b>";
-	print "</td>";
-
-	// NOTE: chart style
-	print "<td rowspan=\"2\" class=\"shade2\">";
-	print_help_link("chart_style_help", "qm");
-	print $gm_lang["displ_layout_conf"];
-	print "</td>";
-	print "<td rowspan=\"2\" class=\"shade1 vmiddle\">";
-	print "<input type=\"radio\" name=\"chart_style\" value=\"0\"";
-	if ($chart_style == "0") print " checked=\"checked\" ";
-	print "onclick=\"toggleStatus('cousins');";
-	if ($chart_style != "1") print " document.people.chart_style.value='1';";
-	print "\" />".$gm_lang["chart_list"];
-	print "<br /><input type=\"radio\" name=\"chart_style\" value=\"1\"";
-	if ($chart_style == "1") print " checked=\"checked\" ";
-	print "onclick=\"toggleStatus('cousins');";
-	if ($chart_style != "1") print " document.people.chart_style.value='0';";
-	print "\" />".$gm_lang["chart_booklet"];
-
-	// NOTE: show cousins
-	print "<br />";
-	print_help_link("show_cousins_help", "qm");
-	print "<input ";
-	if ($chart_style == "0") print "disabled=\"disabled\" ";
-	print "id=\"cousins\" type=\"checkbox\" value=\"";
-	if ($show_cousins) print "1\" checked=\"checked\" onclick=\"document.people.show_cousins.value='0';\"";
-	else print "0\" onclick=\"document.people.show_cousins.value='1';\"";
-	print " />" . $gm_lang["show_cousins"];
-	print "</td>";
-
-	// NOTE: submit
-	print "<td rowspan=\"2\" class=\"facts_label03\">";
-	print "<input type=\"submit\" value=\"".$gm_lang["view"]."\" />";
-	print "</td></tr>";
-
-	// NOTE: generations
-	print "<tr><td class=\"shade2\">";
-	print_help_link("PEDIGREE_GENERATIONS_help", "qm");
-	print $gm_lang["generations"] . "&nbsp;</td>";
-
-	print "<td class=\"shade1 vmiddle\">";
-	print "<select name=\"PEDIGREE_GENERATIONS\">";
-	for ($i=2; $i<=$MAX_PEDIGREE_GENERATIONS; $i++) {
-	print "<option value=\"".$i."\"" ;
-	if ($i == $OLD_PGENS) print "selected=\"selected\" ";
-		print ">".$i."</option>";
-	}
-	print "</select>";
-	
-	print "</td>";
-	
-	
-	
-//	print "<td class=\"shade1 vmiddle\"><input type=\"text\" name=\"PEDIGREE_GENERATIONS\" size=\"3\" value=\"$OLD_PGENS\" /> ";
-//	print "</td>";
-
-	// NOTE: show full
-	print "<td class=\"shade2\">";
-	print "<input type=\"hidden\" name=\"show_full\" value=\"$show_full\" />";
-	print_help_link("show_full_help", "qm");
-	print $gm_lang["show_details"];
-	print "</td>";
-	print "<td class=\"shade1 vmiddle\">";
-	print "<input type=\"checkbox\" value=\"";
-	if ($show_full) print "1\" checked=\"checked\" onclick=\"document.people.show_full.value='0';\"";
-	else print "0\" onclick=\"document.people.show_full.value='1';\"";
-	print " />";
-	print "</td></tr>";
-	print "</table>";
-	print "</form>\n";
+	if (isset($ancestry_controller->max_generation) == true) print "<span class=\"Error\">" . str_replace("#PEDIGREE_GENERATIONS#", ConvertNumber($ancestry_controller->num_generations), GM_LANG_max_generation) . "</span>";
+	if (isset($ancestry_controller->min_generation) == true) print "<span class=\"Error\">" . GM_LANG_min_generation . "</span>";
+	print "<div class=\"AncestryNavBlock\">";
+		print "<form name=\"people\" id=\"people\" method=\"get\" action=\"?\">";
+			print "\n\t\t<table class=\"NavBlockTable AncestryNavBlockTable\">";
+		
+			// Option header
+			$ancestry_controller->PrintInputHeader();
+			
+			// Root ID
+			$ancestry_controller->PrintInputRootId();
+		
+			// Generations
+			$ancestry_controller->PrintInputGenerations(GedcomConfig::$MAX_DESCENDANCY_GENERATIONS, "PEDIGREE_GENERATIONS_help");	
+			
+			// Box width
+			$ancestry_controller->PrintInputBoxWidth();
+		
+			// NOTE: show full
+			$ancestry_controller->PrintInputShowFull();
+					
+			// NOTE: chart style
+			$ancestry_controller->PrintInputChartStyle();
+		
+			// NOTE: show cousins
+			$ancestry_controller->PrintInputShowCousins();
+		
+			// Submit
+			$ancestry_controller->PrintInputSubmit();
+			
+			print "</table>";
+		print "</form>\n";
+	print "</div>";
 }
-print "</td></tr></table>";
 
-if ($chart_style) {
+if ($ancestry_controller->chart_style) {
 	// first page : show indi facts
-	print_pedigree_person($rootid, 2, false, 1);
+	PersonFunctions::PrintPedigreePerson($ancestry_controller->root, 2, false, 1, 1, "", $ancestry_controller->params);
 	// expand the layer
 	echo <<< END
 	<script language="JavaScript" type="text/javascript">
-		expandbox("$rootid.1", 2);
+	<!--
+		expandbox("$ancestry_controller->xref.1", 2);
+	//-->
 	</script>
 	<br />
 END;
 	// process the tree
-	$treeid = pedigree_array($rootid);
-	$treesize = pow(2, (int)($PEDIGREE_GENERATIONS))-1;
+	$treeid = ChartFunctions::PedigreeArray($ancestry_controller->xref, $ancestry_controller->num_generations);
+	$treesize = pow(2, (int)($ancestry_controller->num_generations))-1;
 	for ($i = 0; $i < $treesize; $i++) {
 		$pid = $treeid[$i];
 		if ($pid) {
-			$famids = find_family_ids($pid);
-			$parents = @find_parents($famids[0]);
-			if ($parents) print_sosa_family($famids[0], $pid, $i + 1);
+			$person =& Person::GetInstance($pid);
+			$fam = $person->primaryfamily;
+			if (!empty($fam)) {
+				$family =& Family::GetInstance($fam);
+				ChartFunctions::PrintSosaFamily($family, $pid, $i + 1, "", "", "", $ancestry_controller->view);
+			}
 			// show empty family only if it is the first and only one
-			else if ($i == 0) print_sosa_family("", $pid, $i + 1);
+			else if ($i == 0) ChartFunctions::PrintSosaFamily("", $pid, $i + 1, "", "", "", $ancestry_controller->view);
 		}
 	}
 }
 else {
-	$pidarr=array();
-	print "<ul style=\"list-style: none; display: block;\" id=\"ancestry_chart".($TEXT_DIRECTION=="rtl" ? "_rtl" : "") ."\">\r\n";
-	print_child_ascendancy($rootid, 1, $OLD_PGENS);
+	print "<ul id=\"ancestry_chart\">\r\n";
+	$ancestry_controller->PrintChildAscendancy($ancestry_controller->root, 1, $ancestry_controller->num_generations);
 	print "</ul>";
-	print "<br />";
 }
-
-print_footer();
+print "</div>";
+PrintFooter();
 ?>

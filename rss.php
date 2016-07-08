@@ -4,7 +4,7 @@
  * in the index page.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2012 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage RSS
- * @version $Id: rss.php,v 1.2 2006/04/05 18:00:41 sjouke Exp $
+ * @version $Id: rss.php 13 2016-04-27 09:26:01Z Boudewijn $
  */
 
 if (isset($_SESSION["CLANGUAGE"])) $oldlang = $_SESSION["CLANGUAGE"];
@@ -31,58 +31,49 @@ if (!empty($lang)) {
 	$changelanguage = "yes";
 	$NEWLANGUAGE = $lang;
 }
-/**
- * Inclusion of the RSS feed creator class
-*/
-require("includes/feedcreator.class.php");
 
 /**
  * Inclusion of the RSS functions
 */
-require("includes/functions_rss.php");
+require("includes/functions/functions_rss.php");
 
 /**
  * Inclusion of the configuration file
 */
 require("config.php");
 if (empty($rssStyle)){
-	$rssStyle=$RSS_FORMAT;
+	$rssStyle = GedcomConfig::$RSS_FORMAT;
 }
 if (empty($rssStyle) || ($rssStyle != "HTML" && $rssStyle != "JS" && $rssStyle != "MBOX")) {
 	header("Content-Type: application/xml; charset=utf-8");
 } else {
 	header('Content-Type: text/html; charset=utf-8');
 }
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
 
 if (!isset($_SERVER['QUERY_STRING'])) $_SERVER['QUERY_STRING'] = "lang=".$LANGUAGE;
 
-$user=getUser($CONTACT_EMAIL);
-$author =$user["firstname"]." ".$user["lastname"];
+$user =& User::GetInstance(GedcomConfig::$CONTACT_EMAIL);
+$author =$user->firstname." ".$user->lastname;
 
 $rss = new UniversalFeedCreator();
-$rss->title = $GEDCOMS[$GEDCOM]["title"];
-$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[$GEDCOM]["title"], $gm_lang["rss_descr"]);
+$rss->title = $GEDCOMS[GedcomConfig::$GEDCOMID]["title"];
+$rss->description = str_replace("#GEDCOM_TITLE#", $GEDCOMS[GedcomConfig::$GEDCOMID]["title"], GM_LANG_rss_descr);
 
 //optional
 $rss->descriptionTruncSize = 500;
 $rss->descriptionHtmlSyndicated = true;
 $rss->cssStyleSheet="";
 
-$rss->link = $SERVER_URL;
-$syndURL = $SERVER_URL."rss.php?".$_SERVER['QUERY_STRING'];
+$rss->link = SERVER_URL;
+$syndURL = SERVER_URL."rss.php?".$_SERVER['QUERY_STRING'];
 $syndURL = preg_replace("/&/", "&amp;", $syndURL);
 $rss->syndicationURL = $syndURL;
 
 $image = new FeedImage();
-$image->title = $gm_lang["rss_logo_descr"];
-$image->url = $SERVER_URL."images/genmod.gif";
-$image->link = "http://www.Genmod.net";
-$image->description = $gm_lang["rss_logo_descr"];
+$image->title = GM_LANG_rss_logo_descr;
+$image->url = SERVER_URL."images/gedcom.gif";
+$image->link = "http://www.sourceforge.net/projects/genmod";
+$image->description = GM_LANG_rss_logo_descr;
 
 //optional
 $image->descriptionTruncSize = 500;
@@ -98,114 +89,62 @@ $printGedcomNews = false;
 $printTop10Surnames = false;
 $printRecentChanges = false;
 
-
-$blocks=  getBlocks($GEDCOM);
-$main = $blocks["main"];
-
-if(!empty($module)){
-	if($module == "today"){
-		$printTodays = true;
-	} else if($module == "upcoming"){
-		$printUpcoming = true;
-	} else if($module == "gedcomStats"){
-		$printGedcomStats = true;
-	} else if($module == "gedcomNews"){
-		$printGedcomNews = true;
-	} else if($module == "top10Surnames"){
-		$printTop10Surnames = true;
-	} else if($module == "recentChanges"){
-		$printRecentChanges = true;
+// First try to retrieve the block config from the database
+$bconfig = "";
+$blocks = new Blocks("gedcom");
+foreach ($blocks->main as $order => $blockdata) {
+	if ($blockdata[0] == "print_RSS_block") {
+		$bconfig = $blockdata[1];
+		break;
 	}
-
-} else {
-	if (count($main)==0) {
-		$printGedcomStats = true;
-		$printGedcomNews = true;
-	} else {
-		foreach($main as $mname => $value){
-			if($value[0] == "print_todays_events"){
-				$printTodays = true;
-			} else if($value[0] == "print_upcoming_events"){
-				$printUpcoming = true;
-			} else if($value[0] == "print_gedcom_stats"){
-				$printGedcomStats = true;
-			} else if($value[0] == "print_gedcom_news"){
-				$printGedcomNews = true;
-			} else if($value[0] == "print_block_name_top10"){
-				$printTop10Surnames = true;
-			} else if($value[0] == "print_recent_changes"){
-				$printRecentChanges = true;
-			}
-		}
-	}
-	$right = $blocks["right"];
-	if (count($right)==0) {
-		$printTodays = true;
-	} else {
-		foreach($right as $mname => $value){
-			if($value[0] == "print_todays_events"){
-				$printTodays = true;
-			} else if($value[0] == "print_upcoming_events"){
-				$printUpcoming = true;
-			} else if($value[0] == "print_gedcom_stats"){
-				$printGedcomStats = true;
-			} else if($value[0] == "print_gedcom_news"){
-				$printGedcomNews = true;
-			} else if($value[0] == "print_block_name_top10"){
-				$printTop10Surnames = true;
-			} else if($value[0] == "print_recent_changes"){
-				$printRecentChanges = true;
-			}
+}
+if (empty($bconfig)) {
+	foreach ($blocks->right as $order => $blockdata) {
+		if ($blockdata[0] == "print_RSS_block") {
+			$bconfig = $blockdata[1];
+			break;
 		}
 	}
 }
 
-if($printTodays){
-	$todaysEvents = getTodaysEvents();
-	if (! empty($todaysEvents[2])) {
-		$item = new FeedItem();
-		$item->title = $todaysEvents[0];
-		$item->link = $SERVER_URL. "calendar.php?action=today";
-		$item->description = $todaysEvents[2];
+// If empty, get it from the RSS block
+if (empty($bconfig) || count($bconfig) == 0) {
+	require("blocks/rss_block.php");
+	$bconfig = $GM_BLOCKS["print_RSS_block"]["config"];
+}	
 
-		//optional
-		$item->descriptionTruncSize = 500;
-		$item->descriptionHtmlSyndicated = true;
+if((empty($module) || $module == "print_gedcom_news") && (isset($bconfig["print_gedcom_news"]) && $bconfig["print_gedcom_news"] == "yes")) {
+	$gedcomNews = getGedcomNews();
 
-		$item->date = $todaysEvents[1];
-		$item->source = $SERVER_URL;
-		$item->author = $author;
-		$rss->addItem($item);
+	$numElements = count($gedcomNews); //number of news items
+	for($i=0; $i < $numElements; $i++) {
+		$newsItem = $gedcomNews[$i];
+		if (! empty($newsItem[1])) {
+			$item = new FeedItem();
+			$item->title = $newsItem[0];
+			//$item->link = SERVER_URL . "index.php?command=gedcom#" . $newsItem[0];
+			$item->link = "index.php?gedid=".GedcomConfig::$GEDCOMID."&amp;command=gedcom#" . $newsItem[3];
+			$item->description = $newsItem[2];
+
+			//optional
+			$item->descriptionTruncSize = 500;
+			$item->descriptionHtmlSyndicated = true;
+
+			$item->date = $newsItem[1];
+			$item->source = SERVER_URL ;
+			$item->author = $author;
+			$rss->addItem($item);
+		}
 	}
 }
 
-if($printUpcoming){
-	$upcomingEvent = getUpcomingEvents();
-	if (! empty($upcomingEvent[2])) {
-		$item = new FeedItem();
-		$item->title = $upcomingEvent[0];
-		$item->link = $SERVER_URL. "calendar.php?action=calendar";
-		$item->description = $upcomingEvent[2];
-
-		//optional
-		$item->descriptionTruncSize = 500;
-		$item->descriptionHtmlSyndicated = true;
-
-		$item->date = $upcomingEvent[1];
-		$item->source = $SERVER_URL;
-		$item->author = $author;
-
-		$rss->addItem($item);
-	}
-}
-
-if($printGedcomStats){
+if((empty($module) || $module == "print_gedcom_stats") && (isset($bconfig["print_gedcom_stats"]) && $bconfig["print_gedcom_stats"] == "yes")) {
 	$gedcomStats = getGedcomStats();
 	if (! empty($gedcomStats[2])) {
 		$item = new FeedItem();
 		$item->title = $gedcomStats[0];
-		//$item->link = $SERVER_URL. "index.php?command=gedcom";
-		$item->link = $SERVER_URL. "index.php?command=gedcom#gedcom_stats";
+		//$item->link = SERVER_URL. "index.php?command=gedcom";
+		$item->link = "index.php?gedid=".GedcomConfig::$GEDCOMID."&amp;command=gedcom#gedcom_stats";
 		$item->description = $gedcomStats[2];
 
 		//optional
@@ -215,19 +154,58 @@ if($printGedcomStats){
 		if (! empty($gedcomStats[1])) {
 		$item->date = $gedcomStats[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
 	}
 }
 
-if($printTop10Surnames){
+if((empty($module) || $module == "print_todays_events") && (isset($bconfig["print_todays_events"]) && $bconfig["print_todays_events"] == "yes")) {
+	$todaysEvents = getTodaysEvents();
+	if (! empty($todaysEvents[2])) {
+		$item = new FeedItem();
+		$item->title = $todaysEvents[0];
+		$item->link = "calendar.php?link=15&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;action=today";
+		$item->description = $todaysEvents[2];
+
+		//optional
+		$item->descriptionTruncSize = 500;
+		$item->descriptionHtmlSyndicated = true;
+
+		$item->date = $todaysEvents[1];
+		$item->source = SERVER_URL;
+		$item->author = $author;
+		$rss->addItem($item);
+	}
+}
+
+if((empty($module) || $module == "print_upcoming_events") && (isset($bconfig["print_upcoming_events"]) && $bconfig["print_upcoming_events"] == "yes")) {
+	$upcomingEvent = getUpcomingEvents();
+	if (! empty($upcomingEvent[2])) {
+		$item = new FeedItem();
+		$item->title = $upcomingEvent[0];
+		$item->link = "calendar.php?link=16&amp;gedid=".GedcomConfig::$GEDCOMID."&amp;action=calendar";
+		$item->description = $upcomingEvent[2];
+
+		//optional
+		$item->descriptionTruncSize = 500;
+		$item->descriptionHtmlSyndicated = true;
+
+		$item->date = $upcomingEvent[1];
+		$item->source = SERVER_URL;
+		$item->author = $author;
+
+		$rss->addItem($item);
+	}
+}
+
+if((empty($module) || $module == "print_block_name_top10") && (isset($bconfig["print_block_name_top10"]) && $bconfig["print_block_name_top10"] == "yes")) {
 	$top10 = getTop10Surnames();
 	if (! empty($top10[2])) {
 		$item = new FeedItem();
 		$item->title = $top10[0];
-		$item->link = $SERVER_URL. "indilist.php";
+		$item->link = "indilist.php?show_all=yes&amp;surname_sublist=yes&amp;gedid=".GedcomConfig::$GEDCOMID;
 		$item->description = $top10[2];
 
 		//optional
@@ -237,44 +215,19 @@ if($printTop10Surnames){
 		if (! empty($top10[1])) {
 			$item->date = $top10[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
 	}
 }
 
-if($printGedcomNews){
-	$gedcomNews = getGedcomNews();
-
-	$numElements = count($gedcomNews); //number of news items
-	for($i=0; $i < $numElements; $i++) {
-		$newsItem = $gedcomNews[$i];
-		if (! empty($newsItem[1])) {
-			$item = new FeedItem();
-			$item->title = $newsItem[0];
-			//$item->link = $SERVER_URL . "index.php?command=gedcom#" . $newsItem[0];
-			$item->link = $SERVER_URL . "index.php?command=gedcom#" . $newsItem[3];
-			$item->description = $newsItem[2];
-
-			//optional
-			$item->descriptionTruncSize = 500;
-			$item->descriptionHtmlSyndicated = true;
-
-			$item->date = $newsItem[1];
-			$item->source = $SERVER_URL ;
-			$item->author = $author;
-			$rss->addItem($item);
-		}
-	}
-}
-
-if($printRecentChanges){
-	$recentChanges= getRecentChanges();
+if((empty($module) || $module == "print_recent_changes") && (isset($bconfig["print_recent_changes"]) && $bconfig["print_recent_changes"] == "yes")) {
+	$recentChanges = getRecentChanges();
 	if (! empty($recentChanges[2])) {
 		$item = new FeedItem();
 		$item->title = $recentChanges[0];
-		$item->link = $SERVER_URL. "indilist.php";
+		$item->link = "indilist.php?gedid=".GedcomConfig::$GEDCOMID;
 		$item->description = $recentChanges[2];
 
 		//optional
@@ -284,7 +237,7 @@ if($printRecentChanges){
 		if (! empty($recentChanges[1])) {
 			$item->date = $recentChanges[1];
 		}
-		$item->source = $SERVER_URL;
+		$item->source = SERVER_URL;
 		$item->author = $author;
 
 		$rss->addItem($item);
@@ -299,5 +252,5 @@ echo $rss->createFeed($rssStyle);
 
  //-- preserve the old language by storing it back in the session
 $_SESSION['CLANGUAGE'] = $oldlang;
-
+@session_destroy();
 ?>
