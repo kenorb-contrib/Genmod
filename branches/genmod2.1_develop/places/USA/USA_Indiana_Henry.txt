@@ -1,0 +1,30 @@
+<!-- @version $Id: USA_Indiana_Henry.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Blountsville
+Blue River Township
+Cadiz
+Dudley Township
+Dunreith
+Fall Creek Township
+Franklin Township
+Greensboro
+Harrison Township
+Henry Township
+Jefferson Township
+Kennard
+Knightstown
+Lewisville
+Liberty Township
+Middletown
+Mooreland
+Mount Summit
+New Castle
+New Lisbon
+Prairie Township
+Shirley
+Spiceland
+Springport
+Stoney Creek Township
+Straughn
+Sulphur Springs
+Wayne Township

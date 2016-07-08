@@ -1,0 +1,24 @@
+<!-- @version $Id: USA_Alabama_Baldwin.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bay Minette
+Bon Secour
+Daphne
+Elberta
+Fairhope
+Foley
+Gulf Shores
+Lillian
+Little River
+Loxley
+Magnolia Springs
+Montrose
+Orange Beach
+Perdido
+Point Clear
+Robertsdale
+Seminole
+Silverhill
+Spanish Fort
+Stapleton
+Stockton
+Summerdale

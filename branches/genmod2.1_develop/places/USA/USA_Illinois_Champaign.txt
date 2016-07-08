@@ -1,0 +1,47 @@
+<!-- @version $Id: USA_Illinois_Champaign.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Allerton
+Ayers Township
+Bondville
+Broadlands
+Brown Township
+Champaign City Township
+Champaign Township
+Colfax Township
+Compromise Township
+Condit Township
+Crittenden Township
+Cunningham Township
+Dewey
+East Bend Township
+Fisher
+Foosland
+Gifford
+Harwood Township
+Hensley Township
+Homer
+Ivesdale
+Kerr Township
+Longview
+Ludlow Township
+Mahomet Township
+Newcomb Township
+Ogden Township
+Penfield
+Pesotum Township
+Philo Township
+Rantoul
+Raymond Township
+Royal
+Sadorus
+Saint Joseph
+Savoy
+Scott Township
+Seymour
+Sidney Township
+Somer Township
+South Homer Township
+Stanton Township
+Thomasboro
+Tolono Township
+Urbana

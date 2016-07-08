@@ -1,0 +1,13 @@
+<!-- @version $Id: USA_Illinois_Menard.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Athens
+Atterbury
+Fancy Prairie
+Greenview
+Hubly
+Lincoln's New Salem
+Oakford
+Petersburg
+Sweet Water
+Tallula
+Tice

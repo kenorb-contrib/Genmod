@@ -1,0 +1,22 @@
+<!-- @version $Id: USA_Florida_Marion.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anthony
+Belleview
+Candler
+Citra
+Dunnellon
+Eastlake Weir
+Fairfield
+Fort McCoy
+Lowell
+McIntosh
+Ocala
+Ocklawaha
+Orange Lake
+Orange Springs
+Reddick
+Salt Springs
+Silver Springs
+Sparr
+Summerfield
+Weirsdale

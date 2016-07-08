@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Indiana_Pike.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Clay Township
+Jefferson Township
+Lockhart Township
+Logan Township
+Madison Township
+Marion Township
+Monroe Township
+Otwell
+Patoka Township
+Petersburg
+Spurgeon
+Stendal
+Velpen
+Washington Township
+Winslow

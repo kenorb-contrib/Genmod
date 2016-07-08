@@ -1,0 +1,47 @@
+<!-- @version $Id: USA_Florida_Palm-Beach.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Atlantis
+Belle Glade
+Boca Raton
+Boynton Beach
+Briny Breezes
+Bryant
+Canal Point
+Cloud Lake
+Delray Beach
+Glen Ridge
+Golf
+Golfview
+Greenacres
+Gulf Stream
+Haverhill
+Highland Beach
+Hypoluxo
+Juno Beach
+Jupiter
+Jupiter Inlet Colony
+Lake Clarke Shores
+Lake Harbor
+Lake Park
+Lake Worth
+Lantana
+Loxahatchee
+Manalapan
+Mangonia Park
+North Palm Beach
+Ocean Ridge
+Pahokee
+Palm Beach
+Palm Beach Gardens
+Palm Beach Shores
+Palm Springs
+Riviera Beach
+Royal Palm Beach
+Singer Island
+South Bay
+South Palm Beach
+Tequesta
+Village of Golf
+Village of Wellington
+West Delray Beach
+West Palm Beach

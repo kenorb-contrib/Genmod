@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Indiana_Starke.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+California Township
+Center Township
+Davis Township
+Grovertown
+Hamlet
+Jackson Township
+Knox
+North Bend Township
+North Judson
+Ober
+Ora
+Oregon Township
+Railroad Township
+San Pierre
+Washington Township
+Wayne Township

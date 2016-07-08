@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Indiana_Floyd.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Floyds Knobs
+Franklin Township
+Galena
+Georgetown Township
+Greenville Township
+Lafayette Township
+Mount Saint Francis
+Mount St Francis
+Navilleton
+New Albany Township

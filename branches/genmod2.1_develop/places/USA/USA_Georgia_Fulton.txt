@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Georgia_Fulton.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alpharetta
+Atlanta
+College Park
+Dunwoody
+East Point
+Fairburn
+Hapeville
+Mountain Park
+Palmetto
+Red Oak
+Roswell
+Sandy Springs
+Union City

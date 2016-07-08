@@ -1,0 +1,22 @@
+<!-- $Id: NOR_Hedmark.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Alvdal
+Eidskog
+Elverum
+Engerdal
+Folldal
+Grue
+Hamar
+Kongsvinger
+Løten
+Nord-Odal
+Os
+Rendalen
+Ringsaker
+Stange
+Stor-Elvdal
+Sør-Odal
+Tolga
+Trysil
+Tynset
+Åmot
+Åsnes

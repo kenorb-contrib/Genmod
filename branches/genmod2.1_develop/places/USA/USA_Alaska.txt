@@ -1,0 +1,29 @@
+<!-- @version $Id: USA_Alaska.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Aleutians East Borough
+Aleutians West Census Area
+Anchorage Borough
+Bethel Census Area
+Bristol Bay Borough
+City & Borough of Juneau
+City & Borough of Sitka
+City & Borough of Yakutat
+Denali Borough
+Dillingham Census Area
+Fairbanks North Star Borough
+Haines Borough
+Kenai Peninsula Borough
+Ketchikan Gateway Borough
+Kodiak Island Borough
+Lake And Peninsula Borough
+Matanuska-Susitna Borough
+Nome Census Area
+North Slope Borough
+Northwest Arctic Borough
+Prince of Wales-Outer Ketchikan Census Area
+Skagway-Hoonah-Angoon Census Area.
+Southeast Fairbanks Census Area
+Valdez-Cordova Census Area
+Wade Hampton Census Area
+Wrangell-Petersburg Census Area
+Yukon-Koyukuk Census Area

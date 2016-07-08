@@ -1,0 +1,43 @@
+<!-- @version $Id: USA_California_Fresno.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Auberry
+Big Creek
+Biola
+Burrel
+Cantua Creek
+Caruthers
+Clovis
+Coalinga
+Del Rey
+Dunlap
+Easton
+Firebaugh
+Five Points
+Fowler
+Fresno
+Friant
+Helm
+Hume
+Huron
+Kerman
+Kingsburg
+Lakeshore
+Laton
+Mendota
+Miramonte
+Mono Hot Springs
+Orange Cove
+Parlier
+Piedra
+Pinedale
+Prather
+Raisin
+Reedley
+Riverdale
+San Joaquin
+Sanger
+Selma
+Shaver Lake
+Squaw Valley
+Tollhouse
+Tranquillity

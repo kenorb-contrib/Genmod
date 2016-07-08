@@ -1,0 +1,10 @@
+<!-- @version $Id: USA_Alabama_Lauderdale.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anderson
+Cloverdale
+Florence
+Killen
+Lexington
+Rogersville
+Saint Florian
+Waterloo

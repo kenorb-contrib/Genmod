@@ -1,0 +1,13 @@
+<!-- @version $Id: USA_Idaho_Fremont.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ashton
+Chester
+Drummond
+Island Park
+Macks Inn
+Newdale
+Parker
+Saint Anthony
+Squirrel
+Teton
+Warm River

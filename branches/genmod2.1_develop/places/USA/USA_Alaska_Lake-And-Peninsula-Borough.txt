@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alaska_Lake-And-Peninsula-Borough.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Chignik
+Chignik Lagoon
+Chignik Lake
+Egegik
+Iliamna
+King Salmon
+Kokhanok
+Levelock
+Newhalen
+Nondalton
+Pedro Bay
+Perryville
+Pilot Point
+Port Alsworth
+Port Heiden

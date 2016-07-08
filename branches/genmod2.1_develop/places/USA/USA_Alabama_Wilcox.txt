@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Alabama_Wilcox.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alberta
+Annemanie
+Arlington
+Boykin
+Camden
+Catherine
+Coy
+Furman
+Lower Peach Tree
+McWilliams
+Oak Hill
+Pine Apple
+Pine Hill
+Prairie
+Snow Hill
+Yellow Bluff

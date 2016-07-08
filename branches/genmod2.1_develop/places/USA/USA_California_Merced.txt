@@ -1,0 +1,21 @@
+<!-- @version $Id: USA_California_Merced.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Atwater
+Ballico
+Cressey
+Delhi
+Dos Palos
+El Nido
+Gustine
+Hilmar
+Le Grand
+Livingston
+Los Banos
+Merced
+Planada
+Santa Nella
+Santa Rita Park
+Snelling
+South Dos Palos
+Stevinson
+Winton

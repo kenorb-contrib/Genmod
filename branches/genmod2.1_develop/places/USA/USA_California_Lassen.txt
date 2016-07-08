@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_California_Lassen.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bieber
+Doyle
+Herlong
+Janesville
+Lake Almanor
+Litchfield
+Madeline
+McArthur
+Milford
+Nubieber
+Ravendale
+Standish
+Susanville
+Termo
+Wendel
+Westwood

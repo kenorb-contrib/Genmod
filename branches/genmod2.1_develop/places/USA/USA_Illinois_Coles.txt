@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Illinois_Coles.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ashmore Township
+Charleston
+East Oakland Township
+Humboldt Township
+Hutton Township
+Lafayette Township
+Lerna
+Mattoon
+Morgan Township
+North Okaw Township
+Oakland
+Paradise Township
+Pleasant Grove Township
+Seven Hickory Township
+Trilla

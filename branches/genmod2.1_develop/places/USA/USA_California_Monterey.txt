@@ -1,0 +1,31 @@
+<!-- @version $Id: USA_California_Monterey.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aromas
+Big Sur
+Bradley
+Carmel
+Carmel Valley
+Carmel-by-the-Sea
+Castroville
+Chualar
+Del Rey Oaks
+Fort Hunter Liggett
+Gonzales
+Greenfield
+Jolon
+King City
+Lockwood
+Marina
+Monterey
+Moss Landing
+Pacific Grove
+Pebble Beach
+Presidio of Monterey
+Prunedale
+Salinas
+San Ardo
+San Lucas
+Sand City
+Seaside
+Soledad
+Spreckels

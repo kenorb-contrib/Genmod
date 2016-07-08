@@ -1,0 +1,8 @@
+<!-- @version $Id: USA_District-of-Columbia_District-Of-Columbia.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Autaugaville
+Billingsley
+Booth
+Jones
+Marbury
+Prattville

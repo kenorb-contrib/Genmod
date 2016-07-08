@@ -1,0 +1,21 @@
+<!-- @version $Id: USA_Indiana_LaGrange.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bloomfield Township
+Clay Township
+Clearspring Township
+Eden Township
+Greenfield Township
+Howe
+Johnson Township
+Lagrange
+Lima Township
+Milford Township
+Mongo
+Newbury Township
+Shipshewana
+South Milford
+Springfield Township
+Stroh
+Topeka
+Van Buren Township
+Wolcottville

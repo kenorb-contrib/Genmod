@@ -1,0 +1,21 @@
+<!-- @version $Id: USA_Indiana_Newton.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Beaver Township
+Brook
+Colfax Township
+Goodland
+Grant Township
+Iroquois Township
+Jackson Township
+Jefferson Township
+Kentland
+Lake Township
+Lake Village
+Lincoln Township
+McClellan Township
+Morocco
+Mount Ayr
+Roselawn
+Sumava Resorts
+Thayer
+Washington Township

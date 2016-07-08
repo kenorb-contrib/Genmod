@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_California_Lake.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Clearlake
+Clearlake Oaks
+Clearlake Park
+Cobb
+Finley
+Glenhaven
+Kelseyville
+Lakeport
+Loch Lomond
+Lower Lake
+Lucerne
+Middletown
+Nice
+Upper Lake
+Witter Springs

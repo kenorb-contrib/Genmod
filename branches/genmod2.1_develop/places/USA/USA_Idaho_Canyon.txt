@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Idaho_Canyon.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Caldwell
+Greenleaf
+Huston
+Melba
+Middleton
+Nampa
+Notus
+Parma
+Wilder

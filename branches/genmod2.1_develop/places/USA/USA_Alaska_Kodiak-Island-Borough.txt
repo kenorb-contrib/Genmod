@@ -1,0 +1,10 @@
+<!-- @version $Id: USA_Alaska_Kodiak-Island-Borough.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Akhiok
+Chiniak
+Karluk
+Kodiak
+Larsen Bay
+Old Harbor
+Ouzinkie
+Port Lions

@@ -1,0 +1,31 @@
+<!-- @version $Id: USA_California_El-Dorado.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Cameron Park
+Camino
+Coloma
+Cool
+Diamond Springs
+Echo Lake
+El Dorado
+El Dorado Hills
+Fair Play
+Fallen Leaf
+Garden Valley
+Georgetown
+Greenwood
+Grizzly Flats
+Kelsey
+Kyburz
+Latrobe
+Lotus
+Mount Aukum
+Pacific House
+Pilot Hill
+Placerville
+Pollock Pines
+Rescue
+Shingle Springs
+Somerset
+South Lake Tahoe
+Tahoma
+Twin Bridges

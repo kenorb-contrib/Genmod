@@ -1,0 +1,16 @@
+<!-- @version $Id: USA_Arizona_Gila.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Claypool
+Dudleyville
+Globe
+Hayden
+Miami
+Payson
+Peridot
+Pine
+Roosevelt
+San Carlos
+Strawberry
+Tonto Basin
+Winkelman
+Young

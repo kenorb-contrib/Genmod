@@ -1,0 +1,16 @@
+<!-- @version $Id: USA_Alaska_Wade-Hampton-Census-Area.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alakanuk
+Chevak
+Emmonak
+Fortuna Ledge
+Hooper Bay
+Kotlik
+Marshall
+Mountain Village
+Pilot Station
+Russian Mission
+Saint Mary's
+Scammon Bay
+Sheldon Point
+Wade Hampton Census Area

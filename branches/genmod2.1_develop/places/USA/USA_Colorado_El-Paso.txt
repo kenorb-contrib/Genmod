@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Colorado_El-Paso.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Cadet Station
+Calhan
+Cascade
+Cheyenne Mountain Air Force Base
+Colorado Springs
+Fort Carson
+Fountain
+Green Mountain Falls
+Manitou Springs
+Monument
+Palmer Lake
+Peyton
+Ramah
+Rush
+United States Air Force Academy
+Yoder

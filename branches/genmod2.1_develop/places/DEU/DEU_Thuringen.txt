@@ -1,0 +1,25 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Thuringen.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Ilm-Kreis
+Kreis Altenburger Land
+Kreis Eichsfeld
+Kreis Gotha
+Kreis Greiz
+Kreis Hildburghausen
+Kreis Nordhausen
+Kreis Saalfeld-Rudolstadt
+Kreis Sömmerda
+Kreis Schmalkalden-Meiningen
+Kreis Sonneberg
+Kreis Weimarer Land
+Kyffhäuserkreis
+Saale-Holzland-Kreis
+Saale-Orla-Kreis
+Stadt Eisenach
+Stadt Erfurt
+Stadt Gera
+Stadt Jena
+Stadt Suhl
+Stadt Weimar
+Unstrut-Hainich-Kreis
+Wartburgkreis

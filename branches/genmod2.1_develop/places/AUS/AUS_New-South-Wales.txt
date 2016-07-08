@@ -1,0 +1,16 @@
+<!-- @version $Id: AUS_New-South-Wales.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Blue Mountains
+Canberra
+Capital Country
+Explorer Country
+Greater Sydney
+Hunter Region
+Illawarra
+New England
+North Coast
+Northern Rivers
+Outback NSW
+Riverina
+Snowy Mountains
+South Coast
+The Murray

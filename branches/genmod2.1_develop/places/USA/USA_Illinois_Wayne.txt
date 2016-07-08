@@ -1,0 +1,33 @@
+<!-- @version $Id: USA_Illinois_Wayne.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Arrington Township
+Barnhill Township
+Bedford Township
+Berry Township
+Big Mound Township
+Cisne
+Elm River Township
+Fairfield
+Four Mile Township
+Garden Hill Township
+Geff
+Golden Gate
+Grover Township
+Hickory Hill Township
+Indian Prairie Township
+Jasper Township
+Jeffersonville
+Johnsonville
+Keenes
+Keith Township
+Lamard Township
+Leech Township
+Massilon Township
+Mill Shoals
+Mount Erie Township
+Orchard Township
+Orel Township
+Rinard
+Sims
+Wayne City
+Zif Township

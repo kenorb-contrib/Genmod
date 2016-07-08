@@ -1,0 +1,22 @@
+<!-- @version $Id: USA_Alabama_De-Kalb.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Collinsville
+Crossville
+Dawson
+Fort Payne
+Fyffe
+Geraldine
+Groveoak
+Hammondville
+Henagar
+Ider
+Lakeview
+Mentone
+Pine Ridge
+Powell
+Rainsville
+Sand Rock
+Sardis City
+Shiloh
+Sylvania
+Valley Head

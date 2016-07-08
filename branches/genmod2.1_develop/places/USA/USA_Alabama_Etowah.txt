@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Etowah.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Altoona
+Attalla
+Boaz
+Gadsden
+Gallant
+Glencoe
+Hokes Bluff
+Mountainboro
+Rainbow City
+Reece City
+Ridgeville
+Sardis City
+Snead
+Southside
+Walnut Grove

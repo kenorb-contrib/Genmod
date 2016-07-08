@@ -1,0 +1,46 @@
+<!-- @version $Id: USA_Idaho.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Ada
+Adams
+Bannock
+Bear Lake
+Benewah
+Bingham
+Blaine
+Boise
+Bonner
+Bonneville
+Boundary
+Butte
+Camas
+Canyon
+Caribou
+Cassia
+Clark
+Clearwater
+Custer
+Elmore
+Franklin
+Fremont
+Gem
+Gooding
+Idaho
+Jefferson
+Jerome
+Kootenai
+Latah
+Lemhi
+Lewis
+Lincoln
+Madison
+Minidoka
+Nez Perce
+Oneida
+Owyhee
+Payette
+Power
+Shoshone
+Teton
+Twin Falls
+Valley
+Washington

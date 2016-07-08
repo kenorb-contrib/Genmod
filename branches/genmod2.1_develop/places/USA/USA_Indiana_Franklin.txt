@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Indiana_Franklin.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Batesville
+Bath Township
+Blooming Grove Township
+Brookville Township
+Butler Township
+Cedar Grove
+Fairfield Township
+Highland Township
+Laurel
+Metamora Township
+Mount Carmel
+New Trenton
+Oldenburg
+Posey Township
+Ray Township
+Salt Creek Township
+Springfield Township
+Whitewater Township

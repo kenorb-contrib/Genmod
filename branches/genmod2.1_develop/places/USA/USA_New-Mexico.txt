@@ -1,0 +1,35 @@
+<!-- @version $Id: USA_New-Mexico.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Bernalillo
+Catron
+Chaves
+Cibola
+Colfax
+Curry
+De Baca
+Dona Ana
+Eddy
+Grant
+Guadalupe
+Harding
+Hidalgo
+Lea
+Lincoln
+Los Alamos
+Luna
+McKinley
+Mora
+Otero
+Quay
+Rio Arriba
+Roosevelt
+San Juan
+San Miguel
+Sandoval
+Santa Fe
+Sierra
+Socorro
+Taos
+Torrance
+Union
+Valencia

@@ -1,0 +1,30 @@
+<!-- @version $Id: USA_Florida_Orange.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aloma
+Apopka
+Azalea Park
+Bay Lake
+Belle Isle
+Christmas
+Clarcona
+Eatonville
+Edgewood
+Gotha
+Hiawassee
+Killarney
+Lake Buena Vista
+Lockhart
+Maitland
+Oakland
+Ocoee
+Orlando
+Orlo Vista
+Pine Castle
+Plymouth
+Sand Lake
+South Creek
+Tangerine
+Windermere
+Winter Garden
+Winter Park
+Zellwood

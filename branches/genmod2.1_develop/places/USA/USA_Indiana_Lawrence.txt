@@ -1,0 +1,21 @@
+<!-- @version $Id: USA_Indiana_Lawrence.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Avoca
+Bedford
+Bono Township
+Fort Ritner
+Guthrie Township
+Heltonville
+Huron
+Indian Creek Township
+Marion Township
+Marshall Township
+Mitchell
+Oolitic
+Perry Township
+Pleasant Run Township
+Shawswick Township
+Spice Valley Township
+Springville
+Tunnelton
+Williams

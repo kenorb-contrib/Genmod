@@ -1,0 +1,8 @@
+<!-- @version $Id: AUS_Western-Australia.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Gascoyne Region
+Goldfields Region
+Kimberley Region
+Mid West
+Perth
+Pilbara Region
+South West

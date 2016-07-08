@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_California_Mariposa.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Catheys Valley
+Coulterville
+El Portal
+Fish Camp
+Hornitos
+Mariposa
+Midpines
+Tuolumne Meadows
+Wawona
+Yosemite National Park

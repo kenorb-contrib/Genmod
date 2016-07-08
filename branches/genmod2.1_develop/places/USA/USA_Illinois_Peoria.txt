@@ -1,0 +1,40 @@
+<!-- @version $Id: USA_Illinois_Peoria.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Akron Township
+Bartonville
+Bellevue
+Brimfield
+Chillicothe Township
+Dunlap
+East Peoria
+Edelstein
+Edwards
+Elmwood Township
+Glasford
+Hallock Township
+Hanna City
+Hollis Township
+Jubilee Township
+Kickapoo Township
+Kingston Mines
+Laura
+Limestone Township
+Logan Township
+Mapleton
+Medina Township
+Millbrook Township
+Mossville
+Norwood
+Oak Hill
+Pekin
+Peoria
+Peoria City Township
+Peoria Heights
+Princeville
+Radnor Township
+Richwoods Township
+Rome
+Rosefield Township
+Timber Township
+Trivoli Township
+West Peoria

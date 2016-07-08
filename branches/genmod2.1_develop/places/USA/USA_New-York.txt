@@ -1,0 +1,64 @@
+<!-- @version $Id: USA_New-York.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Albany
+Allegany
+Bronx
+Broome
+Cattaraugus
+Cayuga
+Chautauqua
+Chemung
+Chenango
+Clinton
+Columbia
+Cortland
+Delaware
+Dutchess
+Erie
+Essex
+Franklin
+Fulton
+Genesee
+Greene
+Hamilton
+Herkimer
+Jefferson
+Kings
+Lewis
+Livingston
+Madison
+Monroe
+Montgomery
+Nassau
+New York
+Niagara
+Oneida
+Onondaga
+Ontario
+Orange
+Orleans
+Oswego
+Otsego
+Putnam
+Queens
+Rensselaer
+Richmond / Staten Island
+Rockland
+Saratoga
+Schenectady
+Schoharie
+Schuyler
+Seneca
+St. Lawrence
+Steuben
+Suffolk
+Sullivan
+Tioga
+Tompkins
+Ulster
+Warren
+Washington
+Wayne
+Westchester
+Wyoming
+Yates

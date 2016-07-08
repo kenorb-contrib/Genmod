@@ -1,0 +1,31 @@
+<!-- @version $Id: USA_Illinois_Clinton.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Albers
+Aviston
+Bartelso
+Beckemeyer
+Breese
+Brookside Township
+Carlyle
+Centralia
+Clement Township
+Damiansville
+East Fork Township
+Germantown Township
+Hoffman
+Huey
+Irishtown Township
+Keyesport
+Lake Township
+Looking Glass Township
+Meridian Township
+New Baden
+New Memphis
+Saint Rose Township
+Santa Fe Township
+Shattuc
+Sugar Creek Township
+Trenton
+Wade Township
+Wamac
+Wheatfield Township

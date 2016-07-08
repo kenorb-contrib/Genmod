@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Illinois_Gallatin.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Asbury Township
+Bowlesville Township
+Eagle Creek Township
+Equality Township
+Gold Hill Township
+Junction
+New Haven Township
+North Fork Township
+Old Shawneetown
+Omaha Township
+Ridgway
+Shawnee Township
+Shawneetown

@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Illinois_Moultrie.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Allenville
+Arthur
+Bethany
+Dalton City
+Dora Township
+East Nelson Township
+Gays
+Jonathan Creek Township
+Lovington Township
+Lowe Township
+Marrowbone Township
+Sullivan
+Whitley Township

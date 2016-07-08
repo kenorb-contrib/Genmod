@@ -1,0 +1,29 @@
+<!-- @version $Id: USA_Florida_Volusia.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Barberville
+Cassadaga
+Daytona Beach
+Daytona Beach Shores
+De Bary
+De Land
+De Leon Springs
+Debary
+Deland
+Deltona
+Downtown
+Edgewater
+Enterprise
+Glenwood
+Holly Hill
+Lake Helen
+New Smyrna Beach
+Oak Hill
+Orange City
+Ormond Beach
+Osteen
+Pierson
+Ponce Inlet
+Port Orange
+Seville
+South Daytona
+South Daytona Beach

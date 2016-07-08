@@ -1,0 +1,41 @@
+<!-- @version $Id: USA_Illinois_Ogle.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Adeline
+Baileyville
+Brookville Township
+Buffalo Township
+Byron
+Chana
+Creston
+Davis Junction
+Dement Township
+Eagle Point Township
+Egan
+Flagg Township
+Forreston Township
+Grand Detour Township
+Hillcrest
+Holcomb
+Kings
+Lafayette Township
+Leaf River Township
+Lincoln Township
+Lindenwood
+Lynnville Township
+Marion Township
+Maryland Township
+Monroe Center
+Monroe Township
+Mount Morris Township
+Nashua Township
+Oregon
+Pine Creek Township
+Pine Rock Township
+Polo
+Rochelle
+Rockvale Township
+Scott Township
+Stillman Valley
+Taylor Township
+White Rock Township
+Woosung Township

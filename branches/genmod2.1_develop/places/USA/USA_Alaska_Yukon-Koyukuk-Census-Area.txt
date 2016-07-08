@@ -1,0 +1,36 @@
+<!-- @version $Id: USA_Alaska_Yukon-Koyukuk-Census-Area.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Allakaket
+Anvik
+Arctic Village
+Beaver
+Bettles
+Bettles Field
+Central
+Chalkyitsik
+Circle
+Fairbanks
+Flat
+Fort Yukon
+Galena
+Grayling
+Holy Cross
+Hughes
+Huslia
+Kaltag
+Koyukuk
+Lake Minchumina
+Manley Hot Springs
+McGrath
+Minto
+Nenana
+Nikolai
+Nulato
+Rampart
+Ruby
+Shageluk
+Stevens Village
+Takotna
+Tanana
+Venetie
+Yukon-Koyukuk Census Area

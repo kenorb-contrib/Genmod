@@ -1,0 +1,31 @@
+<!-- @version $Id: USA_Florida_Miami-Dade.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aventura
+Bal Harbour
+Bay Harbor Islands
+Biscayne Park
+Coral Gables
+El Portal
+Florida City
+Golden Beach
+Hialeah
+Hialeah Gardens
+Homestead
+Indian Creek
+Islandia
+Key Biscayne
+Medley
+Miami
+Miami Beach
+Miami Shores
+Miami Springs
+North Bay Village
+North Miami
+North Miami Beach
+Opa-locka
+Perrine
+South Miami
+Surfside
+Sweetwater
+Virginia Gardens
+West Miami

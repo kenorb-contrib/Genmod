@@ -1,0 +1,56 @@
+<!-- @version $Id: USA_California_Kern.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aerial Acres
+Arvin
+Bakersfield
+Bear Valley Springs
+Bodfish
+Boron
+Buttonwillow
+Caliente
+California City
+Cantil
+Del Kern
+Delano
+Di Giorgio
+Edison
+Edwards
+Fellows
+Frazier Park
+Glennville
+Golden Hills
+Gorman
+Greenacres
+Havilah
+Inyokern
+Johannesburg
+Keene
+Kernville
+Lake Isabella
+Lamont
+Lebec
+Lost Hills
+Maricopa
+McFarland
+McKittrick
+Mojave
+Monolith
+Mountain Mesa
+North Edwards
+Onyx
+Pearsonville
+Pond
+Pumpkin Center
+Randsburg
+Ridgecrest
+Rosamond
+Shafter
+Stallion Springs
+Taft
+Tehachapi
+Tupman
+Wasco
+Weldon
+Willow Springs
+Wofford Heights
+Woody

@@ -1,0 +1,23 @@
+<!-- @version $Id: USA_Hawaii_Kauai.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anahola
+Eleele
+Hanalei
+Hanamaulu
+Hanapepe
+Kalaheo
+Kapaa
+Kaumakani
+Kealia
+Kekaha
+Kilauea
+Koloa
+Lawai
+Lihue
+Makaweli
+Omao
+Princeville
+Puhi
+Wailua
+Wailua Homesteads
+Waimea

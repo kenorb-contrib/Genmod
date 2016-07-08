@@ -1,0 +1,27 @@
+<!-- @version $Id: USA_California_Santa-Clara.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alviso
+Campbell
+Coyote
+Cupertino
+Gilroy
+Los Altos
+Los Altos Hills
+Los Gatos
+Milpitas
+Monte Sereno
+Monte Vista
+Morgan Hill
+Mount Hamilton
+Mountain View
+New Almaden
+Onizuka Air Force Base
+Palo Alto
+Permanente
+Redwood Estates
+San Jose
+San Martin
+Santa Clara
+Saratoga
+Stanford
+Sunnyvale

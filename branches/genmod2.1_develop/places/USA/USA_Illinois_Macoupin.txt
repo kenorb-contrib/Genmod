@@ -1,0 +1,50 @@
+<!-- @version $Id: USA_Illinois_Macoupin.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Atwater
+Barr Township
+Benld
+Bird Township
+Brighton
+Brushy Mound Township
+Bunker Hill
+Cahokia Township
+Carlinville
+Chesterfield
+Comer
+Dorchester
+Eagarville
+East Gillespie
+Enos
+Gillespie
+Girard
+Hagaman
+Hettick
+Hillyard Township
+Honey Point Township
+McVey
+Medora
+Modesto
+Mount Clare
+Mount Olive Township
+Nilwood
+North Otter Township
+North Palmyra Township
+Palmyra
+Piasa
+Plainview
+Polk Township
+Royal Lakes
+Sawyerville
+Scottville Township
+Shaws Point Township
+Shipman
+South Otter Township
+South Palmyra Township
+South Standard
+Standard City
+Staunton Township
+Virden
+Western Mound Township
+White City
+Wilsonville
+Womac

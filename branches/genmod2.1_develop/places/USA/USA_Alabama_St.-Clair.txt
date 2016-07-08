@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Alabama_St.-Clair.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Acmar
+Argo
+Ashville
+Branchville
+Cook Springs
+Cropwell
+Leeds
+Margaret
+Moody
+Odenville
+Pell City
+Ragland
+Riverside
+Springville
+Steele
+Vincent
+Wattsville

@@ -1,0 +1,38 @@
+<!-- @version $Id: USA_Florida_Polk.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alturas
+Auburndale
+Babson Park
+Bartow
+Bradley
+Davenport
+Dundee
+Eagle Lake
+Eaton Park
+Eloise
+Fedhaven
+Fort Meade
+Frostproof
+Haines City
+Highland City
+Highland Park
+Hillcrest Heights
+Homeland
+Indian Lake Estates
+Kathleen
+Kissimmee
+Lake Alfred
+Lake Hamilton
+Lake Wales
+Lakeland
+Lakeshore
+Loughman
+Mulberry
+Nalcrest
+Nichols
+Poinciana
+Polk City
+River Ranch
+Wahneta
+Waverly
+Winter Haven

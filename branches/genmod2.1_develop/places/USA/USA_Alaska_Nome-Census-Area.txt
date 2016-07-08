@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Alaska_Nome-Census-Area.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Brevig Mission
+Diomede
+Elim
+Gambell
+Golovin
+Koyuk
+Little Diomede
+Nome
+Nome Census Area
+Saint Michael
+Savoonga
+Shaktoolik
+Shishmaref
+Stebbins
+Teller
+Unalakleet
+Wales
+White Mountain

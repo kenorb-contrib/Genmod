@@ -1,0 +1,64 @@
+<!-- @version $Id: USA_Illinois_Sangamon.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Andrew
+Archer
+Auburn Township
+Ball Township
+Barclay
+Bates
+Berlin
+Berry
+Bissell
+Bolivia
+Bradfordton
+Breckenridge
+Buffalo
+Buffalo Hart Township
+Cantrall
+Capital Township
+Cartwright Township
+Chatham
+Cimic
+Clear Lake Township
+Cooper Township
+Cotton Hill Township
+Curran Township
+Dawson
+Divernon Township
+Fancy Creek Township
+Farmingdale
+Gardner Township
+Glenarm
+Grandview
+Illiopolis Township
+Island Grove Township
+Jerome
+Lanesville Township
+Leland Grove
+Loami Township
+Lowder
+Maxwell Township
+Mechanicsburg Township
+New Berlin Township
+New City
+Old Berlin
+Pawnee Township
+Pleasant Plains
+Richland
+Riddle Hill
+Riverton
+Roby
+Rochester Township
+Salisbury
+Sherman
+Sicily
+Southern View
+Spaulding
+Springfield
+Talkington Township
+Thayer
+Toronto
+Virden
+Williams Township
+Williamsville
+Woodside Township

@@ -1,0 +1,24 @@
+<!-- @version $Id: USA_Florida_Pasco.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aripeka
+Bayonet Point
+Brooksville
+Crystal Springs
+Dade City
+Elfers
+Holiday Hills
+Hudson
+Jasmine Estates
+Lacoochee
+Land O'Lakes
+New Port Richey
+Port Richey
+Richland
+Saint Leo
+San Antonio
+Shady Hills
+Tarpon Springs
+Trilby
+Weeki Wachee
+Wesley Chapel
+Zephyrhills

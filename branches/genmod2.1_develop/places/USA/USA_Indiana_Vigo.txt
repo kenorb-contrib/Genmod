@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_Indiana_Vigo.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Fayette Township
+Fontanet
+Harrison Township
+Honey Creek Township
+Lewis
+Linton Township
+Lost Creek Township
+Nevins Township
+New Goshen
+North Terre Haute
+Otter Creek Township
+Pierson Township
+Pimento
+Prairie Creek Township
+Prairieton Township
+Riley
+Saint Mary of the Woods
+Sandford
+Seelyville
+Shepardsville
+Sugar Creek Township
+Terre Haute
+West Terre Haute

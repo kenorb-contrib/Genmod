@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Illinois_Carroll.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Chadwick
+Cherry Grove-Shannon Township
+Elkhorn Grove Township
+Fairhaven Township
+Freedom Township
+Lanark
+Milledgeville
+Mount Carroll
+Rock Creek-Lima Township
+Salem Township
+Savanna Township
+Shannon
+Thomson
+Washington Township
+Woodland Township
+Wysox Township
+York Township

@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Illinois_White.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Burnt Prairie Township
+Carmi
+Crossville
+Emma Township
+Enfield Township
+Gray Township
+Grayville
+Hawthorne Township
+Herald
+Heralds Prairie Township
+Indian Creek Township
+Maunie
+Mill Shoals
+Norris City
+Phillips Township
+Phillipstown
+Springerton

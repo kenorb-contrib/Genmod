@@ -1,0 +1,38 @@
+<!-- @version $Id: USA_California_Tulare.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alpaugh
+Badger
+California Hot Springs
+Camp Nelson
+Corcoran
+Cutler
+Dinuba
+Ducor
+Earlimart
+Exeter
+Farmersville
+Goshen
+Ivanhoe
+Kaweah
+Kings Canyon National Park
+Lemon Cove
+Lindsay
+Miramonte
+Orosi
+Pixley
+Porterville
+Posey
+Richgrove
+Sequoia National Park
+Springville
+Strathmore
+Sultana
+Terra Bella
+Three Rivers
+Tipton
+Traver
+Tulare
+Visalia
+Waukena
+Woodlake
+Yettem

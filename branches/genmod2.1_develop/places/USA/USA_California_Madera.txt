@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_California_Madera.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ahwahnee
+Bass Lake
+Chowchilla
+Coarsegold
+Madera
+North Fork
+Oakhurst
+O'Neals
+Raymond
+Wishon

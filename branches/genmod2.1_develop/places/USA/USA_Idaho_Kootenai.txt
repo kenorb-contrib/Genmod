@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Idaho_Kootenai.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Athol
+Bayview
+Cataldo
+Coeur d'Alene
+Dalton Gardens
+Fernan Lake Village
+Harrison
+Hauser
+Hayden
+Hayden Lake
+Huetter
+Medimont
+Post Falls
+Rathdrum
+Spirit Lake
+State Line
+Twin Lakes
+Worley

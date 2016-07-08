@@ -1,0 +1,26 @@
+<!-- @version $Id: USA_Indiana_Spencer.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Buffaloville
+Carter Township
+Chrisney
+Christmas Lake Village
+Clay Township
+Dale
+Evanston
+Gentryville
+Grandview
+Grass Township
+Hammond Township
+Harrison Township
+Hatfield
+Huff Township
+Jackson Township
+Lamar
+Lincoln City
+Luce Township
+Mariah Hill
+Ohio Township
+Richland
+Rockport
+Santa Claus
+Troy

@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Florida_Sumter.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bushnell
+Center Hill
+Coleman
+Lake Panasoffkee
+Oxford
+Ridge Manor Estates
+Sumterville
+The Villages
+Webster
+Wildwood

@@ -1,0 +1,47 @@
+<!-- @version $Id: USA_Illinois_McHenry.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alden Township
+Algonquin
+Barnard Mill
+Barrington Hills
+Bull Valley
+Burton Township
+Cary
+Chemung Township
+Coral Township
+Crystal Lake
+Dorr Township
+Dunham Township
+Fox Lake
+Fox River Grove
+Fox River Valley Gardens
+Grafton Township
+Greenwood Township
+Hartland Township
+Harvard
+Hebron Township
+Holiday Hills
+Huntley
+Island Lake
+Johnsburg
+Lake in the Hills
+Lakemoor
+Lakewood
+Marengo
+McCullom Lake
+McHenry
+Nunda Township
+Oakwood Hills
+Prairie Grove
+Richmond Township
+Riley Township
+Ringwood
+Seneca Township
+Solon Mills
+Spring Grove
+Trout Valley
+Union
+Village of Lakewood
+Volo
+Wonder Lake
+Woodstock

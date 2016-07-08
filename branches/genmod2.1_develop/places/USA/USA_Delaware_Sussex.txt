@@ -1,0 +1,32 @@
+<!-- @version $Id: USA_Delaware_Sussex.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bethany Beach
+Bethel
+Blades
+Bridgeville
+Clarksville
+Dagsboro
+Delmar
+Dewey Beach
+Ellendale
+Fenwick Island
+Frankford
+Georgetown
+Greenwood
+Harbeson
+Henlopen Acres
+Laurel
+Lewes
+Lincoln
+Long Neck
+Milford
+Millsboro
+Millville
+Milton
+Nassau
+Ocean View
+Rehoboth Beach
+Seaford
+Selbyville
+Slaughter Beach
+South Bethany

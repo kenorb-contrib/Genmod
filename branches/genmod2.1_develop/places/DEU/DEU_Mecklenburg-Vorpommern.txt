@@ -1,0 +1,20 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Mecklenburg-Vorpommern.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Kreis Bad Doberan
+Kreis Demmin
+Kreis Güstrow
+Kreis Ludwigslust
+Kreis Müritz
+Kreis Mecklenburg-Strelitz
+Kreis Nordvorpommern
+Kreis Nordwestmecklenburg
+Kreis Ostvorpommern
+Kreis Parchim
+Kreis Rügen
+Kreis Uecker-Randow
+Stadt Greifswald
+Stadt Neubrandenburg
+Stadt Rostock
+Stadt Schwerin
+Stadt Stralsund
+Stadt Wismar

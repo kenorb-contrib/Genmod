@@ -1,0 +1,36 @@
+<!-- @version $Id: USA_Alaska_Bethel-Census-Area.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Akiachak
+Akiak
+Aniak
+Atmautluak
+Bethel
+Bethel Census Area
+Chefornak
+Chuathbaluk
+Crooked Creek
+Eek
+Goodnews Bay
+Kalskag
+Kasigluk
+Kipnuk
+Kongiganak
+Kwethluk
+Kwigillingok
+Lower Kalskag
+Mekoryuk
+Napakiak
+Napaskiak
+Newtok
+Nightmute
+Nunapitchuk
+Platinum
+Quinhagak
+Red Devil
+Sleetmute
+Stony River
+Toksook Bay
+Tuluksak
+Tuntutuliak
+Tununak
+Upper Kalskag

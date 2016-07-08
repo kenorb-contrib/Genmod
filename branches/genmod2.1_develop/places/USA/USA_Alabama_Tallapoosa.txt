@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Alabama_Tallapoosa.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alexander City
+Camp Hill
+Dadeville
+Daviston
+East Tallassee
+Goldville
+Jacksons' Gap
+New Site
+Tallassee

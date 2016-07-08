@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Indiana_Posey.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bethel Township
+Black Township
+Center Township
+Cynthiana
+Griffin
+Harmony Township
+Lynn Township
+Marrs Township
+Mount Vernon
+New Harmony
+Point Township
+Poseyville
+Robb Township
+Robinson Township
+Smith Township
+Wadesville

@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_California_Santa-Cruz.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Aptos
+Ben Lomond
+Bonny Doon
+Boulder Creek
+Brookdale
+Capitola
+Corralitos
+Davenport
+Felton
+Freedom
+La Selva Beach
+Mount Hermon
+Pajaro
+Royal Oaks
+Santa Cruz
+Scotts Valley
+Soquel
+Watsonville

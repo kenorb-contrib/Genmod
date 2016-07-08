@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Illinois_Jersey.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Brighton
+Dow
+Elsah Township
+English Township
+Fidelity Township
+Fieldon
+Grafton
+Jersey Township
+Jerseyville
+Medora
+Mississippi Township
+Otter Creek Township
+Otterville
+Piasa Township
+Quarry Township
+Richwood Township
+Rosedale Township
+Ruyle Township

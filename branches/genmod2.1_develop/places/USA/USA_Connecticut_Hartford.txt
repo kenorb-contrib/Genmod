@@ -1,0 +1,59 @@
+<!-- @version $Id: USA_Connecticut_Hartford.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Avon
+Berlin
+Bishops Corner
+Bloomfield
+Bristol
+Broad Brook
+Burlington
+Canton
+Canton Center
+Collinsville
+East Berlin
+East Glastonbury
+East Granby
+East Hampton
+East Hartford
+East Hartland
+East Windsor
+East Windsor Hill
+East Windsor Hl
+Enfield
+Farmington
+Glastonbury
+Granby
+Hartford
+Hartland
+Kensington
+Manchester
+Maple Hill
+Marion
+Marlborough
+Melrose
+Milldale
+New Britain
+Newington
+North Canton
+North Granby
+Plainville
+Plantsville
+Poquonock
+Rocky Hill
+Silver Lane
+Simsbury
+South Glastonbury
+South Windsor
+Southington
+Suffield
+Tariffville
+Unionville
+Weatogue
+West Granby
+West Hartford
+West Hartland
+West Simsbury
+Wethersfield
+Windsor
+Windsor Locks
+Windsorville

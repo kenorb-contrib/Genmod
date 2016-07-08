@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Indiana_Whitley.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Churubusco
+Cleveland Township
+Columbia City
+Columbia Township
+Etna-Troy Township
+Jefferson Township
+Larwill
+Richland Township
+Smith Township
+South Whitley
+Thorncreek Township
+Union Township
+Washington Township

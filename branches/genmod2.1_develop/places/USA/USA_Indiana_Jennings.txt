@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Indiana_Jennings.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bigger Township
+Butlerville
+Campbell Township
+Center Township
+Columbia Township
+Commiskey
+Geneva Township
+Hayden
+Lovett Township
+Marion Township
+Montgomery Township
+Nebraska
+North Vernon
+Paris Crossing
+Sand Creek Township
+Scipio
+Spencer Township
+Vernon

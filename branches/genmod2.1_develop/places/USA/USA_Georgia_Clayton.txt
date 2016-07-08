@@ -1,0 +1,13 @@
+<!-- @version $Id: USA_Georgia_Clayton.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+College Park
+Conley
+Ellenwood
+Forest Park
+Fort Gillem
+Jonesboro
+Lake City
+Lovejoy
+Morrow
+Rex
+Riverdale

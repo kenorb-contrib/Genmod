@@ -1,0 +1,36 @@
+<!-- @version $Id: USA_Illinois_Henry.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alba Township
+Alpha
+Andover Township
+Annawan Township
+Atkinson
+Bishop Hill
+Burns Township
+Cambridge Township
+Cleveland
+Clover Township
+Coal Valley
+Colona Township
+Cornwall Township
+Edford Township
+Galva Township
+Geneseo
+Green Rock
+Hanna Township
+Hooppole
+Kewanee
+Loraine Township
+Lynn Center
+Lynn Township
+Munson Township
+Opheim
+Orion
+Osco Township
+Oxford Township
+Phenix Township
+Weller Township
+Western Township
+Wethersfield Township
+Woodhull
+Yorktown Township

@@ -1,0 +1,17 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- @version $Id: DEU_Schleswig-Holstein.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Kreis Dithmarschen
+Kreis Herzogtum Lauenburg
+Kreis Nordfriesland
+Kreis Ostholstein
+Kreis Pinneberg
+Kreis Plön
+Kreis Rendsburg-Eckernförde
+Kreis Schleswig-Flensburg
+Kreis Segeberg
+Kreis Steinburg
+Kreis Stormarn
+Stadt Flensburg
+Stadt Kiel
+Stadt Lübeck
+Stadt Neumünster

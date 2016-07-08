@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_California_Imperial.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bard
+Brawley
+Calexico
+Calipatria
+El Centro
+Felicity
+Heber
+Holtville
+Imperial
+Niland
+Ocotillo
+Palo Verde
+Salton City
+Seeley
+Westmorland
+Winterhaven

@@ -1,0 +1,29 @@
+<!-- @version $Id: USA_California_Placer.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alpine Meadows
+Alta
+Applegate
+Auburn
+Bowman
+Carnelian Bay
+Colfax
+Dutch Flat
+Emigrant Gap
+Foresthill
+Gold Run
+Granite Bay
+Homewood
+Iowa Hill
+Kings Beach
+Lincoln
+Loomis
+Meadow Vista
+Newcastle
+Olympic Valley
+Penryn
+Rocklin
+Roseville
+Sheridan
+Tahoe City
+Tahoe Vista
+Weimar

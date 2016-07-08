@@ -1,0 +1,39 @@
+<!-- @version $Id: USA_Indiana_La-Porte.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Cass Township
+Center Township
+Clinton Township
+Coolspring Township
+Dewey Township
+Galena Township
+Hanna Township
+Hudson Township
+Johnson Township
+Kankakee Township
+Kingsbury
+Kingsford Heights
+La Crosse
+La Porte
+Lincoln Township
+Long Beach
+Michiana Shores
+Michigan City
+Michigan Township
+Mill Creek
+New Durham Township
+Noble Township
+Otis
+Pleasant Township
+Pottawattomie Park
+Prairie Township
+Rolling Pr
+Rolling Prairie
+Scipio Township
+Springfield Township
+Trail Creek
+Union Mills
+Union Township
+Wanatah
+Washington Township
+Westville
+Wills Township

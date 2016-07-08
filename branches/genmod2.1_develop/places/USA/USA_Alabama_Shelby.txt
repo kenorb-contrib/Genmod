@@ -1,0 +1,27 @@
+<!-- @version $Id: USA_Alabama_Shelby.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alabaster
+Birmingham
+Calera
+Chelsea
+Columbiana
+Harpersville
+Helena
+Hoover
+Indian Springs Village
+Leeds
+Maylene
+Montevallo
+Pelham
+Saginaw
+Shelby
+Shoal Creek
+Siluria
+Sterrett
+Vandiver
+Vestavia
+Vestavia Hills
+Vincent
+Westover
+Wilsonville
+Wilton

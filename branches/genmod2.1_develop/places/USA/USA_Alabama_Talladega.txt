@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Talladega.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alpine
+Bon Air
+Childersburg
+Coosa Pines
+Gantts Quarry
+Lincoln
+Munford
+Oak Grove
+Oxford
+Sycamore
+Sylacauga
+Talladega
+Talladega Springs
+Vincent
+Waldo

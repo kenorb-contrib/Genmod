@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Illinois_Winnebago.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Burritt Township
+Cherry Valley
+Durand Township
+Harlem Township
+Harrison Township
+Laona Township
+Loves Park
+Machesney Park
+New Millford
+Owen Township
+Pecatonica Township
+Rockford
+Rockton Township
+Roscoe
+Seward Township
+Shirland Township
+South Beloit
+Winnebago Township

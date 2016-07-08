@@ -1,0 +1,31 @@
+<!-- @version $Id: USA_Indiana_Lake.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Calumet Township
+Cedar Creek Township
+Cedar Lake
+Center Township
+Crown Point
+Dyer
+Eagle Creek Township
+East Chicago
+Gary
+Griffith
+Hammond
+Hanover Township
+Highland
+Hobart
+Lake Station
+Leroy
+Lowell
+Merrillville
+Munster
+New Chicago
+North Township
+Ross Township
+Saint John
+Schererville
+Schneider
+Shelby
+West Creek Township
+Whiting
+Winfield

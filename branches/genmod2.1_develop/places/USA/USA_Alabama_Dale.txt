@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Dale.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ariton
+Clayhatchee
+Clopton
+Daleville
+Dothan
+Enterprise
+Fort Rucker
+Grimes
+Level Plains
+Midland City
+Napier Field
+Newton
+Ozark
+Pinckard
+Skipperville

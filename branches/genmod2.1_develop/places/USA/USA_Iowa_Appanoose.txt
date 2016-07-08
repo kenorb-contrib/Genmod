@@ -1,0 +1,13 @@
+<!-- @version $Id: USA_Iowa_Appanoose.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Centerville
+Cincinnati
+Exline
+Moravia
+Moulton
+Mystic
+Numa
+Plano
+Rathbun
+Udell
+Unionville

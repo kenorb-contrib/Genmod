@@ -1,0 +1,19 @@
+<!-- $Id: NOR_Ostfold.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Aremark
+Askim
+Eidsberg
+Fredrikstad
+Halden
+Hobøl
+Hvaler
+Marker
+Moss
+Rakkestad
+Rygge
+Rømskog
+Råde
+Sarpsborg
+Skiptvet
+Spydeberg
+Trøgstad
+Våler

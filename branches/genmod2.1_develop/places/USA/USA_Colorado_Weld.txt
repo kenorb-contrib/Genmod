@@ -1,0 +1,42 @@
+<!-- @version $Id: USA_Colorado_Weld.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ault
+Briggsdale
+Brighton
+Broomfield
+Carr
+Dacono
+Eaton
+Erie
+Evans
+Firestone
+Fort Lupton
+Frederick
+Galeton
+Garden City
+Gilcrest
+Gill
+Greeley
+Grover
+Hereford
+Hudson
+Johnstown
+Keenesburg
+Kersey
+La Salle
+Lochbuie
+Longmont
+Lucerne
+Mead
+Milliken
+New Raymer
+Northglenn
+Nunn
+Pierce
+Platteville
+Raymer
+Roggen
+Severance
+Stoneham
+Wattenburg
+Windsor

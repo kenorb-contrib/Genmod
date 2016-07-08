@@ -1,0 +1,39 @@
+<!-- @version $Id: USA_California_Humboldt.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alderpoint
+Arcata
+Bayside
+Blocksburg
+Blue Lake
+Bridgeville
+Carlotta
+Cutten
+Eureka
+Ferndale
+Fields Landing
+Fortuna
+Garberville
+Honeydew
+Hoopa
+Hydesville
+Kneeland
+Korbel
+Loleta
+McKinleyville
+Miranda
+Myers Flat
+Orick
+Orleans
+Petrolia
+Phillipsville
+Redcrest
+Redway
+Rio Dell
+Ruth
+Samoa
+Scotia
+Trinidad
+Weott
+Westhaven
+Whitethorn
+Willow Creek

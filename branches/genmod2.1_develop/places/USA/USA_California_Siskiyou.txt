@@ -1,0 +1,27 @@
+<!-- @version $Id: USA_California_Siskiyou.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Callahan
+Dorris
+Dunsmuir
+Edgewood
+Etna
+Forks of Salmon
+Fort Jones
+Gazelle
+Greenview
+Grenada
+Happy Camp
+Hornbrook
+Horse Creek
+Klamath River
+Macdoel
+McCloud
+Montague
+Mount Shasta
+Sawyers Bar
+Scott Bar
+Seiad Valley
+Somes Bar
+Tulelake
+Weed
+Yreka

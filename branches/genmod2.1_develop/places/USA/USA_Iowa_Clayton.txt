@@ -1,0 +1,22 @@
+<!-- @version $Id: USA_Iowa_Clayton.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Clayton
+Edgewood
+Elkader
+Elkport
+Farmersburg
+Garber
+Garnavillo
+Guttenberg
+Littleport
+Luana
+Marquette
+McGregor
+Millville
+Monona
+North Buena Vista
+Osterdock
+Postville
+Saint Olaf
+Strawberry Point
+Volga

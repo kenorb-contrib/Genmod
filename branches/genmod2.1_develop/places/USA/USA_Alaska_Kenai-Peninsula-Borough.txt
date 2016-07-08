@@ -1,0 +1,23 @@
+<!-- @version $Id: USA_Alaska_Kenai-Peninsula-Borough.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anchor Point
+Clam Gulch
+Cooper Landing
+Fritz Creek
+Halibut Cove
+Homer
+Hope
+Kachemak
+Kasilof
+Kenai
+Moose Pass
+Nanwalek
+Nikiski
+Nikolaevsk
+Ninilchik
+Port Graham
+Seldovia
+Seward
+Soldotna
+Sterling
+Tyonek

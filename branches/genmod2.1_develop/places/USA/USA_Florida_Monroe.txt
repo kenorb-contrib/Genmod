@@ -1,0 +1,28 @@
+<!-- @version $Id: USA_Florida_Monroe.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Big Pine Key
+Big Torch Key
+Conch Key
+Cudjoe Key
+Duck Key
+East Rockland Key
+Grassy Key
+Key Colony Beach
+Key Largo
+Key West
+Key West Naval Air Station
+Layton
+Little Torch Key
+Long Key
+Lower Sugarloaf Key
+Marathon
+Marathon Shores
+Middle Torch Key
+Ocean Reef
+Ramrod Key
+Sugarloaf
+Sugarloaf Key
+Sugarloaf Shores
+Tavernier
+The Villages
+Upper Sugarloaf Key

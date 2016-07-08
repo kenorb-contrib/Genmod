@@ -1,0 +1,34 @@
+<!-- @version $Id: USA_California_Shasta.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anderson
+Bella Vista
+Big Bend
+Burney
+Cassel
+Castella
+Central Valley
+Cottonwood
+Fall River Mills
+French Gulch
+Hat Creek
+Igo
+Lakehead
+Little Valley
+McArthur
+Millville
+Montgomery Creek
+Oak Run
+Obrien
+Old Station
+Palo Cedro
+Platina
+Project City
+Redding
+Round Mountain
+Shasta
+Shasta Lake
+Shingletown
+Summit City
+Whiskeytown
+Whitmore
+Wildwood

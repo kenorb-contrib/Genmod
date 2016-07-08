@@ -1,0 +1,40 @@
+<!-- @version $Id: USA_California_Sonoma.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Annapolis
+Bodega
+Bodega Bay
+Boyes Hot Springs
+Camp Meeker
+Cazadero
+Cloverdale
+Cotati
+Duncans Mills
+El Verano
+Eldridge
+Forestville
+Freestone
+Fulton
+Geyserville
+Glen Ellen
+Graton
+Guerneville
+Healdsburg
+Jenner
+Kenwood
+Larkfield
+Monte Rio
+Occidental
+Penngrove
+Petaluma
+Rio Nido
+Rohnert Park
+Russian River Mdws
+Santa Rosa
+Sebastopol
+Sonoma
+Stewarts Point
+The Sea Ranch
+Valley Ford
+Villa Grande
+Vineburg
+Windsor

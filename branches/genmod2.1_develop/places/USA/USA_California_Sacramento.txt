@@ -1,0 +1,28 @@
+<!-- @version $Id: USA_California_Sacramento.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Antelope
+Carmichael
+Citrus Heights
+Courtland
+Elk Grove
+Elverta
+Fair Oaks
+Folsom
+Galt
+Gold River
+Herald
+Hood
+Isleton
+Mather
+McClellan Air Force Base
+North Highlands
+Orangevale
+Rancho Cordova
+Rancho Murieta
+Represa
+Rio Linda
+Ryde
+Sacramento
+Sloughhouse
+Walnut Grove
+Wilton

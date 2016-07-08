@@ -1,0 +1,9 @@
+<!-- @version $Id: USA_Florida_Clay.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Doctors Inlet
+Green Cove Springs
+Keystone Heights
+Lake Geneva
+Middleburg
+Orange Park
+Penney Farms

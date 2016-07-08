@@ -1,0 +1,196 @@
+<GMReport access="PRIV_PUBLIC" icon="place" type="general">
+	<!--
+	@package Genmod
+	@subpackage Reports
+	@version $Id: bdmlist.xml 13 2016-04-27 09:26:01Z Boudewijn $
+	-->
+	<GMRTitle><GMRvar var="GM_LANG_bdm" /></GMRTitle>
+	<GMRDescription>Prints a list of BIRT/DEAT/MARR events for individuals matching NAME or PLAC criteria.</GMRDescription>
+	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="GM_LANG_name" /></GMRInput>
+	<GMRInput name="bdmplace" lookup="PLAC" type="text"><GMRvar var="GM_FACT_PLAC" /></GMRInput>
+	<GMRInput name="birthdate1" lookup="DATE" type="text"><GMRvar var="GM_LANG_birthdate1" /></GMRInput>
+	<GMRInput name="birthdate2" lookup="DATE" type="text"><GMRvar var="GM_LANG_birthdate2" /></GMRInput>
+	<GMRInput name="deathdate1" lookup="DATE" type="text"><GMRvar var="GM_LANG_deathdate1" /></GMRInput>
+	<GMRInput name="deathdate2" lookup="DATE" type="text"><GMRvar var="GM_LANG_deathdate2" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="BIRT,DEAT,ID,NAME"><GMRvar var="GM_LANG_sort_by" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="GM_LANG_SHOW_FAM_ID_NUMBERS" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="GM_LANG_page_size" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="9" style="" />
+	<GMRStyle name="small" font="LucidaSansUnicode" size="7" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="10" style="b" />
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="label">
+				<GMRvar var="GM_LANG_bdm" />
+			</GMRCell>
+			<GMRCell width="0" height="20" align="center" style="header">
+				<GMRif condition="$name!=''">
+					<GMRvar var="name" />
+					<GMRif condition="$bdmplace!=''">
+						-
+					</GMRif>
+				</GMRif>
+				<GMRif condition="$bdmplace!=''">
+					<GMRvar var="bdmplace" />
+				</GMRif>
+			</GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="GM_LANG_page" /> <GMRPageNum /> <GMRvar var="GM_LANG_of" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRSetVar name="fill" value="" />
+			<GMRif condition="$sortby=='ID'">
+				<GMRSetVar name="fill" value="#DDDDDD" />
+			</GMRif>
+			<GMRSetVar name="fill" value="" />
+			<GMRif condition="$sortby=='NAME'">
+				<GMRSetVar name="fill" value="#DDDDDD" />
+			</GMRif>
+			<GMRTextBox width="224" height="12" border="1" fill="$fill">
+				<GMRText style="label">
+					<GMRvar var="GM_LANG_name" />
+				</GMRText>
+			</GMRTextBox>
+			<GMRSetVar name="fill" value="" />
+			<GMRif condition="$sortby=='BIRT'">
+				<GMRSetVar name="fill" value="#DDDDDD" />
+			</GMRif>
+			<GMRTextBox width="177" height="12" border="1" fill="$fill">
+				<GMRText style="label">
+					<GMRvar var="GM_FACT_BIRT" />   [
+					<GMRif condition="$birthdate1!=''">
+						<GMRvar var="birthdate1" />
+					</GMRif>
+					-
+					<GMRif condition="$birthdate2!=''">
+						<GMRvar var="birthdate2" />
+					</GMRif>
+					]
+				</GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="177" height="12" border="1">
+				<GMRText style="label">
+					<GMRvar var="GM_FACT_MARR" />
+				</GMRText>
+			</GMRTextBox>
+			<GMRSetVar name="fill" value="#FFFFFF" />
+			<GMRif condition="$sortby=='DEAT'">
+				<GMRSetVar name="fill" value="#DDDDDD" />
+			</GMRif>
+			<GMRTextBox width="177" height="12" border="1" fill="$fill">
+				<GMRText style="label">
+					<GMRvar var="GM_FACT_DEAT" />   [
+					<GMRif condition="$deathdate1!=''">
+						<GMRvar var="deathdate1" />
+					</GMRif>
+					-
+					<GMRif condition="$deathdate2!=''">
+						<GMRvar var="deathdate2" />
+					</GMRif>
+					]
+				</GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="5" height="12" border="0" newline="1">
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRSetVar name="filter1" value="" />
+			<GMRif condition="$bdmplace!=''">
+				<GMRSetVar name="filter1" value=":PLAC CONTAINS $bdmplace" />
+			</GMRif>
+			<GMRList list="individual" filter1="$filter1" filter2="BIRT:DATE GTE $birthdate1" filter3="BIRT:DATE LTE $birthdate2" filter4="DEAT:DATE GTE $deathdate1" filter5="DEAT:DATE LTE $deathdate2" filter6="NAME CONTAINS $name" sortby="$sortby">
+				<GMRSetVar name="spid" value="@ID" />
+				<GMRTextBox width="224" height="41" border="0">
+					<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
+					<GMRText style="small">
+						<br />   <GMRvar var="GM_LANG_father" />
+						: <GMRGedcom id="@FAMC"><GMRGetPersonName id="@HUSB" truncate="32" /></GMRGedcom>
+						<br />   <GMRvar var="GM_LANG_mother" />
+						: <GMRGedcom id="@FAMC"><GMRGetPersonName id="@WIFE" truncate="32" /></GMRGedcom>
+						<!-- GMRif condition="$showFamID"><br />   (<GMRGedcom id="@FAMC"><GMRGedcomValue tag="@id" /></GMRGedcom>)</GMRif -->
+					</GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="177" height="41" border="1">
+					<GMRRepeatTag tag="BIRT">
+						<GMRText style="small">
+							<GMRvar var="GM_FACT_DATE" />
+							: <GMRGedcomValue tag="BIRT:DATE" />
+							<br />   <GMRvar var="GM_FACT_PLAC" />
+							: <GMRGedcomValue tag="BIRT:PLAC" />
+							<br />      <GMRvar var="GM_FACT_SOUR" />
+							: <GMRGedcomValue tag="BIRT:SOUR" />
+						</GMRText>
+					</GMRRepeatTag>
+				</GMRTextBox>
+				<GMRTextBox width="177" height="41" border="1">
+					<GMRSetVar name="more" value="0" />
+					<GMRRepeatTag tag="FAMS">
+						<GMRGedcom id="@FAMS">
+							<GMRif condition="$more==1">
+								<GMRText style="small">
+									<br />
+									~~~~~~~~~~~~~~~~~~~~~~~~~~~
+									<br />
+								</GMRText>
+							</GMRif>
+							<GMRText style="small">
+								<GMRvar var="GM_FACT_DATE" />
+								: <GMRGedcomValue tag="MARR:DATE" />
+								<br />   <GMRvar var="GM_FACT_PLAC" />
+								: <GMRGedcomValue tag="MARR:PLAC" />
+								<br />      <GMRvar var="GM_FACT_SOUR" />
+								: <GMRGedcomValue tag="MARR:SOUR" />
+								<br />
+								<GMRvar var="GM_LANG_spouse" />
+								<GMRif condition="$showFamID"> (<GMRGedcomValue tag="@id" />)</GMRif>
+								: </GMRText>
+							<GMRif condition="$spid==@WIFE">
+								<GMRText style="small">
+									<GMRGetPersonName id="@HUSB" truncate="32" />
+								</GMRText>
+							</GMRif>
+							<GMRif condition="$spid==@HUSB">
+								<GMRText style="small">
+									<GMRGetPersonName id="@WIFE" truncate="32" />
+								</GMRText>
+							</GMRif>
+							<GMRSetVar name="more" value="1" />
+						</GMRGedcom>
+					</GMRRepeatTag>
+				</GMRTextBox>
+				<GMRTextBox width="177" height="41" border="1">
+					<GMRRepeatTag tag="DEAT">
+						<GMRText style="small">
+							<GMRvar var="GM_FACT_DATE" />
+							: <GMRGedcomValue tag="DEAT:DATE" />
+							<br />   <GMRvar var="GM_FACT_PLAC" />
+							: <GMRGedcomValue tag="DEAT:PLAC" />
+							<br />      <GMRvar var="GM_FACT_SOUR" />
+							: <GMRGedcomValue tag="DEAT:SOUR" />
+						</GMRText>
+					</GMRRepeatTag>
+					<GMRRepeatTag tag="BURI">
+						<GMRRepeatTag tag="CEME">
+							<GMRText style="small">
+								<br /><GMRvar var="GM_FACT_CEME" />
+								: <GMRGedcomValue tag="BURI:CEME" />
+							</GMRText>
+						</GMRRepeatTag>
+					</GMRRepeatTag>
+				</GMRTextBox>
+				<GMRTextBox width="5" height="41" border="0" newline="1">
+				</GMRTextBox>
+			</GMRList>
+			<GMRCell width="0" height="24" border="0" align="right" style="label">
+				<GMRvar var="GM_LANG_total_indis" />
+				: <GMRListTotal />
+			</GMRCell>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

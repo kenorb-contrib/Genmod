@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Idaho_Idaho.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Clearwater
+Cottonwood
+Dixie
+Elk City
+Fenn
+Ferdinand
+Grangeville
+Greencreek
+Kamiah
+Keuterville
+Kooskia
+Lucile
+Pollock
+Riggins
+Stites
+Warren
+White Bird

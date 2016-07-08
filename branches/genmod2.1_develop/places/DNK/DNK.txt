@@ -1,0 +1,16 @@
+<!-- $Id: DNK.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Bornholm
+Frederiksborg
+Fyn
+København
+Nordjylland
+Ribe
+Roskilde
+Ringkøbing
+Storstrøm
+Sønderjylland
+Vejle
+Vestsjælland
+Viborg
+Århus
+				

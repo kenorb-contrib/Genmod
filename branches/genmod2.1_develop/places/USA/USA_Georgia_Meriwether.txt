@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Georgia_Meriwether.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alvaton
+Gay
+Greenville
+Haralson
+Lone Oak
+Luthersville
+Manchester
+Stovall
+Warm Springs
+Woodbury

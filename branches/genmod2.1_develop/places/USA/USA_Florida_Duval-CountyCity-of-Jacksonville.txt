@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Florida_Duval-CountyCity-of-Jacksonville.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Atlantic Beach
+Baldwin
+Cecil Field NAS
+Dinsmore
+Jacksonville (remainder)
+Jacksonville Beach
+Maxville
+Mayport Naval Station
+Neptune Beach

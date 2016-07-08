@@ -1,0 +1,10 @@
+<!-- @version $Id: USA_California_Kings.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Armona
+Avenal
+Corcoran
+Hanford
+Kettleman City
+Lemoore
+Lemoore Naval Air Station
+Stratford

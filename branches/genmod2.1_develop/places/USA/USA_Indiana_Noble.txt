@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_Indiana_Noble.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Albion
+Allen Township
+Avilla
+Cromwell
+Elkhart Township
+Green Township
+Jefferson Township
+Kendallville
+Kimmell
+Laotto
+Ligonier
+Noble Township
+Orange Township
+Perry Township
+Rome City
+Sparta Township
+Swan Township
+Washington Township
+Wawaka
+Wayne Township
+Wolcottville
+Wolflake
+York Township

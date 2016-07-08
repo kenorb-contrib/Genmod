@@ -1,0 +1,7 @@
+<!-- @version $Id: USA_Florida_St.-Lucie.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Fort Pierce
+Hutchinson Island
+Port Saint Lucie
+Saint Lucie
+Saint Lucie West

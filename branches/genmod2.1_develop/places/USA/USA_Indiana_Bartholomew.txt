@@ -1,0 +1,23 @@
+<!-- @version $Id: USA_Indiana_Bartholomew.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Camp Atterbury
+Clay Township
+Clifford
+Clifty Township
+Columbus
+Edinburgh
+Elizabethtown
+Flat Rock Township
+German Township
+Grammer
+Harrison Township
+Hartsville
+Haw Creek Township
+Hope
+Jackson Township
+Jonesville
+Ohio Township
+Rock Creek Township
+Sand Creek Township
+Taylorsville
+Wayne Township

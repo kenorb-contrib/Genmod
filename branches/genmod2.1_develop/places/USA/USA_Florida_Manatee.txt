@@ -1,0 +1,21 @@
+<!-- @version $Id: USA_Florida_Manatee.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Anna Maria
+Braden River
+Bradenton
+Bradenton Beach
+Cortez
+Ellenton
+Fifty Seventh Avenue
+Holmes Beach
+Longboat Key
+Manasota
+Myakka City
+Oneco
+Palma Sola
+Palmetto
+Parrish
+Rubonia
+Tallevast
+Terra Ceia
+University Park

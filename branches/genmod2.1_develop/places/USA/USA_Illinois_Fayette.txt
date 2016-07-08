@@ -1,0 +1,30 @@
+<!-- @version $Id: USA_Illinois_Fayette.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Avena Township
+Bear Grove Township
+Bingham
+Bowling Green Township
+Brownstown
+Carson Township
+Farina
+Hagarstown
+Hurricane Township
+Kaskaskia Township
+La Clede Township
+Lone Grove Township
+Loogootee
+Loudon Township
+Otego Township
+Pope Township
+Ramsey Township
+Saint Elmo
+Saint Peter
+Sefton Township
+Seminary Township
+Shafter Township
+Sharon Township
+Shobonier
+South Hurricane Township
+Vandalia
+Wheatland Township
+Wilberton Township

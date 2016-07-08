@@ -1,0 +1,44 @@
+<!-- @version $Id: USA_Hawaii_Hawaii.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Captain Cook
+Hakalau
+Hawaii National Park
+Hawaiian Beaches
+Hawaiian Paradise Park
+Hawi
+Hilo
+Holualoa
+Honalo
+Honaunau
+Honaunau-Napoopoo
+Honokaa
+Honomu
+Kailua
+Kailua Kona
+Kakaluu-Keauhou
+Kalaoa
+Kamuela
+Kapaau
+Keaau
+Kealakekua
+Keauhou
+Kurtistown
+Laupahoehoe
+Mountain Valley
+Mountain View
+Naalehu
+Ninole
+Ocean View
+Ookala
+Paauhau
+Paauilo
+Pahala
+Pahoa
+Papaaloa
+Papaikou
+Pepeekeo
+Volcano
+Waikoloa
+Waikoloa Village
+Waimea
+Wainaku

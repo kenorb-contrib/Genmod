@@ -1,0 +1,27 @@
+<!-- @version $Id: USA_Illinois_Mercer.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Abington Township
+Aledo
+Alexis
+Duncan Township
+Eliza Township
+Greene Township
+Joy
+Keithsburg
+Matherville
+Mercer Township
+Millersburg Township
+New Boston Township
+New Windsor
+North Henderson Township
+Ohio Grove Township
+Perryton Township
+Preemption Township
+Reynolds
+Richland Grove Township
+Rivoli Township
+Seaton
+Sherrard
+Suez Township
+Viola
+Windsor

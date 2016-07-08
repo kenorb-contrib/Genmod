@@ -1,0 +1,40 @@
+<!-- @version $Id: USA_Illinois_Shelby.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ash Grove Township
+Beecher City
+Big Spring Township
+Clarksburg Township
+Cold Spring Township
+Cowden
+Dollville
+Dry Point Township
+Duvall
+Findlay
+Flat Branch Township
+Henton
+Herrick Township
+Hinton
+Holland Township
+Lakewood Township
+Middlesworth
+Mode
+Moweaqua
+Oconee Township
+Okaw Township
+Penn Township
+Pickaway Township
+Prairie Township
+Radford
+Richland Township
+Ridge Township
+Rose Township
+Rural Township
+Shelbyville
+Sigel
+Stewardson
+Strasburg
+Todds Point Township
+Tower Hill Township
+Westervelt
+Windsor
+Yantisville

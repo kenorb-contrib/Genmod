@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Indiana_Daviess.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alfordsville
+Barr Township
+Bogard Township
+Cannelburg
+Elmore Township
+Elnora
+Harrison Township
+Madison Township
+Montgomery
+Odon
+Plainville
+Reeve Township
+Steele Township
+Van Buren Township
+Veale Township
+Washington Township

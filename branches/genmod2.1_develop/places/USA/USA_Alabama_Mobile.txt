@@ -1,0 +1,26 @@
+<!-- @version $Id: USA_Alabama_Mobile.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Axis
+Bayou La Batre
+Brookley Field
+Bucks
+Chickasaw
+Chunchula
+Citronelle
+Coden
+Creola
+Dauphin Island
+Eight Mile
+Grand Bay
+Irvington
+Magazine
+Mobile
+Mount Vernon
+Prichard
+Saint Elmo
+Saraland
+Satsuma
+Semmes
+Theodore
+Whistler
+Wilmer

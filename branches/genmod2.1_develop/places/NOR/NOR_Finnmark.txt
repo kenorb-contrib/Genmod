@@ -1,0 +1,21 @@
+<!-- $Id: NOR_Finnmark.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Alta
+Berlevåg
+Båtsfjord
+Gamvik
+Hammerfest
+Hasvik
+Karasjok
+Kautokeino
+Kvalsund
+Lebesby
+Loppa
+Måsvik
+Måsøy
+Nesseby
+Nordkapp
+Porsanger
+Sør-Varanger
+Tana
+Vadsø
+Vardø

@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_California_Ventura.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Agoura Hills
+Brandeis
+Camarillo
+Fillmore
+Hidden Valley
+Lake Sherwood
+Moorpark
+Newbury Park
+Oak Park
+Oak View
+Ojai
+Oxnard
+Piru
+Point Mugu NAWC
+Port Hueneme
+San Buenaventura (Ventura)
+Santa Paula
+Santa Susana
+Simi Valley
+Somis
+Thousand Oaks
+Ventura
+Westlake Village

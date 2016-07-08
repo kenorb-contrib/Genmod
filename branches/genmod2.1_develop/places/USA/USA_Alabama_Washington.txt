@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Alabama_Washington.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bigbee
+Calvert
+Chatom
+Deer Park
+Frankville
+Fruitdale
+Leroy
+Malcolm
+McIntosh
+Millry
+Saint Stephens
+Sunflower
+Tibbie
+Vinegar Bend
+Wagarville

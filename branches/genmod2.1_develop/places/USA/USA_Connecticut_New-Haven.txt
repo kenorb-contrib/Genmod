@@ -1,0 +1,36 @@
+<!-- @version $Id: USA_Connecticut_New-Haven.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Allingtown
+Ansonia
+Beacon Falls
+Bethany
+Branford
+Cheshire
+Derby
+East Haven
+Guilford
+Hamden
+Madison
+Meriden
+Middlebury
+Milford
+Milford (remainder)
+Naugatuck
+New Haven
+North Branford
+North Haven
+Northford
+Orange
+Oxford
+Prospect
+Seymour
+South Britain
+Southbury
+Wallingford
+Waterbury
+West Haven
+Whitneyville
+Wolcott
+Woodbridge
+Woodmont
+Yalesville

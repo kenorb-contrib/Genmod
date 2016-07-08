@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Illinois_Calhoun.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Batchtown
+Brussels
+Golden Eagle
+Hamburg
+Hardin
+Kampsville
+Meppen
+Michael
+Mozier

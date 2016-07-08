@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Alabama_Madison.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Big Cove
+Brownsboro
+Gurley
+Hampton Cove
+Harvest
+Hazel Green
+Huntsville
+Madison
+Meridianville
+New Hope
+New Market
+Normal
+Owens Cross Roads
+Owens Crossroads
+Ryland
+Toney
+Triana

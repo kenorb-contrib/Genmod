@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_California_Solano.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+American Canyon
+Benicia
+Birds Landing
+Dixon
+Elmira
+Fairfield
+Liberty Farms
+Nut Tree
+Rio Vista
+Suisun City
+Travis Air Force Base
+Vacaville
+Vallejo

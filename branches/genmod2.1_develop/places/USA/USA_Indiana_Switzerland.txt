@@ -1,0 +1,13 @@
+<!-- @version $Id: USA_Indiana_Switzerland.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Bennington
+Cotton Township
+Craig Township
+East Enterprise
+Florence
+Jefferson Township
+Patriot
+Pleasant Township
+Posey Township
+Vevay
+York Township

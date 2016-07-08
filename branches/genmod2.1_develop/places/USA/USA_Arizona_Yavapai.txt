@@ -1,0 +1,33 @@
+<!-- @version $Id: USA_Arizona_Yavapai.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Ash Fork
+Bagdad
+Bensch Ranch
+Black Canyon City
+Camp Verde
+Chino Valley
+Clarkdale
+Congress
+Cordes Lakes
+Cornville
+Cottonwood
+Crown King
+Dewey
+Groom Creek
+Humboldt
+Iron Springs
+Jerome
+Kirkland
+Lake Montezuma
+Mayer
+Paulden
+Prescott
+Prescott Valley
+Rimrock
+Rock Springs
+Sedona
+Seligman
+Skull Valley
+Spring Valley
+West Sedona
+Yarnell

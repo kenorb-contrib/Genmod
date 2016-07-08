@@ -1,0 +1,11 @@
+<!-- @version $Id: USA_Idaho_Twin-Falls.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Buhl
+Castleford
+Filer
+Hansen
+Hollister
+Kimberly
+Murtaugh
+Rogerson
+Twin Falls

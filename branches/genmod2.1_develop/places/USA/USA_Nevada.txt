@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Nevada.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://countyhunter.com/counties.htm -->
+Carson
+Churchill
+Clark
+Douglas
+Elko
+Esmeralda
+Eureka
+Humboldt
+Lander
+Lincoln
+Lyon
+Mineral
+Nye
+Pershing
+Storey
+Washoe
+White Pine

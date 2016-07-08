@@ -1,0 +1,25 @@
+<!-- $Id: NOR_Nord-Trondelag.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Flatanger
+Fosnes
+Frosta
+Grong
+Høylandet
+Inderøy
+Leka
+Leksvik
+Levanger
+Lierne
+Meråker
+Mosvik
+Namdalseid
+Namsos
+Namsskogan
+Nærøy
+Overhalla
+Røyrvik
+Snåsa
+Steinkjer
+Stjørdal
+Verdal
+Verran
+Vikna

@@ -1,0 +1,20 @@
+<!-- @version $Id: USA_Arkansas_Washington.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Canehill
+Elkins
+Elm Springs
+Evansville
+Farmington
+Fayetteville
+Goshen
+Greenland
+Johnson
+Lincoln
+Morrow
+Prairie Grove
+Springdale
+Summers
+Tontitown
+West Fork
+Wheeler
+Winslow

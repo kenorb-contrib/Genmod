@@ -1,0 +1,29 @@
+<!-- @version $Id: USA_Florida_Lake.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Altoona
+Astatula
+Astor
+Clermont
+Deer Island
+Dona Vista
+Eustis
+Ferndale
+Fruitland Park
+Grand Island
+Groveland
+Haines Creek
+Howey-in-the-Hills
+Lady Lake
+Leesburg
+Mascotte
+Minneola
+Montverde
+Mount Dora
+Mount Plymouth
+Okahumpka
+Paisley
+Sorrento
+Tavares
+The Villages
+Umatilla
+Yalaha

@@ -1,0 +1,7 @@
+<!-- @version $Id: USA_Alaska_Ketchikan-Gateway-Borough.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Edna Bay
+Kasaan
+Ketchikan
+Saxman
+Ward Cove

@@ -1,0 +1,32 @@
+<!-- @version $Id: USA_Florida_Broward.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Coconut Creek
+Cooper City
+Coral Springs
+Dania Beach
+Davie
+Deerfield Beach
+Fort Lauderdale
+Hallandale Beach
+Hillsboro Beach
+Hollywood
+Lauderdale Lakes
+Lauderdale-by-the-Sea
+Lauderhill
+Lazy Lake
+Lighthouse Point
+Margate
+Miramar
+North Lauderdale
+Oakland Park
+Parkland
+Pembroke Park
+Pembroke Pines
+Plantation
+Pompano Beach
+Sea Ranch Lakes
+Southwest Ranches
+Sunrise
+Tamarac
+Weston
+Wilton Manors

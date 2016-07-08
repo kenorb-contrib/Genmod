@@ -1,0 +1,29 @@
+<!-- @version $Id: USA_California_San-Luis-Obispo.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Adelaide
+Arroyo Grande
+Atascadero
+Avila Beach
+Cal Poly Student Dorms
+Cal Poly University
+Cambria
+Cayucos
+Creston
+El Paso de Robles (Paso Robles)
+Grover Beach
+Harmony
+Los Osos
+Morro Bay
+Nipomo
+Oceano
+Parkfield
+Paso Robles
+Pismo Beach
+Ragged Point
+San Luis Obispo
+San Miguel
+San Simeon
+Santa Margarita
+Shandon
+Shell Beach
+Templeton

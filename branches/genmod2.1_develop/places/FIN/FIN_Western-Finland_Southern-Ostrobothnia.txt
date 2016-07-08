@@ -1,0 +1,28 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- $Id: FIN_Western-Finland_Southern-Ostrobothnia.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Alajärvi
+Alavus
+Kauhava
+Kurikka
+Lapua
+Seinäjoki
+Ähtäri
+Alahärmä
+Evijärvi
+Ilmajoki
+Isojoki
+Jalasjärvi
+Jurva
+Karijoki
+Kauhajoki
+Kortesjärvi
+Kuortane
+Lappajärvi
+Lehtimäki
+Nurmo
+Soini
+Teuva
+Töysä
+Vimpeli
+Ylihärmä
+Ylistaro

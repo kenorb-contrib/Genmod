@@ -1,0 +1,54 @@
+<!-- @version $Id: USA_California_San-Diego.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Alpine
+Bonita
+Bonsall
+Borrego Springs
+Boulevard
+Camp Pendleton
+Cardiff-by-the-Sea
+Carlsbad
+Chula Vista
+Coronado
+Del Mar
+Descanso
+Dulzura
+El Cajon
+Encinitas
+Escondido
+Fallbrook
+Guatay
+Imperial Beach
+Jacumba
+Jamul
+Julian
+La Jolla
+La Mesa
+Lakeside
+Lemon Grove
+Lincoln Acres
+Mount Laguna
+National City
+Nestor
+Oceanside
+Pala
+Palomar Mountain
+Pauma Valley
+Pine Valley
+Potrero
+Poway
+Ramona
+Ranchita
+Rancho Santa Fe
+San Diego
+San Luis Rey
+San Marcos
+San Ysidro
+Santa Ysabel
+Santee
+Solana Beach
+Spring Valley
+Tecate
+Valley Center
+Vista
+Warner Springs

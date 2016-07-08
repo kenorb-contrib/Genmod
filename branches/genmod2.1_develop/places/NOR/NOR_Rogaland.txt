@@ -1,0 +1,28 @@
+<!-- $Id: NOR_Rogaland.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Bjerkreim
+Bokn
+Eigersund
+Finnøy
+Forsand
+Gjesdal
+Haugesund
+Hjelmeland
+Hå
+Karmøy
+Klepp
+Kvitsøy
+Lund
+Randaberg
+Rennesøy
+Sandnes
+Sauda
+Sokndal
+Sola
+Stavanger
+Strand
+Suldal
+Time
+Tysvær
+Utsira
+Vindafjord
+Ølen (n� Vindafjord)

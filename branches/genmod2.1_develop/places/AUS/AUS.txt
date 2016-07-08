@@ -1,0 +1,8 @@
+﻿<!-- @version $Id: AUS.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+New South Wales
+Northern Territory
+Queensland
+South Australia
+Tasmania
+Victoria
+Western Australia

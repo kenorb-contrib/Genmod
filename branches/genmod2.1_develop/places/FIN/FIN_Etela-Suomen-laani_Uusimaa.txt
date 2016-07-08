@@ -1,0 +1,26 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- $Id: FIN_Etela-Suomen-laani_Uusimaa.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Espoo
+Hanko
+Helsinki
+Hyvinkää
+Järvenpää
+Karjaa
+Karkkila
+Kauniainen
+Kerava
+Lohja
+Tammisaari
+Vantaa
+Inkoo
+Karjalohja
+Kirkkonummi
+Mäntsälä
+Nummi-Pusula
+Nurmijärvi
+Pohja
+Pornainen
+Sammatti
+Siuntio
+Tuusula
+Vihti

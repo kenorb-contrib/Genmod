@@ -1,0 +1,22 @@
+<!-- @version $Id: USA_Hawaii_Maui.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Haiku
+Haiku-Pauwela
+Hana
+Hoolehua
+Kahului
+Kaunakakai
+Kihei
+Kualapuu
+Kula
+Lahaina
+Lanai City
+Makawao
+Maunaloa
+Napili-Honokowai
+Paia
+Pukalani
+Puunene
+Wailea
+Wailea-Makena
+Wailuku

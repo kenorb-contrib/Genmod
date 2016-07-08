@@ -1,0 +1,18 @@
+<!-- @version $Id: USA_Alabama_Walker.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Burnwell
+Carbon Hill
+Cordova
+Dora
+Eldridge
+Empire
+Goodsprings
+Jasper
+Kansas
+Nauvoo
+Oakman
+Parrish
+Quinton
+Sipsey
+Sumiton
+Townley

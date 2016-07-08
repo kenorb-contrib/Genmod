@@ -1,0 +1,33 @@
+<!-- @version $Id: USA_Florida_Brevard.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Barefoot Bay
+Canaveral Air Station
+Cape Canaveral
+Cocoa
+Cocoa Beach
+Grant
+Indialantic
+Indian Harbor Beach
+Indian Harbour Beach
+Kennedy Space Center
+Malabar
+Melbourne
+Melbourne Beach
+Melbourne Village
+Merritt Island
+Micco
+Mims
+Palm Bay
+Palm Shores
+Patrick Air Force Base
+Port Canaveral
+Port Saint John
+Rockledge
+Satellite Beach
+Scottsmoor
+Sebastian
+Sharpes
+Titusville
+Viera
+West Cocoa
+West Melbourne

@@ -1,0 +1,14 @@
+<!-- @version $Id: USA_Alaska_Southeast-Fairbanks-Census-Area.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Border
+Chicken
+Delta Junction
+Dot Lake
+Eagle
+Mentasta Lake
+Northway
+Paxson
+Southeast Fairbanks Census Area
+Tanacross
+Tetlin
+Tok

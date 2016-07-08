@@ -1,0 +1,17 @@
+<!-- @version $Id: USA_Florida_Okaloosa.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Baker
+Cinco Bayou
+Crestview
+Destin
+Duke Field AFS
+Eglin Air Force Base
+Fort Walton Beach
+Holt
+Hurlburt Field
+Laurel Hill
+Mary Esther
+Milligan
+Niceville
+Shalimar
+Valparaiso

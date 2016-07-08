@@ -1,0 +1,34 @@
+<!-- @version $Id: USA_California_San-Mateo.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Atherton
+Belmont
+Brisbane
+Burlingame
+Colma
+Daly City
+East Palo Alto
+El Granada
+Emerald Hills
+Foster City
+Half Moon Bay
+Hillsborough
+La Honda
+Ladera
+Loma Mar
+Menlo Park
+Millbrae
+Montara
+Moss Beach
+Pacifica
+Palo Alto
+Pescadero
+Portola Valley
+Redwood City
+Redwood Shores
+San Bruno
+San Carlos
+San Gregorio
+San Mateo
+South San Francisco
+West Menlo Park
+Woodside

@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_Connecticut_Tolland.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Amston
+Andover
+Bolton
+Columbia
+Coventry
+Ellington
+Hebron
+Manchester
+Mansfield
+Mansfield Center
+Mansfield Depot
+Somers
+Somersville
+South Willington
+Stafford
+Stafford Springs
+Staffordville
+Storrs Mansfield
+Tolland
+Union
+Vernon
+Vernon Rockville
+Willington

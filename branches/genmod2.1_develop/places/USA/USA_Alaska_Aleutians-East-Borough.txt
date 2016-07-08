@@ -1,0 +1,9 @@
+<!-- @version $Id: USA_Alaska_Aleutians-East-Borough.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Adak
+Akutan
+Cold Bay
+False Pass
+King Cove
+Nelson Lagoon
+Sand Point

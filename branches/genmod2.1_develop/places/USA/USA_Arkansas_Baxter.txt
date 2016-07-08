@@ -1,0 +1,15 @@
+<!-- @version $Id: USA_Arkansas_Baxter.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Big Flat
+Clarkridge
+Cotter
+Gamaliel
+Gassville
+Harriet
+Henderson
+Lakeview
+Midway
+Mountain Home
+Norfork
+Old Joe
+Salesville

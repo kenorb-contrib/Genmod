@@ -1,0 +1,19 @@
+<!-- @version $Id: USA_Alabama_Cullman.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Arab
+Baileyton
+Bremen
+Colony
+Crane Hill
+Cullman
+Dodge City
+Fairview
+Garden City
+Good Hope
+Hanceville
+Holly Pond
+Joppa
+Logan
+South Vinemont
+Vinemont
+West Point

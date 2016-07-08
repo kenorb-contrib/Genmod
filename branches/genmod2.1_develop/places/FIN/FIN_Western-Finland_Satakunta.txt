@@ -1,0 +1,28 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- $Id: FIN_Western-Finland_Satakunta.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Harjavalta
+Huittinen
+Kankaanpää
+Kokemäki
+Pori
+Rauma
+Eura
+Eurajoki
+Honkajoki
+Jämijärvi
+Karvia
+Kiikoinen
+Kiukainen
+Kodisjoki
+Köyliö
+Lappi
+Lavia
+Luvia
+Merikarvia
+Nakkila
+Noormarkku
+Pomarkku
+Siikainen
+Säkylä
+Ulvila
+Vampula

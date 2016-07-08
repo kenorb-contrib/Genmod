@@ -1,0 +1,25 @@
+<!-- @version $Id: USA_Connecticut_Middlesex.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @see http://www.naco.org/ -->
+Centerbrook
+Chester
+Clinton
+Cobalt
+Cromwell
+Deep River
+Durham
+East Haddam
+East Hampton
+Essex
+Haddam
+Haddam Neck
+Higganum
+Ivoryton
+Killingworth
+Middle Haddam
+Middlefield
+Middletown
+Moodus
+Old Saybrook
+Portland
+Rockfall
+Westbrook

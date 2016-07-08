@@ -1,0 +1,22 @@
+<!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
+<!-- $Id: CAN.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+Alberta
+British Columbia
+Colombie-Britannique
+Île-du-Prince-Édouard
+Manitoba
+New Brunswick
+Newfoundland and Labrador
+Northwest Territories
+Nouveau-Brunswick
+Nouvelle-Écosse
+Nova Scotia
+Nunavut
+Ontario
+Prince Edward Island
+Quebec
+Québec
+Saskatchewan
+Terre-Neuve-et-Labrador
+Territoires du Nord-Ouest
+Yukon
