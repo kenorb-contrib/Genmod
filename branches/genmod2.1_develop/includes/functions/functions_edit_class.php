@@ -269,7 +269,7 @@ abstract class EditFunctions {
 	 * @param string $namerec		the name subrecord when editing a name
 	 * @param string $famtag		how the new person is added to the family
 	 */
-	public function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL") {
+	public function PrintIndiForm($nextaction, $famid, $linenum="", $namerec="", $famtag="CHIL", $count="1") {
 		global $pid, $GM_IMAGES, $monthtonum;
 		global $NPFX_accept, $SPFX_accept, $NSFX_accept, $FILE_FORM_accept, $change_type, $pid_type;
 		global $gm_user;
@@ -280,6 +280,7 @@ abstract class EditFunctions {
 		print "<input type=\"hidden\" name=\"famid\" value=\"".$famid."\" />\n";
 		print "<input type=\"hidden\" name=\"pid\" value=\"".$pid."\" />\n";
 		print "<input type=\"hidden\" name=\"change_type\" value=\"".$change_type."\" />\n";
+		print "<input type=\"hidden\" name=\"count\" value=\"".$count."\" />\n";
 		print "<input type=\"hidden\" name=\"pid_type\" value=\"".$pid_type."\" />\n";
 		print "<input type=\"hidden\" name=\"famtag\" value=\"".$famtag."\" />\n";
 		print "<table class=\"NavBlockTable EditTable\">";
@@ -863,12 +864,12 @@ abstract class EditFunctions {
 					if ($fact=="NPFX") print " onkeyup=\"wactjavascript_autoComplete(npfx_accept,this,event);\" ";
 					if (in_array($fact, $subnamefacts)) print " onchange=\"updatewholename();\"";
 					if ($fact=="DATE") print " onblur=\"valid_date(this);if (this.value.length != 0) {sndReq('".$element_id."_date', 'getchangeddate', true, 'date', this.value, '', '');} else {document.getElementById('".$element_id."_date').innerHTML='';}\"";
-					if ($fact=="EMAIL") print " onblur=\"sndReq('".$element_id."_email', 'checkemail', true, 'email', this.value, '', '');\"";
-					if ($fact == "SOUR") print " onblur=\"sndReq('".$element_id."_src', 'getsourcedescriptor', true, 'sid', this.value, '', '');\"";
-					if ($fact == "REPO") print " onblur=\"sndReq('".$element_id."_repo', 'getrepodescriptor', true, 'rid', this.value, '', '');\"";
-					if ($fact == "ASSO") print " onblur=\"sndReq('".$element_id."_asso', 'getpersonname', true, 'pid', this.value, '', '');\"";
-					if ($fact == "NOTE") print " onblur=\"sndReq('".$element_id."_gnote', 'getnotedescriptor', true, 'oid', this.value, '', '');\"";
-					if ($fact == "OBJE") print " onblur=\"sndReq('".$element_id."_obj', 'getmediadescriptor', true, 'mid', this.value, '', '');\"";
+					if ($fact=="EMAIL") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_email', 'checkemail', true, 'email', this.value, '', '')};\"";
+					if ($fact == "SOUR") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_src', 'getsourcedescriptor', true, 'sid', this.value, '', '')};\"";
+					if ($fact == "REPO") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_repo', 'getrepodescriptor', true, 'rid', this.value, '', '')};\"";
+					if ($fact == "ASSO") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_asso', 'getpersonname', true, 'pid', this.value, '', '')};\"";
+					if ($fact == "NOTE") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_gnote', 'getnotedescriptor', true, 'oid', this.value, '', '')};\"";
+					if ($fact == "OBJE") print " onblur=\"if (this.value.length != 0) {sndReq('".$element_id."_obj', 'getmediadescriptor', true, 'mid', this.value, '', '')};\"";
 					print " />\n";
 				}
 			}

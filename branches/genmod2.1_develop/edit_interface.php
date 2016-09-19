@@ -2324,7 +2324,7 @@ switch ($action) {
 	// NOTE editname done
 	case "editname":
 		$namerecnew = GetSubRecord(1, "1 NAME", $gedrec, $count);
-		EditFunctions::PrintIndiForm("update", "", "", $namerecnew);
+		EditFunctions::PrintIndiForm("update", "", "", $namerecnew, "", $count);
 		break;
 		
 	
@@ -2541,7 +2541,7 @@ switch ($action) {
 			$oldrec = $gedrec;
 		}
 		else $oldrec = "";
-		
+
 		if (!isset($gedfile)) $gedfile = GedcomConfig::$GEDCOMID;
 		//-- check for photo update
 		if (count($_FILES)>0) {
