@@ -630,7 +630,7 @@ abstract class BlockFunctions {
 			}
 			else $stats["gs_avg_children"] = "";
 			
-			$sql = "INSERT INTO ".TBLPREFIX."statscache ";
+			$sql = "REPLACE INTO ".TBLPREFIX."statscache ";
 			$sqlf = "(gs_file";
 			$sqlv = "('".GedcomConfig::$GEDCOMID."'";
 			foreach($stats as $skey => $svalue) {

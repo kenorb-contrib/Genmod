@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed SQL error when rebuilding caches
 - Fixed wrong name record is updated if more than one exists
 - Fixed wrong layout on fampage is hitcounter is hidden
 - Fixed error in uploading gedcom file
