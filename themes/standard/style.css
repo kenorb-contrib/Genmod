@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: style.css 25 2016-05-27 06:47:30Z Boudewijn $
+ * @version $Id: style.css 36 2016-12-24 06:47:36Z Boudewijn $
  */
 
 .something {
@@ -1878,7 +1878,10 @@ DIV.ActionListOptionContainer SPAN {
 .GedcomBlockTime, .GedcomBlockCounter, .UserBlockPediLink, .UserBlockIndiLink, .UserBlockTimeLink {
 	margin-top: 8px;
 }
-.GedcomBlockCustLink, .GedcomBlockFavLink, .UserBlockOwnLink  {
+.GedcomBlockCustLink, #GedcomBlockFavLink, .UserBlockOwnLink  {
+}
+#GedcomBlockFavLink {
+	display: none;
 }
 
 .TodaysEventsName, .UpcomingEventsName, .Top10Name, .RecentChangesName {

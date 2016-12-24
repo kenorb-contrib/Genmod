@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: functions_edit_class.php 30 2016-07-08 09:16:21Z Boudewijn $
+ * @version $Id: functions_edit_class.php 34 2016-09-19 16:46:18Z Boudewijn $
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

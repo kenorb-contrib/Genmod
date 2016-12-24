@@ -5,10 +5,11 @@
 	This and other information can be found online at
 	http://www.sourceforge.net/projects/genmod
 
-	# $Id: changelog.txt 32 2016-07-08 14:35:37Z Boudewijn $
+	# $Id: changelog.txt 36 2016-12-24 06:47:36Z Boudewijn $
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed Message block send message not working
 - Fixed SQL error when rebuilding caches
 - Fixed wrong name record is updated if more than one exists
 - Fixed wrong layout on fampage is hitcounter is hidden

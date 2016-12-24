@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage zwooff
- * @version $Id: gmrpc.php 30 2016-07-08 09:16:21Z Boudewijn $
+ * @version $Id: gmrpc.php 36 2016-12-24 06:47:36Z Boudewijn $
  */
  
 require "config.php";
@@ -405,6 +405,7 @@ switch($action) {
 	
 	case "loadblockusermessage":
 	
+		print "<form name=\"messageform\" action=\"\" onsubmit=\"return confirm('".GM_LANG_confirm_message_delete."');\">\n";				
 		$usermessages = MessageController::getUserMessages($gm_user->username);
 		print "<form name=\"messageform\" action=\"\" onsubmit=\"return confirm('".GM_LANG_confirm_message_delete."');\">\n";
 		if (count($usermessages)==0) {
@@ -476,7 +477,7 @@ switch($action) {
 		}
 		$users = UserController::GetUsers("lastname", "asc", "firstname");
 		if (count($users)>1) {
-			print GM_LANG_message." <select name=\"touser\">\n";
+			print GM_LANG_message." <select name=\"touser\" id=\"touser\">\n";
 			$username = $gm_user->username;
 			if ($gm_user->userIsAdmin()) {
 				print "<option value=\"all\">".GM_LANG_broadcast_all."</option>\n";
@@ -491,7 +492,7 @@ switch($action) {
 					else print " &rlm; - ".$user->username."&rlm;</option>\n";
 				}
 			}
-			print "</select><input type=\"button\" value=\"".GM_LANG_send."\" onclick=\"message(document.messageform.touser.options[document.messageform.touser.selectedIndex].value, 'messaging2', ''); return false;\" />\n";
+			print "</select><input type=\"button\" value=\"".GM_LANG_send."\" onclick=\"message(document.getElementById('touser').value, 'messaging2', ''); return false;\" />\n";
 		}
 		print "</form>\n";
 	

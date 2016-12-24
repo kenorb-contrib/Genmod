@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: gedcom_block.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: gedcom_block.php 36 2016-12-24 06:47:36Z Boudewijn $
  */
  
 $GM_BLOCKS["print_gedcom_block"]["name"]        = GM_LANG_gedcom_block;
@@ -45,7 +45,7 @@ function print_gedcom_block($block = true, $config="", $side, $index) {
 			print "<div class=\"GedcomBlockTime\">".GetChangedDate(GetCurrentDay()." ".GetCurrentMonth()." ".GetCurrentYear())." - ".date($TIME_FORMAT, time()-$_SESSION["timediff"])."</div>\n";
 			if(GedcomConfig::$SHOW_COUNTER)
 					print "<div class=\"PageCounter GedcomBlockCounter\">".GM_LANG_hit_count."  ".$hits."</div>\n";
-			print "<div class=\"GedcomBlockFavLink\"><a href=\"javascript: ".GM_LANG_add_site_to_favs."\" onclick='window.external.AddFavorite(location.href, document.title); return false;'>".GM_LANG_add_site_to_favs."</a></div>";
+			print "<div id=\"GedcomBlockFavLink\"><a href=\"javascript: ".GM_LANG_add_site_to_favs."\" onclick='window.external.AddFavorite(location.href, document.title); return false;'>".GM_LANG_add_site_to_favs."</a></div>";
 			if ($gm_user->userGedcomAdmin()) {
 				print "<div class=\"GedcomBlockCustLink\"><a href=\"javascript: ".GM_LANG_customize_gedcom_page."\" onclick=\"window.open('index_edit.php?name=".preg_replace("/'/", "\'", get_gedcom_from_id(GedcomConfig::$GEDCOMID))."&amp;command=gedcom', '', 'top=50,left=10,width=1000,height=400,scrollbars=1,resizable=1'); return false;\">".GM_LANG_customize_gedcom_page."</a></div>\n";
 			}
