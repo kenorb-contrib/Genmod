@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: archiefalmelo.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: wiewaswie.php 34 2016-09-19 16:46:18Z Boudewijn $
  */
 
 class AlmeloSearchModule extends BaseExternalSearch {

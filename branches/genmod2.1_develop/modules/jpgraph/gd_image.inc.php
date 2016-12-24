@@ -3,7 +3,7 @@
 // File:        GD_IMAGE.INC.PHP
 // Description: PHP Graph Plotting library. Low level image drawing routines
 // Created:     2001-01-08, refactored 2008-03-29
-// Ver:         $Id: gd_image.inc.php 1922 2010-01-11 11:42:50Z ljp $
+// Ver:         $Id: gd_image.inc.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================
