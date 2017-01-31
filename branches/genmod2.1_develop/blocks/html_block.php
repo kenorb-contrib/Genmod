@@ -29,7 +29,7 @@
 $GM_BLOCKS["print_html_block"]["name"]        = GM_LANG_html_block_name;
 $GM_BLOCKS["print_html_block"]["descr"]       = "html_block_descr";
 $GM_BLOCKS["print_html_block"]["canconfig"]   = true;
-$GM_BLOCKS["print_html_block"]["config"]      = array("html"=>GM_LANG_html_block_sample_part1." <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".GM_LANG_config_block."\" /> ".GM_LANG_html_block_sample_part2, "only_show_logged_in"=>"no");
+$GM_BLOCKS["print_html_block"]["config"]      = array("html"=>GM_LANG_html_block_sample_part1." <img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".GM_LANG_config_block."\" title=\"".GM_LANG_config_block."\" /> ".GM_LANG_html_block_sample_part2, "only_show_logged_in"=>"no");
 $GM_BLOCKS["print_html_block"]["rss"]			= false;
 
 function print_html_block($block=true, $config="", $side, $index) {

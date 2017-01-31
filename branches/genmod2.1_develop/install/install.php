@@ -168,13 +168,13 @@ if ($step == 1) {
 	print "<br /><br />";
 	
 	if (phpversion() < $min_php_version) {
-		print "<img src=\"images/nok.png\" alt=\"PHP version too low\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"PHP version too low\" title=\"PHP version too low\" /> ";
 		print "<span class=\"Error\">Genmod requires PHP version 4.3.0 or later.</b><br />\nYour server is running PHP version ".phpversion().". Please ask your server's Administrator to upgrade the PHP installation.</span>";
 		print "<br /><br />";
 		$setup_php = false;
 	}
 	else {
-		print "<img src=\"images/ok.png\" alt=\"PHP version OK\"/> ";
+		print "<img src=\"images/ok.png\" alt=\"PHP version OK\" title=\"PHP version OK\" /> ";
 		print "Your PHP version meets the requirement for Genmod.<br />";
 		$setup_php = true;
 	}
@@ -202,11 +202,11 @@ if ($step == 1) {
 	else $media = true;
 	
 	if ($media) {
-		print "<img src=\"images/ok.png\" alt=\"Media structure OK\"/> ";
+		print "<img src=\"images/ok.png\" alt=\"Media structure OK\" title=\"Media structure OK\" /> ";
 		print "The media folder structure has been checked and found OK.<br />";
 	}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\" title=\"Media structure NOK\" /> ";
 		print "<span class=\"Error\">The media folder structure has been checked and not found OK. The media folder could not be created.</span><br />";
 	}
 	// Check if the thumbs folder exists
@@ -231,11 +231,11 @@ if ($step == 1) {
 	else $thumbs = true;
 	
 	if ($thumbs) {
-		print "<img src=\"images/ok.png\" alt=\"Media structure OK\"/> ";
+		print "<img src=\"images/ok.png\" alt=\"Media structure OK\" title=\"Media structure OK\" /> ";
 		print "The thumbnail media folder structure has been checked and found OK.<br />";
 	}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Media structure NOK\" title=\"Media structure NOK\" /> ";
 		print "<span class=\"Error\">The thumbnail media folder structure has been checked and not found OK. The media folder could not be created.</span>";
 	}
 	
@@ -251,7 +251,7 @@ if ($step == 1) {
 	}
 	else {
 		print "<br /><br />";
-		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\" title=\"Requirements not OK\" /> ";
 		print "Unable to continue. Please update your system so that you meet all requirements.";
 		print "<br /><br />";
 		print "<span class=\"Error\">The installation has been terminated.</span>";
@@ -306,7 +306,7 @@ if ($step == 3) {
 	print GM_LANG_step3;
 	print "<br /><br />";
 	if (substr(trim(((is_null($___mysqli_res = mysqli_get_server_info($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res)), 0, strlen($min_mysql_version)) < $min_mysql_version) {
-		print "<img src=\"images/nok.png\" alt=\"MySQL version too low\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"MySQL version too low\" title=\"MySQL version too low\" /> ";
 		print "<b style=\"color: red;\">Genmod requires MySQL version ".$min_mysql_version." or later.</b><br />\nYour server is running PHP version ".((is_null($___mysqli_res = mysqli_get_server_info($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res).". Please ask your server's Administrator to upgrade the MySQL installation.";
 		print "<br /><br />";
 		$setup_mysql = false;
@@ -317,12 +317,12 @@ if ($step == 3) {
 			$mode = mysqli_fetch_assoc($res);
 			$strict = stristr($mode["Value"], "STRICT_TRANS_TABLES");
 			if ($strict) {
-				print "<img src=\"images/nok.png\" alt=\"MySQL mode incorrect\"/> ";
+				print "<img src=\"images/nok.png\" alt=\"MySQL mode incorrect\" title=\"MySQL mode incorrect\" /> ";
 				print "<b style=\"color: red;\">Your MySQL installation is in Strict Mode.</b><br />\nPlease ask your server's Administrator to modify the MySQL installation.";
 				$setup_mysql = false;
 			}
 			else {
-				print "<img src=\"images/ok.png\" alt=\"MySQL version OK\"/> ";
+				print "<img src=\"images/ok.png\" alt=\"MySQL version OK\" title=\"MySQL version OK\" /> ";
 				print "Your MySQL version meets the requirement for Genmod.<br />";
 				$setup_mysql = true;
 			}
@@ -337,7 +337,7 @@ if ($step == 3) {
 		}
 		else {
 			if (!$db_ok) {
-				print "<img src=\"images/nok.png\" alt=\"Database layout not OK\"/> ";
+				print "<img src=\"images/nok.png\" alt=\"Database layout not OK\" title=\"Database layout not OK\" /> ";
 				print "There are missing entries found in your database. Your database will now be upgraded.";
 				print "<br />";
 				print "<div style=\"overflow-y: auto; border: 1px solid #DE0039; height: 5em; width: 30em; margin: 1em; padding: 1em;\">";
@@ -358,7 +358,7 @@ if ($step == 3) {
 				print "</div>";
 			}
 			if ($db_ok) {
-				print "<img src=\"images/ok.png\" alt=\"Database layout OK\" /> ";
+				print "<img src=\"images/ok.png\" alt=\"Database layout OK\" title=\"Database layout OK\" /> ";
 				print "Your database layout has been checked and found correct.";
 				print "<br />";
 				$setup_db = true;
@@ -369,7 +369,7 @@ if ($step == 3) {
 				print "</form>";
 			}
 			else if (!$db_ok) {
-				print "<img src=\"images/nok.png\" alt=\"Database layout not OK\" /> ";
+				print "<img src=\"images/nok.png\" alt=\"Database layout not OK\" title=\"Database layout not OK\" /> ";
 				print "Unable to setup the database correctly. Please check if you have the correct priviliges.";
 				print "<br /><br />";
 				print "Run installation again after all priviliges has been set. ";
@@ -379,7 +379,7 @@ if ($step == 3) {
 	}
 	else {
 		print "<br /><br />";
-		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Requirements not OK\" title=\"Requirements not OK\" /> ";
 		print "Unable to continue. Please update your system so that you meet all requirements.";
 		print "<br /><br />";
 		print "<span class=\"Error\">The installation has been terminated.</span>";
@@ -424,13 +424,13 @@ if ($step == 4) {
 		$au = InstallAddAdminUser($user);
 		unset($_SESSION["action"]);
 		if ($au) {
-			print "<img src=\"images/ok.png\" alt=\"Create administrator account OK\" /> ";
+			print "<img src=\"images/ok.png\" alt=\"Create administrator account OK\" title=\"Create administrator account OK\" /> ";
 			print GM_LANG_user_created;
 			print "<br />";
 			$_SESSION["gm_user"]=$username;
 		}
 		else {
-			print "<img src=\"images/nok.png\" alt=\"Create administrator account NOK\" /> ";
+			print "<img src=\"images/nok.png\" alt=\"Create administrator account NOK\" title=\"Create administrator account NOK\" /> ";
 			print GM_LANG_user_create_error;
 			print "<br />";
 		}
@@ -441,7 +441,7 @@ if ($step == 4) {
 	$row = mysqli_fetch_row($res);
 	
 	if ($row[0] > 0) {
-		print "<img src=\"images/ok.png\" alt=\"Administrator account OK\" /> ";
+		print "<img src=\"images/ok.png\" alt=\"Administrator account OK\" title=\"Administrator account OK\" /> ";
 		print "An administrator account exists.";
 		print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">";
 		print "<input type=\"hidden\" name=\"step\" value=\"5\">";
@@ -451,7 +451,7 @@ if ($step == 4) {
 		// session_destroy();
 	}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Administrator account NOK\" /> ";
+		print "<img src=\"images/nok.png\" alt=\"Administrator account NOK\" title=\"Administrator account NOK\" /> ";
 		print "An administrator account does not yet exist.";
 		print "<br />";
 		?>
@@ -696,7 +696,7 @@ if ($step ==  6) {
 		$all_ok = true;
 		foreach ($output as $type => $result) {
 			if ($result) {
-				print "<img src=\"images/ok.png\" alt=\"Language import OK\" /> ";
+				print "<img src=\"images/ok.png\" alt=\"Language import OK\" title=\"Language import OK\" /> ";
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
@@ -705,7 +705,7 @@ if ($step ==  6) {
 			}
 			else {
 				$all_ok = false;
-				print "<img src=\"images/nok.png\" alt=\"Language import NOK\" /> ";
+				print "<img src=\"images/nok.png\" alt=\"Language import NOK\" title=\"Language import NOK\" /> ";
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
@@ -726,7 +726,7 @@ if ($step ==  6) {
 		$output = InstallStoreLanguage($NEW_LANGS[0]);
 		foreach ($output as $type => $result) {
 			if ($result) {
-				print "<img src=\"images/ok.png\" alt=\"Language import OK\" /> ";
+				print "<img src=\"images/ok.png\" alt=\"Language import OK\" title=\"Language import OK\" /> ";
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
@@ -734,7 +734,7 @@ if ($step ==  6) {
 				print "<br />";
 			}
 			else {
-				print "<img src=\"images/nok.png\" alt=\"Language import NOK\" /> ";
+				print "<img src=\"images/nok.png\" alt=\"Language import NOK\" title=\"Language import NOK\" /> ";
 				if ($type == "lang") print "Language ";
 				else if ($type == "help") print "Help ";
 				else if ($type == "facts") print "Facts ";
@@ -792,11 +792,11 @@ if ($step == 7) {
 	$CONFIG_PARMS[$LOCATION] = $CONFIG;
 	$newconfigparms[$LOCATION] = $CONFIG_PARMS[$LOCATION];
 	if (InstallStoreConfig()) {
-		print "<img src=\"images/ok.png\" alt=\"Configuration save OK\" /> Configuration file saved.<br />";
+		print "<img src=\"images/ok.png\" alt=\"Configuration save OK\" title=\"Configuration save OK\" /> Configuration file saved.<br />";
 		$setup_config = true;
 	}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Configuration save NOK\" /> Configuration file could not be saved.<br />";
+		print "<img src=\"images/nok.png\" alt=\"Configuration save NOK\" title=\"Configuration save NOK\" /> Configuration file could not be saved.<br />";
 		print "<span class=\"Error\">Most likely the file is not writeable.</span><br />";
 	}
 	
@@ -886,10 +886,10 @@ if ($step == 7) {
 		if (!$result) $setup_langconfig = false;
 	}
 	if ($setup_langconfig) {
-		print "<img src=\"images/ok.png\" alt=\"Language config save OK\" /> Language configuration settings saved.<br />";
+		print "<img src=\"images/ok.png\" alt=\"Language config save OK\" title=\"Language config save OK\" /> Language configuration settings saved.<br />";
 		}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Language config save NOK\" /> Language configuration settings could not be saved.<br />";
+		print "<img src=\"images/nok.png\" alt=\"Language config save NOK\" title=\"Language config save NOK\" /> Language configuration settings could not be saved.<br />";
 	}
 	if (!$setup_config || !$setup_langconfig) {
 		print "<form method=\"post\" name=\"next\" action=\"".$_SERVER["SCRIPT_NAME"]."\">";

@@ -188,7 +188,7 @@ class IndividualController extends DetailController {
 						else $filename = $media->fileobj->f_main_file;
 						if ($media->fileobj->f_height != 0 && $media->fileobj->f_height < 150) $height = $media->fileobj->f_height;
 						else $height = 150;
-						$this->HighlightedObject = '<img src="'.$filename.'" class="IndiPicture" height="'.$height.'" alt="'.$media->title.'" />';
+						$this->HighlightedObject = '<img src="'.$filename.'" class="IndiPicture" height="'.$height.'" alt="'.$media->title.'" title="'.$media->title.'" />';
 						$this->canshowhighlightedobj = true;
 					}
 					else $this->canshowhighlightedobj = false;

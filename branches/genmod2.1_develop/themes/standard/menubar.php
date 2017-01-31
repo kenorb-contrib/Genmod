@@ -135,7 +135,7 @@ if (is_object($custommenu)) $showmenu[GM_LANG_my_pages] = CreateMenu($custommenu
 		<?php if (isset($GEDCOMS[GedcomConfig::$GEDCOMID])) { ?>
 			<div id="HeaderLogoLink">
 			<a href="index.php?command=gedcom">
-			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" />
+			<img src="<?php print GM_IMAGE_DIR."/".$GM_IMAGES['gedcom']['small']; ?>" alt="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" title="<?php print $GEDCOMS[GedcomConfig::$GEDCOMID]['title']; ?>" />
 			</a>
 			</div>
 		<?php } 

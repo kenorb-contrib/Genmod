@@ -167,13 +167,13 @@ if ($auth) {
 		print " />".GM_LANG_all."&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"I\" onclick=\"document.location='viewlog.php?type=I&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "I") print " checked=\"checked\"";
-		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" title=\"".GM_LANG_information."\" />&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"W\" onclick=\"document.location='viewlog.php?type=W&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "W") print " checked=\"checked\"";
-		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" title=\"".GM_LANG_warning."\" />&nbsp;";
 		print "<input type=\"radio\" name=\"type\" value=\"E\" onclick=\"document.location='viewlog.php?type=E&amp;cat=$cat&amp;max=$max&amp;gedid=$gedid'\"";
 		if ($type == "E") print " checked=\"checked\"";
-		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />&nbsp;";
+		print " /><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" title=\"".GM_LANG_error."\" />&nbsp;";
 		print "</td>\n";
 
 		print "<td class=\"NavBlockLabel\">".GM_LANG_export."</td>";
@@ -196,9 +196,9 @@ if ($auth) {
 		foreach ($loglines as $key => $logline) {
 			print "<tr>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
-			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />";
+			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" title=\"".GM_LANG_information."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" title=\"".GM_LANG_warning."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" title=\"".GM_LANG_error."\" />";
 			print "</td>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".date("d.m.Y H:i:s", $logline["time"])."</td>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".$logline["ip"]."</td>\n";
@@ -215,9 +215,9 @@ if ($auth) {
 		foreach ($loglines as $key => $logline) {
 			print "<tr>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">";
-			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />";
-			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />";
-			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />";
+			if ($logline["type"] == "I") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" title=\"".GM_LANG_information."\" />";
+			if ($logline["type"] == "W") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" title=\"".GM_LANG_warning."\" />";
+			if ($logline["type"] == "E") print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" title=\"".GM_LANG_error."\" />";
 			print "</td>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".date("d.m.Y H:i:s", $logline["time"])."</td>\n";
 			print "<td class=\"NavBlockLabel AdminNavBlockLabel\">".$logline["ip"]."</td>\n";

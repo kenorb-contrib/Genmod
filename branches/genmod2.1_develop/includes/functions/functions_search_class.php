@@ -927,7 +927,7 @@ abstract class SearchFunctions {
 			$cti = count($controller->printindiname);
 			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($cti > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" title=\"".GM_LANG_people."\" alt=\"".GM_LANG_individuals."\" title=\"".GM_LANG_individuals."\" />&nbsp;&nbsp;";
 			print GM_LANG_individuals;
 			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;
@@ -960,7 +960,7 @@ abstract class SearchFunctions {
 			$ctf = count($controller->printfamname);
 			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if ($ctf > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["sfamily"]["small"]."\" border=\"0\" alt=\"".GM_LANG_families."\" title=\"".GM_LANG_families."\" />&nbsp;&nbsp;";
 			print GM_LANG_families;
 			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;
@@ -993,7 +993,7 @@ abstract class SearchFunctions {
 			$cts = count($controller->printsource);
 			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($cts > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["source"]["small"]."\" border=\"0\" alt=\"".GM_LANG_sources."\" title=\"".GM_LANG_sources."\" />&nbsp;&nbsp;";
 			print GM_LANG_sources;
 			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$sour_private = array();
@@ -1025,7 +1025,7 @@ abstract class SearchFunctions {
 			$ctr = count($controller->printrepo);
 			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($ctr > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["repository"]["small"]."\" border=\"0\" alt=\"".GM_LANG_search_repos."\" title=\"".GM_LANG_search_repos."\" />&nbsp;&nbsp;";
 			print GM_LANG_search_repos;
 			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$repo_private = array();
@@ -1057,7 +1057,7 @@ abstract class SearchFunctions {
 			$ctn = count($controller->printnote);
 			print "\n\t<table class=\"ListTable".($controller->classname == 'SearchController' && $controller->origin != 'find' ? ' SearchListTable' : '')."\">\n\t\t<tr><td class=\"ListTableColumnHeader\"";
 			if($ctn > 12) print " colspan=\"2\"";
-			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
+			print "><img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["note"]["other"]."\" border=\"0\" alt=\"".GM_LANG_notes."\" title=\"".GM_LANG_notes."\" />&nbsp;&nbsp;";
 			print GM_LANG_notes;
 			print "</td></tr><tr><td class=\"ListTableContent\"><ul>";
 			$i=1;

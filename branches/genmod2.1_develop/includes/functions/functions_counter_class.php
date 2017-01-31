@@ -113,7 +113,7 @@ abstract class CounterFunctions {
 		
 			//replace the numbers with their images
 			for($i=0;$i<10;$i++)
-		    $hits = str_replace("$i","<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"".GM_LANG_hit_count."\" />","$hits");
+		    $hits = str_replace("$i","<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES[$i]["digit"]."\" alt=\"".GM_LANG_hit_count."\" title=\"".GM_LANG_hit_count."\" />","$hits");
 			$hits = '<span dir="ltr">'.$hits.'</span>';
 			return $hits;
 		}
