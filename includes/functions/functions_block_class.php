@@ -34,7 +34,7 @@ abstract class BlockFunctions {
 	public function PrintAdminIcon() {
 		global $GM_IMAGES;
 		
-		print "<img class=\"BlockAdminIcon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".GM_LANG_config_block."\" />\n";
+		print "<img class=\"BlockAdminIcon\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["admin"]["small"]."\" alt=\"".GM_LANG_config_block."\" title=\"".GM_LANG_config_block."\" />\n";
 	}
 	/**
 	 * get the top surnames
@@ -452,7 +452,7 @@ abstract class BlockFunctions {
 			<br />
 		<?php
 		PrintHelpLink("index_add_favorites_help", "qm", "add_favorite");
-		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_".$type."_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
+		print "<b><a href=\"javascript: ".GM_LANG_add_favorite." \" onclick=\"expand_layer('add_".$type."_fav'); return false;\"><img id=\"add_".$type."_fav_img\" src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["plus"]["other"]."\" border=\"0\" alt=\"".GM_LANG_add_favorite."\" title=\"".GM_LANG_add_favorite."\" />&nbsp;".GM_LANG_add_favorite."</a></b>";
 		print "<br /><div id=\"add_".$type."_fav\" style=\"display: none;\">\n";
 			print "<form name=\"addfavform\" method=\"get\" action=\"index.php\">\n";
 			print "<input type=\"hidden\" name=\"action\" value=\"addfav\" />\n";

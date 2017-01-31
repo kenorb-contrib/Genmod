@@ -464,7 +464,7 @@ if ($disp1 == "block") {
 					print "\n\t<a href=\"mediadetail.php?mid=".$media->xref."&amp;gedid=".$media->gedcomid."\" target=\"_blank\">".$media->title."</a><br />";
 				}
 				print "</div>";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" class=\"ManageMediaFileLinks\" border=\"0\" alt=\"".GM_LANG_click_mm_links."\" onclick=\"showbox(this, '".$counter."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."');return false;\"/>";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["link"]["other"]."\" class=\"ManageMediaFileLinks\" border=\"0\" alt=\"".GM_LANG_click_mm_links."\" title=\"".GM_LANG_click_mm_links."\" onclick=\"showbox(this, '".$counter."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."');return false;\"/>";
 			}
 			else print "&nbsp;";
 			print "</td>";
@@ -476,7 +476,7 @@ if ($disp1 == "block") {
 				print "<a href=\"media.php?action=delete&amp;file=".urlencode(MediaFS::NormalizeLink($filename))."&amp;directory=".$directory."&amp;thumbs=".$thumbs."&amp;filter=".$filter."\" onclick=\"return confirm('".GM_LANG_del_mm_file1;
 				if (isset($file["objects"])) print GM_LANG_del_mm_file2;
 				print "');\">";
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".GM_LANG_delete_file."\" /></a>";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["delete"]["other"]."\" border=\"0\" alt=\"".GM_LANG_delete_file."\" title=\"".GM_LANG_delete_file."\" /></a>";
 			}
 			else print "&nbsp;";
 //			print "</td>";
@@ -494,7 +494,7 @@ if ($disp1 == "block") {
 				print "\" target=\"_blank\">";
 			}
 			else print "<a href=\"downloadbackup.php?fname=".urlencode($filename)."\" target=\"_blank\">";
-			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".GM_LANG_download_now."\" />";
+			print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["download"]["other"]."\" border=\"0\" alt=\"".GM_LANG_download_now."\" title=\"".GM_LANG_download_now."\" />";
 			print "</a>";
 			
 			// Details
@@ -511,7 +511,7 @@ if ($disp1 == "block") {
 				print "</span>";
 				print "</div>";
 			
-				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".GM_LANG_click_details."\" onclick=\"showbox(this, '".$counter."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."D"."');return false;\" />";
+				print "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["search"]["small"]."\" height=\"15\" width=\"15\" border=\"0\" alt=\"".GM_LANG_click_details."\" title=\"".GM_LANG_click_details."\" onclick=\"showbox(this, '".$counter."D"."', 'relatives'); return false;\" onmouseout=\"moveout('".$counter."D"."');return false;\" />";
 			print "</td>";
 			
 			$i++;

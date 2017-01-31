@@ -51,20 +51,20 @@ function InstallCheckDBLayout() {
 
 	if (!mysqli_query($GLOBALS["___mysqli_ston"], "SHOW CREATE DATABASE `".$DBNAME."`")) {
 		// NOTE: Database does not exist. Try to create it.
-		print "<img src=\"images/nok.png\" alt=\"Database does not exist\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Database does not exist\" title=\"Database does not exist\" /> ";
 		print "Database ".$DBNAME." does not exist.";
 		print "<br />";
 		$sqlcreate = "CREATE DATABASE `".$DBNAME."`"." CHARACTER SET ".$server_charset." COLLATE ".$server_collation;
 		$rescreate = mysqli_query($GLOBALS["___mysqli_ston"], $sqlcreate);
 		if (!$rescreate) {
-			print "<img src=\"images/nok.png\" alt=\"Database cannot be created\"/> ";
+			print "<img src=\"images/nok.png\" alt=\"Database cannot be created\" title=\"Database cannot be created\" /> ";
 			print "Cannot create database: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)).".";
 			print "<br />";
 			return false;
 		}
 		else {
 			((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE " . $DBNAME));
-			print "<img src=\"images/ok.png\" alt=\"Database created\"/> ";
+			print "<img src=\"images/ok.png\" alt=\"Database created\" title=\"Database created\" /> ";
 			print "Database ".$DBNAME." has been created.";
 			print "<br />";
 		}
@@ -211,11 +211,11 @@ function InstallAddMissingTable($tablename) {
 	// NOTE: Execute the query
 	$res = mysqli_query($GLOBALS["___mysqli_ston"], $sql);
 	if($res) {
-		print "<img src=\"images/ok.png\" alt=\"Table created\"/> ";
+		print "<img src=\"images/ok.png\" alt=\"Table created\" title=\"Table created\" /> ";
 		print $ok."<br />\n";
 	}
 	else {
-		print "<img src=\"images/nok.png\" alt=\"Table not created\"/> ";
+		print "<img src=\"images/nok.png\" alt=\"Table not created\" title=\"Table not created\" /> ";
 		print $nok."<br />".((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false))."\n";
 	}
 }
@@ -273,7 +273,7 @@ function InstallAddAdminUser($newuser, $msg = "added") {
 function InstallShowProgress() {
 	global $step;
 	print "<div style=\"border: 1px solid #FF0000; width: 700px;\">";
-	print "<img src=\"images/progressbar.png\" width=\"".$step."00px\" height=\"10px\" alt=\"Progress\"/> ";
+	print "<img src=\"images/progressbar.png\" width=\"".$step."00px\" height=\"10px\" alt=\"Progress\" title=\"Progress\" /> ";
 	print "</div>";
 }
 

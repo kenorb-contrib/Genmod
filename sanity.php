@@ -57,9 +57,9 @@ if (!isset($check_gedtags)) $check_gedtags = "";
 if (!isset($check_unlinked)) $check_unlinked = "";
 if (!isset($check_cits)) $check_sits = "";
 if (!isset($action)) $action = "";
-$info_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" />&nbsp;";
-$warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" />&nbsp;";
-$error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" />&nbsp;";
+$info_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["information"]."\" alt=\"".GM_LANG_information."\" title=\"".GM_LANG_information."\" />&nbsp;";
+$warn_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["warning"]."\" alt=\"".GM_LANG_warning."\" title=\"".GM_LANG_warning."\" />&nbsp;";
+$error_icon = "<img src=\"".GM_IMAGE_DIR."/".$GM_IMAGES["log"]["error"]."\" alt=\"".GM_LANG_error."\" title=\"".GM_LANG_error."\" />&nbsp;";
 ?>
 <!-- Setup the left box -->
 <div id="AdminColumnLeft">
