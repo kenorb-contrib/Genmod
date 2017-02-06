@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed Message text doesn't wrap
 - Fixed some title tags missing in HTML
 - Fixed Message block send message not working
 - Fixed SQL error when rebuilding caches
