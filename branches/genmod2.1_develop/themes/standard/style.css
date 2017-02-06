@@ -1955,6 +1955,7 @@ DIV.ActionListOptionContainer SPAN {
 	border: 1px solid #9B9796;
 	padding: 3px;
 	font-size: 11px;
+	white-space: normal;
 }
 .QSLeftBlock, .AddFavLeftBlock {
 	width: 50%;
