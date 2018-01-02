@@ -22,7 +22,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: descendancy_ctrl.php 18 2016-05-15 08:58:01Z Boudewijn $
+ * @version $Id: descendancy_ctrl.php 37 2017-01-31 08:44:35Z Boudewijn $
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

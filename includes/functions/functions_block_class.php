@@ -22,7 +22,7 @@
  * @subpackage Tools
  * @see validategedcom.php
  *
- * $Id: functions_block_class.php 35 2016-10-15 06:08:21Z Boudewijn $
+ * $Id: functions_block_class.php 37 2017-01-31 08:44:35Z Boudewijn $
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

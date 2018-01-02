@@ -5,10 +5,11 @@
 	This and other information can be found online at
 	http://www.sourceforge.net/projects/genmod
 
-	# $Id: changelog.txt 36 2016-12-24 06:47:36Z Boudewijn $
+	# $Id: changelog.txt 39 2017-12-31 15:21:44Z Boudewijn $
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed invalid redirect after HTTPS login
 - Fixed Message text doesn't wrap
 - Fixed some title tags missing in HTML
 - Fixed Message block send message not working
