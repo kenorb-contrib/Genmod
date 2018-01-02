@@ -25,14 +25,13 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: login.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: login.php 39 2017-12-31 15:21:44Z Boudewijn $
  */ 
 
 /**
  * Inclusion of the configuration file
 */
 require "config.php";
-
 $message="";
 if (!isset($action)) {
 	$action="";
@@ -43,7 +42,6 @@ if (!isset($action)) {
 if (!isset($type)) $type = "full";
 
 if (isset($url)) $url = html_entity_decode(urldecode($url));
-
 if ($action=="login") {
 	if (isset($_POST['username'])) $username = $_POST['username'];
 	else $username="";
@@ -66,9 +64,9 @@ if ($action=="login") {
 		}
 		session_write_close();
 		$url = preg_replace("/logout=1/", "", $url);
-		if (stristr(SERVER_URL, $url) === false) $url = SERVER_URL . $url;
+		if (stristr("http://".$url, SERVER_URL) === false && stristr("https://".$url, SERVER_URL) === false) $url = SERVER_URL . $url;
 		else $url = SERVER_URL;
-		if (( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) && !stristr('https', $url)) {
+		if (( (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443) && !stristr($url, 'https')) {
 			$url = preg_replace("/http/", "https", $url);
 		} 
 		if ($remember=="yes") setcookie("gm_rem", $username, time()+60*60*24*7);

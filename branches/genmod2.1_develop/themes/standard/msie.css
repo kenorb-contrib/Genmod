@@ -20,3 +20,6 @@
 .ie_popup_width {
 	width: 150px;
 }
+#GedcomBlockFavLink {
+	display: block;
+}

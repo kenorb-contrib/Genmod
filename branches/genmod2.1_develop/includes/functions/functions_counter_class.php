@@ -21,7 +21,7 @@
  * @package Genmod
  * @subpackage Tools
  *
- * $Id: functions_counter_class.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * $Id: functions_counter_class.php 37 2017-01-31 08:44:35Z Boudewijn $
  */
  
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
