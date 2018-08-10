@@ -127,7 +127,7 @@ if ($action=="createuser") {
 			if (!empty($user_language)) $user->language = $user_language;
 			else $user->language = $LANGUAGE;
 			$user->reg_timestamp = $reg_timestamp;
-			$user->reg_hashcode = $reg_hashcode;
+			$user->reg_hashcode = (isset($reg_hashcode) ? $reg_hashcode : "");
 			$user->gedcomid=array();
 			$user->rootid=array();
 			$user->canedit=array();

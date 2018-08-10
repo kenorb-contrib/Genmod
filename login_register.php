@@ -525,6 +525,7 @@ switch ($action) {
 		break;
 	case "verify_hash" :
   		$QUERY_STRING = "";
+		if (!isset($user_hashcode)) $user_hashcode = "";
 		WriteToLog("LoginRegister-&gt; User attempted to verify hashcode: ".$user_name, "I", "S");
 		PrintHeader("Genmod - " . GM_LANG_user_verify);# <-- better verification of authentication code
 		print "<div class=\"LoginPageContainer\">";

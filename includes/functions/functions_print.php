@@ -179,7 +179,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		  if (!empty(GedcomConfig::$META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_PAGE_TOPIC)."\" />\n";
 	 	  if (!empty(GedcomConfig::$META_AUDIENCE)) print "<meta name=\"audience\" content=\"".GedcomConfig::$META_AUDIENCE."\" />\n";
 	 	  if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
-	 	  if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
+	 	  print ParseRobotsTXT();
 	 	  if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
 		  print "<meta name=viewport content=\"width=1020, initial-scale=1.01\" />\n";
 		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.sourceforge.net/projects/genmod\" />\n";
@@ -350,7 +350,7 @@ function PrintSimpleHeader($title) {
 	if (!empty(GedcomConfig::$META_PAGE_TOPIC)) print "<meta name=\"page-topic\" content=\"".preg_replace("/\"/", "", GedcomConfig::$META_PAGE_TOPIC)."\" />\n";
 	if (!empty(GedcomConfig::$META_AUDIENCE)) print "<meta name=\"audience\" content=\"".GedcomConfig::$META_AUDIENCE."\" />\n";
 	if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
-	if (!empty(GedcomConfig::$META_ROBOTS)) print "<meta name=\"robots\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
+	print ParseRobotsTXT();
 	if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
 	print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.sourceforge.net/projects/genmod\" />\n";
 	GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
@@ -429,7 +429,7 @@ function PrintFooter() {
 	else {
 		include(GM_PRINT_FOOTERFILE);
 		print "\n\t<div class=\"FooterPreviewLinkContainer\"><br />";
-		$backlink = SCRIPT_NAME."?".GetQueryString();
+		$backlink = basename(SCRIPT_NAME)."?".GetQueryString();
 		if (!$printlink) {
 			print "\n\t<br /><a id=\"printlink\" href=\"#\" onclick=\"print(); return false;\">".GM_LANG_print."</a><br />";
 			print "\n\t <a id=\"printlinktwo\"	  href=\"#\" onclick=\"window.location='".$backlink."'; return false;\">".GM_LANG_cancel_preview."</a><br />";

@@ -145,7 +145,7 @@ abstract class MenuBar {
 		// NOTE: Print preview
 		$submenu = new Menu(GM_LANG_print_preview);
 		// TODO: Querystring contains htmlcode, kills the JS
-		$submenu->addLink(SCRIPT_NAME."?view=preview&".htmlentities(GetQueryString()));
+		$submenu->addLink(basename(SCRIPT_NAME)."?view=preview&".htmlentities(GetQueryString()));
 		$menu->addSubmenu($submenu);
 		
 		// NOTE: Logout link
