@@ -2114,5 +2114,43 @@ function SmartUtf8Decode($in_str) {
 	$new_str = str_replace("&OElig;", "\x8c", $new_str);
 	return $new_str;
 }
+
+function ParseRobotsTXT() {
+	
+	$robots = array();
+	$printline = "";
+	if (!file_exists("robots.txt")) {
+		return $robots;
+	}
+	else {
+		$r = file_get_contents("robots.txt");
+		$r = rtrim($r)."\n";
+		$agents = preg_split("/User-agent: /", $r);
+		foreach ($agents as $agent => $line) {
+			$lines = preg_match_all("/(.*)\n/", $line, $match, PREG_SET_ORDER);
+			$maynot = false;
+			foreach ($match as $key => $rule) {
+				if ($key == 0) {
+					$robot = (trim($rule[0]) == "*" ? "robots" : trim($rule[0]));
+				}
+				else {
+					if (strpos($rule[0], "/\n") !== false && strpos($rule[0], "Disallow:") !== false) {
+						$maynot = true;
+					}
+					if (strpos($rule[0], $_SERVER["SCRIPT_NAME"]) !== false && strpos($rule[0], "Disallow:") !== false) {
+						$maynot = true;
+					}
+				}
+			}
+			if ($maynot) {
+				$printline .= "<meta name=\"".$robot."\" content=\"noindex\" />\n";
+			}
+			else {
+				if (isset($robot)) $printline .= "<meta name=\"".$robot."\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";
+			}
+		}
+	}
+	return $printline;
+}
 	
 ?>

@@ -1193,8 +1193,10 @@ IMG.StatsPlot {
 }
 .LoginPageTable {
 	width: 40%;
+	table-layout: fixed;
 	margin-left: auto;
 	margin-right: auto;
+	white-space: normal;
 }
 .LoginPageTableTextWidth {
 	width: 40%;

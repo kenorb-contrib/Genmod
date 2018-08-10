@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Added robots meta tags follow robots.txt
 - Fixed invalid redirect after HTTPS login
 - Fixed Message text doesn't wrap
 - Fixed some title tags missing in HTML
