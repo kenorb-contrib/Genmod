@@ -181,7 +181,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	 	  if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
 	 	  print ParseRobotsTXT();
 	 	  if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
-		  print "<meta name=viewport content=\"width=1020, initial-scale=1.01\" />\n";
+		  print "<meta name=\"viewport\" content=\"width=1020, initial-scale=1.01\" />\n";
 		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - http://www.sourceforge.net/projects/genmod\" />\n";
 		 GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
 		 GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
