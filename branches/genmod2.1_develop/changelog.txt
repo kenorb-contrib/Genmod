@@ -5,10 +5,11 @@
 	This and other information can be found online at
 	http://www.sourceforge.net/projects/genmod
 
-	# $Id: changelog.txt 39 2017-12-31 15:21:44Z Boudewijn $
+	# $Id: changelog.txt 41 2018-08-10 09:36:57Z Boudewijn $
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed validation error on viewport metatag
 - Added robots meta tags follow robots.txt
 - Fixed invalid redirect after HTTPS login
 - Fixed Message text doesn't wrap
