@@ -2132,17 +2132,20 @@ function ParseRobotsTXT() {
 			foreach ($match as $key => $rule) {
 				if ($key == 0) {
 					$robot = (trim($rule[0]) == "*" ? "robots" : trim($rule[0]));
+//					print "found robot ".$robot."<br />";
 				}
 				else {
+//					print "check ".$rule[0]." ".$_SERVER["SCRIPT_NAME"]."<br />";
 					if (strpos($rule[0], "/\n") !== false && strpos($rule[0], "Disallow:") !== false) {
 						$maynot = true;
 					}
-					if (strpos($rule[0], $_SERVER["SCRIPT_NAME"]) !== false && strpos($rule[0], "Disallow:") !== false) {
+					if (strpos($rule[0], "/".basename($_SERVER["SCRIPT_NAME"])) !== false && strpos($rule[0], "Disallow:") !== false) {
 						$maynot = true;
 					}
 				}
 			}
 			if ($maynot) {
+//				print "found for ".$robot." page ". $rule[0];
 				$printline .= "<meta name=\"".$robot."\" content=\"noindex\" />\n";
 			}
 			else {
