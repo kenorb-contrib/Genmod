@@ -2146,7 +2146,7 @@ function ParseRobotsTXT() {
 			}
 			if ($maynot) {
 //				print "found for ".$robot." page ". $rule[0];
-				$printline .= "<meta name=\"".$robot."\" content=\"noindex\" />\n";
+				$printline .= "<meta name=\"".$robot."\" content=\"".GedcomConfig::$META_ROBOTS_DENY."\" />\n";
 			}
 			else {
 				if (isset($robot)) $printline .= "<meta name=\"".$robot."\" content=\"".GedcomConfig::$META_ROBOTS."\" />\n";

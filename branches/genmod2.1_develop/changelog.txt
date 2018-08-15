@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Added config variable to set value for robots meta tag if no access
 - Fixed validation error on viewport metatag
 - Added robots meta tags follow robots.txt
 - Fixed invalid redirect after HTTPS login

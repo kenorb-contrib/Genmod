@@ -146,6 +146,7 @@ abstract class GedcomConfig {
 	public static $META_AUDIENCE = "All";					// The intended audience
 	public static $META_PAGE_TYPE = "Private Homepage";		// The type of page
 	public static $META_ROBOTS = "index,follow";			// Instructions for robots
+	public static $META_ROBOTS_DENY = "none";					// Instructions for robots if access is denied by robots.txt
 	public static $META_REVISIT = "10 days";				// How often crawlers should reindex the site
 	public static $META_KEYWORDS = "ancestry, genealogy, pedigree tree";	
 															// any aditional keywords, the most common surnames list will be appended to 
