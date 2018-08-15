@@ -315,6 +315,7 @@ if ($action=="update") {
 	$newconf["meta_publisher"] = $_POST["NEW_META_PUBLISHER"];
 	$newconf["meta_revisit"] = $_POST["NEW_META_REVISIT"];
 	$newconf["meta_robots"] = $_POST["NEW_META_ROBOTS"];
+	$newconf["meta_robots_deny"] = $_POST["NEW_META_ROBOTS_DENY"];
 	$newconf["meta_surname_keywords"] = $boolarray[$_POST["NEW_META_SURNAME_KEYWORDS"]];
 	$newconf["meta_title"] = $_POST["NEW_META_TITLE"];
 	$newconf["nick_delim"] = $_POST["NEW_NICK_DELIM0"].$_POST["NEW_NICK_DELIM1"];
@@ -1560,6 +1561,11 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick
 	<tr>
 		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_ROBOTS_help", "qm", "META_ROBOTS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_ROBOTS;?></div></td>
 		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_ROBOTS" value="<?php print GedcomConfig::$META_ROBOTS?>" tabindex="<?php $i++; print $i?>" /><br />
+		</td>
+	</tr>
+	<tr>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_ROBOTS_DENY_help", "qm", "META_ROBOTS_DENY"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_ROBOTS_DENY;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_ROBOTS_DENY" value="<?php print GedcomConfig::$META_ROBOTS_DENY?>" tabindex="<?php $i++; print $i?>" /><br />
 		</td>
 	</tr>
 	<tr>

@@ -1,4 +1,4 @@
-User-agent: Googlebot
+User-agent: googlebot
 Disallow: /aliveinyear.php
 Disallow: /ancestry.php
 Disallow: /calendar.php

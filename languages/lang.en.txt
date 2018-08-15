@@ -99,6 +99,7 @@
 "META_PUBLISHER_descr";"Leave this field empty to use the full name of the  #gm_lang[CONTACT_EMAIL]#."
 "META_REVISIT";"How often should crawlers revisit META tag"
 "META_ROBOTS";"Robots META tag"
+"META_ROBOTS_DENY";"Robots META tag (access denied)"
 "META_SURNAME_KEYWORDS";"Add Most Common Surnames to Keywords META field"
 "META_TITLE";"Add to TITLE header tag"
 "NEWS_TYPE";"Type of Genmod News to display on Admin page"

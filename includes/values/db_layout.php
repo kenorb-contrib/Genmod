@@ -270,6 +270,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_page_topic"]["details"] = "VAR
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_audience"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_page_type"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_robots"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_robots_DENY"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_revisit"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_keywords"]["details"] = "VARCHAR (128) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_title"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
