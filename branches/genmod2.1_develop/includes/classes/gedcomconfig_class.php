@@ -154,6 +154,7 @@ abstract class GedcomConfig {
 	public static $META_TITLE = "";							// Optional text that can be added to the html page <title></title> line
 	public static $META_SURNAME_KEYWORDS = true;			// Option to use the most common surnames in the keywords field
 	public static $CHART_BOX_TAGS = "";						// Optional comma seperated gedcom tags to show in chart boxes
+	public static $INCLUDE_IN_SITEMAP = true;				// Whether or not to include in sitemaps (with respect to privacy)
 	public static $SHOW_LDS_AT_GLANCE = false;				// Show status of LDS ordinances in chart boxes
 	public static $UNDERLINE_NAME_QUOTES = false;			// Convert double quotes in names to underlines
 	public static $SPLIT_PLACES = false;					// Split PLAC tag into subtags (town, county, state...) in edit mode

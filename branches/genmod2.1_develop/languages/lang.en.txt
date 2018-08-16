@@ -55,6 +55,7 @@
 "HIDE_LIVE_PEOPLE";"Show people who are alive"
 "HOME_SITE_TEXT";"Main WebSite text"
 "HOME_SITE_URL";"Main WebSite URL"
+"INCLUDE_IN_SITEMAP";"Include in sitemap"
 "INDEX_DIRECTORY";"Index file directory"
 "INDI_EXT_FAM_FACTS";"Show extended family facts in individual fact list"
 "INDI_FACTS_ADD";"Individual Add Facts"

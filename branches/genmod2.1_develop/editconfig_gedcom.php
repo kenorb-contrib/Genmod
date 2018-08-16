@@ -337,6 +337,7 @@ if ($action=="update") {
 	$newconf["show_counter"] = $boolarray[$_POST["NEW_SHOW_COUNTER"]];
 	$newconf["show_empty_boxes"] = $boolarray[$_POST["NEW_SHOW_EMPTY_BOXES"]];
 	$newconf["show_external_search"] = $_POST["NEW_SHOW_EXTERNAL_SEARCH"];
+	$newconf["include_in_sitemap"] = $boolarray[$_POST["NEW_INCLUDE_IN_SITEMAP"]];
 	$newconf["lists_all"] = $boolarray[$_POST["NEW_LISTS_ALL"]];
 	$newconf["show_fam_id_numbers"] = $boolarray[$_POST["NEW_SHOW_FAM_ID_NUMBERS"]];
 	$newconf["show_gedcom_record"] = $_POST["NEW_SHOW_GEDCOM_RECORD"];
@@ -1589,6 +1590,14 @@ print "&nbsp;<a href=\"javascript: ".htmlentities(GM_LANG_meta_conf)."\" onclick
 	<tr>
 		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("META_TITLE_help", "qm", "META_TITLE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_META_TITLE;?></div></td>
 		<td class="NavBlockField AdminNavBlockField"><input type="text" dir="ltr" name="NEW_META_TITLE" value="<?php print GedcomConfig::$META_TITLE?>" tabindex="<?php $i++; print $i?>" size="75" /></td>
+	</tr>
+	<tr>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("INCLUDE_IN_SITEMAP_help", "qm", "INCLUDE_IN_SITEMAP"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_INCLUDE_IN_SITEMAP;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><select name="NEW_INCLUDE_IN_SITEMAP" tabindex="<?php $i++; print $i?>">
+				<option value="yes" <?php if (GedcomConfig::$INCLUDE_IN_SITEMAP) print "selected=\"selected\""; ?>><?php print GM_LANG_yes;?></option>
+				<option value="no" <?php if (!GedcomConfig::$INCLUDE_IN_SITEMAP) print "selected=\"selected\""; ?>><?php print GM_LANG_no;?></option>
+			</select>
+		</td>
 	</tr>
 	<tr>
 		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("RSS_FORMAT_help", "qm", "RSS_FORMAT"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_RSS_FORMAT;?></div></td>

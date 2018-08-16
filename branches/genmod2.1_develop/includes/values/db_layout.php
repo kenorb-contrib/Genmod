@@ -275,6 +275,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_revisit"]["details"] = "VARCHA
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_keywords"]["details"] = "VARCHAR (128) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_title"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_meta_surname_keywords"]["details"] = "TINYINT(1)";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_include_in_sitemap"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_chart_box_tags"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 // gc_use_quick_update, gc_show_quick_resn, gc_quick_add_facts, gc_quick_required_facts, gc_quick_add_famfacts, gc_quick_required_famfacts removed in 2.0
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_show_lds_at_glance"]["details"] = "TINYINT(1)";
