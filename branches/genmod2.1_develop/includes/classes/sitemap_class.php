@@ -45,7 +45,7 @@ class SiteMap {
 	private $sitemap = array();				// array to store the items for the sitemap
 	private $types = array();				// Types of records to generate a sitemap for
 	private $list = array();				// Used to hold the list with objects
-	public  $added = false;					// keep track whether anything is added
+	private $added = false;					// keep track whether anything is added
 
 	public function __construct($types=array("INDI")) {
 		global $GEDCOMS;
@@ -76,9 +76,23 @@ class SiteMap {
 			}
 		}
 		$this->sitemap[] = $this->xmlfooter;
-		
-		$this->PrintSitemap();
+		WriteToLog("Sitemap-class-&gt; ".GM_LANG_sitemap_export_success, "I", "S");
 	}
+	
+	public function __get($property) {
+		switch ($property) {
+			case "sitemap":
+				return implode("", $this->sitemap);
+				break;
+			case "hascontent":
+				return $this->added;
+				break;
+			default:
+				PrintGetSetError($property, get_class($this), "get");
+				break;
+		}
+	}
+	
 	private function AddIDs($type) {
 
 		if ($type == "INDI") {
@@ -97,21 +111,6 @@ class SiteMap {
 				$this->sitemap[] = htmlspecialchars(SERVER_URL . $page . ".php?" . $id . "=" . $object->xref . "&gedid=" . $object->gedcomid) . "\n";
 				$this->sitemap[] = $this->urlfooter;
 			}
-		}
-	}
-	
-	private function PrintSitemap() {
-		
-		if (file_exists($this->sitemapfilename)) unlink($this->sitemapfilename);
-		if ($this->added) {
-			if($handle = fopen($this->sitemapfilename, "w")) {
-				foreach($this->sitemap as $key => $line) {
-					fwrite($handle, $line);
-				}
-				fclose($handle);
-				WriteToLog("Sitemap-class-&gt; "."Sitemap succesfully written", "I", "S");
-			}
-			else WriteToLog("Sitemap-class-&gt; "."Sitemap cannot be written", "E", "S");
 		}
 	}
 }

@@ -32,5 +32,5 @@ require("config.php");
 
 $map = new SiteMap(array("INDI", "FAM"));
 
-if ($map->added) print file_get_contents(INDEX_DIRECTORY . "sitemap.xml");
+if ($map->hascontent) print $map->sitemap;
 ?>
