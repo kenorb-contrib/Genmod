@@ -514,7 +514,7 @@ function getRecentChanges() {
 	if (count($found_facts)==0) {
 		$recentText .= PrintText("recent_changes_none", 0, 1);
 	} else {
-		$recentText .= PrintText("recent_changes_some", 0, 1);
+		$recentText .= PrintText("recent_changes_some", 0, 1) . "<br />\n";
 		$ASC = 1;
 		$IGNORE_FACTS = 1;
 		$IGNORE_YEAR = 0;
