@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: session.php 19 2016-05-15 10:50:03Z Boudewijn $
+ * @version $Id: session.php 43 2018-08-15 15:38:10Z Boudewijn $
  */
 
 // NOTE: Start the debug collector
@@ -131,7 +131,7 @@ date_default_timezone_set(date_default_timezone_get());
 
 // NOTE: Version of Genmod
 define("GM_VERSION", "2.1");
-define("GM_VERSION_RELEASE", "Beta 1");
+define("GM_VERSION_RELEASE", "Beta 2");
 define("GM_REQUIRED_PRIVACY_VERSION", "3.3");
 define("GM_REQUIRED_CONFIG_VERSION", "3.1");
 

@@ -5,10 +5,11 @@
 	This and other information can be found online at
 	http://www.sourceforge.net/projects/genmod
 
-	# $Id: changelog.txt 41 2018-08-10 09:36:57Z Boudewijn $
+	# $Id: changelog.txt 48 2019-03-02 09:25:15Z Boudewijn $
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed version to Beta 2 in install and admin
 - Fixed linebreak missing in RSS feed recent changes
 - Fixed CONT text in sources is printed twice
 - Added function and option to create sitemaps
