@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: install.php 37 2017-01-31 08:44:35Z Boudewijn $
+ * @version $Id: install.php 43 2018-08-15 15:38:10Z Boudewijn $
  * @package Genmod
  * @subpackage Installation
  */
@@ -37,7 +37,7 @@
 // 5. Admin user
 
 define('GM_VERSION', "2.1");
-define('GM_VERSION_RELEASE', "Beta 1");
+define('GM_VERSION_RELEASE', "Beta 2");
 define('DEBUG', false);
 $min_php_version = "5.2";
 $min_mysql_version = "5.1";

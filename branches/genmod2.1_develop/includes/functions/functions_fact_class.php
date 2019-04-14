@@ -453,7 +453,9 @@ abstract class FactFunctions {
 					do {
 						$trec = GetSubRecord(3, "3 TEXT", $srec, $i);
 						if ($trec != "") {
-							print "<br /><span class=\"FactDetailLabel\">".GM_LANG_text." </span><span class=\"FactDetailField\">".GetGedcomValue("TEXT", 3, $trec);
+							// fix: only print the level 3 TEXT, as the CONT will be added below.
+							$cs = preg_match("/3 TEXT (.*)/", $trec, $cmatch);
+							print "<br /><span class=\"FactDetailLabel\">".GM_LANG_text." </span><span class=\"FactDetailField\">".GetGedcomValue("TEXT", 3, $cmatch[0]);
 							$text = GetCont(4, $trec);
 							$text = self::ExpandUrl($text);
 							print $text;
