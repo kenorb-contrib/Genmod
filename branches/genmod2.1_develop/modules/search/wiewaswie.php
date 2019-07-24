@@ -24,7 +24,7 @@
  * @version $Id: wiewaswie.php 34 2016-09-19 16:46:18Z Boudewijn $
  */
 
-class AlmeloSearchModule extends BaseExternalSearch {
+class WieWasWieSearchModule extends BaseExternalSearch {
 	
 	// Class information
 	public $classname 			= "WieWasWieSearchModule";			// Name of the class
