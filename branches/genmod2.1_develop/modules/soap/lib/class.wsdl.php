@@ -9,7 +9,7 @@
 * 
 * @author   Dietrich Ayala <dietrich@ganx4.com>
 * @author   Scott Nichol <snichol@users.sourceforge.net>
-* @version  $Id: class.wsdl.php,v 1.76 2010/04/26 20:15:08 snichol Exp $
+* @version  $Id: class.wsdl.php 34 2016-09-19 16:46:18Z Boudewijn $
 * @access public 
 */
 class wsdl extends nusoap_base {

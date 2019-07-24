@@ -154,7 +154,7 @@ class PlaceListController extends ListController {
 			$placelist[] = $row["p_place"];
 		}
 		$res->FreeResult();
-		if (count($placelist == 0)) $this->action = "show";
+		if (count($placelist) == 0) $this->action = "show";
 		uasort($placelist, "stringsort");
 		return $placelist;
 	}

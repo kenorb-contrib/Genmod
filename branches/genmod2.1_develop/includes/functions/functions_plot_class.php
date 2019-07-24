@@ -616,7 +616,7 @@ abstract class PlotFunctions {
 			$new_size = array();
 			if ($graphSize == "autoScreen") $new_size = explode("x",$screenRes);
 			else if ($graphSize == "autoWindow") $new_size = explode("x",$windowRes);
-			if (count($new_size >= 2)) {
+			if (count($new_size) >= 2) {
 				$graph_width = ($new_size[0]*7)/8;
 				$graph_height = ($graph_width*4)/7;
 			}

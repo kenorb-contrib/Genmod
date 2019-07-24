@@ -3,7 +3,7 @@
  // File:  		 JPGRAPH_LINE.PHP
  // Description: Line plot extension for JpGraph
  // Created:  	 2001-01-08
- // Ver:  		 $Id: jpgraph_line.php 1921 2009-12-11 11:46:39Z ljp $
+ // Ver:  		 $Id: jpgraph_line.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

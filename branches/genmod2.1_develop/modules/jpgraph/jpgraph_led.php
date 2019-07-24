@@ -3,7 +3,7 @@
 // File:        JPGRAPH_LED.PHP
 // Description: Module to generate Dotted LED-like digits
 // Created:     2006-11-26
-// Ver:         $Id: jpgraph_led.php 1674 2009-07-22 19:42:23Z ljp $
+// Ver:         $Id: jpgraph_led.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright 2006 (c) Asial Corporation. All rights reserved.
 //

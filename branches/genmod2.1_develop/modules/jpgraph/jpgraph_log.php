@@ -3,7 +3,7 @@
  // File:        JPGRAPH_LOG.PHP
  // Description: Log scale plot extension for JpGraph
  // Created:     2001-01-08
- // Ver:         $Id: jpgraph_log.php 1106 2009-02-22 20:16:35Z ljp $
+ // Ver:         $Id: jpgraph_log.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

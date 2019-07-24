@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: gedcomconfig_class.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: gedcomconfig_class.php 44 2018-08-16 14:40:42Z Boudewijn $
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {

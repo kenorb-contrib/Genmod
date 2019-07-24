@@ -3,7 +3,7 @@
  // File:        JPGRAPH_UTILS.INC
  // Description: Collection of non-essential "nice to have" utilities
  // Created:     2005-11-20
- // Ver:         $Id: jpgraph_utils.inc.php 1777 2009-08-23 17:34:36Z ljp $
+ // Ver:         $Id: jpgraph_utils.inc.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

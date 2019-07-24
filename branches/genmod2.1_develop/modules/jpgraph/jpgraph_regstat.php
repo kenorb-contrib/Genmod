@@ -3,7 +3,7 @@
  // File:        JPGRAPH_REGSTAT.PHP
  // Description: Regression and statistical analysis helper classes
  // Created:     2002-12-01
- // Ver:         $Id: jpgraph_regstat.php 1131 2009-03-11 20:08:24Z ljp $
+ // Ver:         $Id: jpgraph_regstat.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

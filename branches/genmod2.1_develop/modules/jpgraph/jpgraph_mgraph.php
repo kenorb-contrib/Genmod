@@ -3,7 +3,7 @@
  // File:        JPGRAPH_MGRAPH.PHP
  // Description: Class to handle multiple graphs in the same image
  // Created:     2006-01-15
- // Ver:         $Id: jpgraph_mgraph.php 1770 2009-08-17 06:10:22Z ljp $
+ // Ver:         $Id: jpgraph_mgraph.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================
