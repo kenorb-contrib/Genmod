@@ -3,7 +3,7 @@
 // File:        JPGRAPH_ANTISPAM.PHP
 // Description: Genarate anti-spam challenge
 // Created:     2004-10-07
-// Ver:         $Id: jpgraph_antispam.php 1106 2009-02-22 20:16:35Z ljp $
+// Ver:         $Id: jpgraph_antispam.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================

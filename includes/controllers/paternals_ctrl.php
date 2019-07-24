@@ -125,7 +125,7 @@ class PaternalsController extends ChartController {
 				$this->rootfams = $this->PrintParents($this->rootfams, $i);
 			}
 			// Only go on if the persons had ancestral families
-			if (count($this->rootfams > 0)) {
+			if (count($this->rootfams) > 0) {
 				if ($this->line == "long") $this->PrintLongestLines();
 				else $this->PrintAncestors();
 			}

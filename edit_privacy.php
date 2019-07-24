@@ -24,7 +24,7 @@
  * @author GM Development Team
  * @package Genmod
  * @subpackage Privacy
- * @version $Id: edit_privacy.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: edit_privacy.php 49 2019-03-02 09:47:12Z Boudewijn $
  */
 
 /**
@@ -183,7 +183,10 @@ if (empty($action)) $action="";
 PrintHeader(GM_LANG_privacy_header);
 if ($action=="update") {
 	if (!isset($_POST)) $_POST = $HTTP_POST_VARS;
-	$boolarray = array();
+/*	print "<pre>";
+	print_r($_POST);
+	print "</pre>";
+*/	$boolarray = array();
 	$boolarray["yes"]="1";
 	$boolarray["no"]="0";
 	$boolarray[false]="0";
@@ -212,10 +215,14 @@ if ($action=="update") {
 	$settings->CHECK_MARRIAGE_RELATIONS = $boolarray[$_POST["v_CHECK_MARRIAGE_RELATIONS"]];
 	$settings->CHECK_CHILD_DATES = $boolarray[$_POST["v_CHECK_CHILD_DATES"]];
 	
-	if (!isset($v_person_privacy_del)) $v_person_privacy_del = array();
+	if (!isset($_POST["v_person_privacy_del"])) $v_person_privacy_del = array();
+	else $v_person_privacy_del = $_POST["v_person_privacy_del"];
 	if (!is_array($v_person_privacy_del)) $v_person_privacy_del = array();
-	if (!isset($v_person_privacy)) $v_person_privacy = array();
+	
+	if (!isset($_POST["v_person_privacy"])) $v_person_privacy = array();
+	else $v_person_privacy = $_POST["v_person_privacy"];
 	if (!is_array($v_person_privacy)) $v_person_privacy = array();
+	
 	foreach($person_privacy as $key=>$value) {
 		if (!isset($v_person_privacy_del[$key])) {
 			if (isset($v_person_privacy[$key])) $person_privacy[$key] = $v_person_privacy[$key];
@@ -223,18 +230,22 @@ if ($action=="update") {
 		}
 		else unset($person_privacy[$key]);
 	}
-	if ((!empty($v_new_person_privacy_access_ID))&&(!empty($v_new_person_privacy_acess_option))) {
-		$obj = ConstructObject($v_new_person_privacy_access_ID);
-		if (!$obj->isempty) $person_privacy[$v_new_person_privacy_access_ID] = $v_new_person_privacy_acess_option;
+	if ((!empty($_POST["v_new_person_privacy_access_ID"]))&&(!empty($_POST["v_new_person_privacy_acess_option"]))) {
+		$obj = ConstructObject($_POST["v_new_person_privacy_access_ID"]);
+		if (!$obj->isempty) $person_privacy[$_POST["v_new_person_privacy_access_ID"]] = $_POST["v_new_person_privacy_acess_option"];
 	}
 	
 	if (file_exists("setpersonprivacy.php")) include("setpersonprivacy.php");
 	$settings->person_privacy = $person_privacy;
 
-	if (!isset($v_user_privacy_del)) $v_user_privacy_del = array();
+	if (!isset($_POST["v_user_privacy_del"])) $v_user_privacy_del = array();
+	else $v_user_privacy_del = $_POST["v_user_privacy_del"];
 	if (!is_array($v_user_privacy_del)) $v_user_privacy_del = array();
-	if (!isset($v_user_privacy)) $v_user_privacy = array();
+	
+	if (!isset($_POST["v_user_privacy"])) $v_user_privacy = array();
+	else $v_user_privacy = $_POST["v_user_privacy"];
 	if (!is_array($v_user_privacy)) $v_user_privacy = array();
+	
 	foreach($user_privacy as $key=>$value) {
 		foreach($value as $id=>$setting) {
 			if (!isset($v_user_privacy_del[$key][$id])) {
@@ -244,16 +255,20 @@ if ($action=="update") {
 			else unset($user_privacy[$key][$id]);
 		}
 	}
-	if ((!empty($v_new_user_privacy_username))&&(!empty($v_new_user_privacy_access_ID))) {
-		$obj = ConstructObject($v_new_user_privacy_access_ID);
-		if (!$obj->isempty) $user_privacy[$v_new_user_privacy_username][$v_new_user_privacy_access_ID] = $v_new_user_privacy_acess_option;
+	if ((!empty($_POST["v_new_user_privacy_username"]))&&(!empty($_POST["v_new_user_privacy_access_ID"]))) {
+		$obj = ConstructObject($_POST["v_new_user_privacy_access_ID"]);
+		if (!$obj->isempty) $user_privacy[$_POST["v_new_user_privacy_username"]][$_POST["v_new_user_privacy_access_ID"]] = $_POST["v_new_user_privacy_acess_option"];
 	}
 	$settings->user_privacy = $user_privacy;	
 		
-	if (!isset($v_global_facts_del)) $v_global_facts_del = array();
+	if (!isset($_POST["v_global_facts_del"])) $v_global_facts_del = array();
+	else $v_global_facts_del = $_POST["v_global_facts_del"];
 	if (!is_array($v_global_facts_del)) $v_global_facts_del = array();
-	if (!isset($v_global_facts)) $v_global_facts = array();
+
+	if (!isset($_POST["v_global_facts"])) $v_global_facts = array();
+	else $v_global_facts = $_POST["v_global_facts"];
 	if (!is_array($v_global_facts)) $v_global_facts = array();
+	
 	foreach($global_facts as $tag=>$value) {
 		foreach($value as $key=>$setting) {
 			if (!isset($v_global_facts_del[$tag][$key])) {
@@ -263,15 +278,19 @@ if ($action=="update") {
 			else unset($global_facts[$tag][$key]);
 		}
 	}
-	if (!empty($v_new_global_facts_abbr) && !empty($v_new_global_facts_choice) && !empty($v_new_global_facts_access_option)) {
-		$global_facts[$v_new_global_facts_abbr][$v_new_global_facts_choice] = $v_new_global_facts_access_option;
+	if (!empty($_POST["v_new_global_facts_abbr"]) && !empty($_POST["v_new_global_facts_choice"]) && !empty($_POST["v_new_global_facts_access_option"])) {
+		$global_facts[$_POST["v_new_global_facts_abbr"]][$_POST["v_new_global_facts_choice"]] = $_POST["v_new_global_facts_access_option"];
 	}
 	$settings->global_facts = $global_facts;
 	
-	if (!isset($v_person_facts_del)) $v_person_facts_del = array();
+	if (!isset($_POST["v_person_facts_del"])) $v_person_facts_del = array();
+	else $v_person_facts_del = $_POST["v_person_facts_del"];
 	if (!is_array($v_person_facts_del)) $v_person_facts_del = array();
-	if (!isset($v_person_facts)) $v_person_facts = array();
+	
+	if (!isset($_POST["v_person_facts"])) $v_person_facts = array();
+	else $v_person_facts = $_POST["v_person_facts"];
 	if (!is_array($v_person_facts)) $v_person_facts = array();
+	
 	foreach($person_facts as $id=>$value) {
 		foreach($value as $tag=>$value1) {
 			foreach($value1 as $key=>$setting) {
@@ -283,9 +302,9 @@ if ($action=="update") {
 			}
 		}
 	}
-	if (!empty($v_new_person_facts_access_ID) && !empty($v_new_person_facts_abbr) && !empty($v_new_global_facts_choice) && !empty($v_new_global_facts_access_option)) {
-		$obj = ConstructObject($v_new_person_facts_access_ID);
-		if (!$obj->isempty) $person_facts[$v_new_person_facts_access_ID][$v_new_person_facts_abbr][$v_new_person_facts_choice] = $v_new_person_facts_acess_option;
+	if (!empty($_POST["v_new_person_facts_access_ID"]) && !empty($_POST["v_new_person_facts_abbr"]) && !empty($_POST["v_new_global_facts_choice"]) && !empty($_POST["v_new_global_facts_access_option"])) {
+		$obj = ConstructObject($_POST["v_new_person_facts_access_ID"]);
+		if (!$obj->isempty) $person_facts[$_POST["v_new_person_facts_access_ID"]][$_POST["v_new_person_facts_abbr"]][$_POST["v_new_person_facts_choice"]] = $_POST["v_new_person_facts_acess_option"];
 	}
 	$settings->person_facts = $person_facts;	
 	PrivacyController::StorePrivacy($settings);

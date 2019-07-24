@@ -5,7 +5,7 @@
 // Created:     2006-03-06
 // Author:      Timo Leopold (timo@leopold-hh.de)
 //              Johan Persson (ljp@localhost.nil)
-// Ver:         $Id: de.inc.php 1886 2009-10-01 23:30:16Z ljp $
+// Ver:         $Id: de.inc.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright (c)
 //========================================================================

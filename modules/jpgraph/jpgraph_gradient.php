@@ -3,7 +3,7 @@
  // File:        JPGRAPH_GRADIENT.PHP
  // Description: Create a color gradient
  // Created:     2003-02-01
- // Ver:         $Id: jpgraph_gradient.php 1761 2009-08-01 08:31:28Z ljp $
+ // Ver:         $Id: jpgraph_gradient.php 34 2016-09-19 16:46:18Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

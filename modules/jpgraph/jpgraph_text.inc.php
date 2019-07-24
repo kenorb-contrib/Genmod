@@ -4,7 +4,7 @@
 // Description: Class to handle text as object in the graph.
 //              The low level text layout engine is handled by the GD class
 // Created:     2001-01-08 (Refactored to separate file 2008-08-01)
-// Ver:         $Id: jpgraph_text.inc.php 1844 2009-09-26 17:05:31Z ljp $
+// Ver:         $Id: jpgraph_text.inc.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================

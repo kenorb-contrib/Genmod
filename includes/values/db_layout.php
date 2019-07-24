@@ -22,7 +22,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: db_layout.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: db_layout.php 44 2018-08-16 14:40:42Z Boudewijn $
  * @package Genmod
  * @subpackage DB
  */

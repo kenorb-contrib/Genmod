@@ -3,7 +3,7 @@
 // File:        JPGRAPH.PHP
 // Description: PHP Graph Plotting library. Base module.
 // Created:     2001-01-08
-// Ver:         $Id: jpgraph.php 1924 2010-01-11 14:03:26Z ljp $
+// Ver:         $Id: jpgraph.php 34 2016-09-19 16:46:18Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================
@@ -1492,7 +1492,12 @@ class Graph {
         else {
             $txts = $this->texts;
         }
-        $n = count($txts);
+		if (is_array($txts)) {
+			$n = count($txts);
+		}
+		else {
+			$n = 0;
+		}
         $min=null;
         $max=null;
         for( $i=0; $i < $n; ++$i ) {
@@ -3021,7 +3026,13 @@ class Graph {
 
     // Get Y min and max values for added lines
     function GetLinesYMinMax( $aLines ) {
-        $n = count($aLines);
+		if (is_array($aLines)) {
+			$n = count($aLines);
+		}
+		else
+		{
+			$n = 0;
+		}
         if( $n == 0 ) return false;
         $min = $aLines[0]->scaleposition ;
         $max = $min ;
