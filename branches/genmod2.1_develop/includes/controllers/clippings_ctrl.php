@@ -440,10 +440,9 @@ class ClippingsController extends BaseController {
 				$record = RemoveCustomTags($record, $this->remove);
 				if ($this->convert == "yes") $record = utf8_decode($record);
 				if ($clipping['type'] == 'indi') {
-					foreach($object->famc as $key => $famid) {
-						if (!$this->IdInCart($famid)) {
-							$record = preg_replace("/1 FAMC @".$famid."@.*/", "", $record);
-						}
+					$famid = $object->primaryfamily;
+					if (!$this->IdInCart($famid)) {
+						$record = preg_replace("/1 FAMC @".$famid."@.*/", "", $record);
 					}
 					foreach ($object->fams as $key => $famid) {
 						if (!$this->IdInCart($famid)) {

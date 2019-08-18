@@ -1536,12 +1536,12 @@ class Person extends GedcomRecord {
 					}
 					// age in months if < 2 years
 					if ($age<2) {
-						$y1 = $birthdate[0]["year"];
-						$y2 = $date[0]["year"];
-						$m1 = $birthdate[0]["mon"];
-						$m2 = $date[0]["mon"];
-						$d1 = $birthdate[0]["day"];
-						$d2 = $date[0]["day"];
+						$y1 = intval($birthdate[0]["year"]);
+						$y2 = intval($date[0]["year"]);
+						$m1 = intval($birthdate[0]["mon"]);
+						$m2 = intval($date[0]["mon"]);
+						$d1 = intval($birthdate[0]["day"]);
+						$d2 = intval($date[0]["day"]);
 						$apx = (empty($m2) or empty($m1) or empty($d2) or empty($d1)); // approx
 						if ($apx) $realbirthdt .= " ".GM_LANG_apx;
 						if (empty($m2)) $m2=$m1;
@@ -1558,7 +1558,7 @@ class Person extends GedcomRecord {
 								else if ($m1==4 or $m1==6 or $m1==9 or $m1==11) $d2+=30;
 								else $d2+=31;
 							}
-							$age = $d2-$d1;
+							$age = intval($d2)-intval($d1);
 							$realbirthdt .= " ".$age." ";
 							if ($age < 2) $realbirthdt .= GM_LANG_day1;
 							else $realbirthdt .= GM_LANG_days;
