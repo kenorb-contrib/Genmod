@@ -72,7 +72,7 @@ $rss->syndicationURL = $syndURL;
 $image = new FeedImage();
 $image->title = GM_LANG_rss_logo_descr;
 $image->url = SERVER_URL."images/gedcom.gif";
-$image->link = "http://www.sourceforge.net/projects/genmod";
+$image->link = "https://www.sourceforge.net/projects/genmod";
 $image->description = GM_LANG_rss_logo_descr;
 
 //optional

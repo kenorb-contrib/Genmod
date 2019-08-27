@@ -138,7 +138,7 @@ class GMReport {
 		if ($showGenText) {
 			$element = new GMRCell(0,10, "C", "");
 			$element->addText(GM_LANG_generated_by." Genmod ".GM_VERSION);
-			$element->setUrl("http://www.sourceforge.net/projects/genmod");
+			$element->setUrl("https://www.sourceforge.net/projects/genmod");
 			$this->pdf->addFooter($element);
 		}
 		$this->pdf->SetAutoPageBreak(false);

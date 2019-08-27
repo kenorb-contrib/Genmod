@@ -883,7 +883,7 @@ abstract class AdminFunctions {
 			$item["date"] = "";
 			$item["type"] = "Urgent";
 			$item["header"] = "Warning: News cannot be retrieved";
-			$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"http://www.sourceforge.net/projects/genmod\">Genmod Help forum</a>";
+			$item["text"] = "Genmod cannot retrieve the news from the news server. If this problem persist after next logons, please report this on the <a href=\"https://www.sourceforge.net/projects/genmod\">Genmod Help forum</a>";
 			$gmnews[] = $item;
 		}
 		// -- Store the news in the session data

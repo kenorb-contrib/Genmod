@@ -249,7 +249,7 @@ abstract class UserController {
 	* 	return a sorted array of user
  	*
 	* returns a sorted array of the users in the system
-	* @link http://Genmod.sourceforge.net/devdocs/arrays.php#users
+	* @link https://Genmod.sourceforge.net/devdocs/arrays.php#users
 	* @param string $field the field in the user array to sort on
 	* @param string $order asc or dec
 	* @return array returns a sorted array of users
