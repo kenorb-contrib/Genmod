@@ -84,7 +84,8 @@ if($clippings_controller->action == 'download') {
 		print "<tr><td class=\"NavBlockLabel\" rowspan=\"".$clippings_controller->mediacount."\">".GM_LANG_media_files."</td>";
 		for($m=0; $m < $clippings_controller->mediacount; $m++) {
 			$fileobj = new MFile(trim(GedcomConfig::$MEDIA_DIRECTORY.$clippings_controller->media[$m]));
-			print "<td class=\"NavBlockField\"><a href=\"".$fileobj->f_main_file."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/")+1)."</a></td>";
+			print "<td class=\"NavBlockField\">";
+			print "<a href=\"".SERVER_URL.$fileobj->f_main_file."\">".substr($clippings_controller->media[$m], strrpos($clippings_controller->media[$m], "/")+1)."</a></td>";
 			if ($m <> $clippings_controller->mediacount-1) print "</tr><tr>";
 		}
 		print "</tr>";

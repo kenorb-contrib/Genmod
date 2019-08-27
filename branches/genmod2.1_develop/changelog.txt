@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.0 beta 2
+- Fixed http links to sourceforge should be https
 - Fixed date error in person_class
 - Fixed error in clippings
 - Added support for PHP 7.2
