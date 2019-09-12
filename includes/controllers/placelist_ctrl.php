@@ -49,8 +49,8 @@ class PlaceListController extends ListController {
 	public function __construct() {
 		
 		parent::__construct();
-		if ($this->action = "") $this->action = "find";
-		
+		if ($this->action == "") $this->action = "find";
+
 		if (isset($_REQUEST["display"])) $this->display = $_REQUEST["display"];
 		if (is_null($this->display)) $this->display = "hierarchy";
 		

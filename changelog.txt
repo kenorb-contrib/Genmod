@@ -8,7 +8,9 @@
 	# $Id: changelog.txt 48 2019-03-02 09:25:15Z Boudewijn $
 =====================================================================
 
-Version 2.0 beta 2
+Version 2.1 beta 1
+- Fixed date error in calendar
+- Fixed placelist link for showing indi/fams doesn't work
 - Fixed http links to sourceforge should be https
 - Fixed date error in person_class
 - Fixed error in clippings
