@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed URL in repo facts print incorrect
 - Fixed date error in calendar
 - Fixed placelist link for showing indi/fams doesn't work
 - Fixed http links to sourceforge should be https

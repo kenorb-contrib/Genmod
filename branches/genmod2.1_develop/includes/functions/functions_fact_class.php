@@ -1256,7 +1256,7 @@ abstract class FactFunctions {
 				  if (!$firstline) print "<br />";
 				  else $firstline = false;
 				   if ($level>1) print "\n\t\t<span class=\"FactDetailLabel\">".GM_FACT_URL.": </span><span class=\"FactDetailField\">";
-				   print "<a href=\"".$omatch[$i][2]."\" target=\"_blank\">".$omatch[$i][2]."</a>\n";
+				   print "<a href=\"".(!preg_match('/^http/', $omatch[$i][2]) ? "http://" : "") . $omatch[$i][2]."\" target=\"_blank\">".$omatch[$i][2]."</a>\n";
 				   if ($level>1) print "</span>\n";
 			  }
 		 }
@@ -1347,7 +1347,7 @@ abstract class FactFunctions {
 			$yearnow = $yearnow["year"];
 		}
 		else	{
-			$yearnow = $year;
+			$yearnow = intval($year);
 		}
 	
 		$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $factobj->factrec, $match);
@@ -1388,9 +1388,9 @@ abstract class FactFunctions {
 				if ($yt>0) {
 					$hct = preg_match("/2 DATE.*(@#DHEBREW@)/", $match[1], $hmatch);
 		            if ($hct>0 && GedcomConfig::$USE_RTL_FUNCTIONS && $action=='today')
-	                   $age = $currhYear - $ymatch[1];
+	                   $age = $currhYear - intval($ymatch[1]);
 					else
-					   $age = $yearnow - $ymatch[1];
+					   $age = $yearnow - intval($ymatch[1]);
 					$yt2 = preg_match("/(...) (\d\d\d\d|\d\d\d)/", $match[1], $bmatch);
 					if ($yt2>0) {
 						if (isset($monthtonum[strtolower(trim($bmatch[1]))])) {
