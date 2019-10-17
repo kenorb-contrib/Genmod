@@ -499,6 +499,7 @@ abstract class BlockFunctions {
 		
 		// First see if the cache must be refreshed
 		$cache_load = GedcomConfig::GetLastCacheDate("stats", GedcomConfig::$GEDCOMID);
+		// $cache_load=false;
 		if (!$cache_load) {
 			$sql = "DELETE FROM ".TBLPREFIX."statscache WHERE gs_file='".GedcomConfig::$GEDCOMID."'";
 			$res = NewQuery($sql);
@@ -590,7 +591,7 @@ abstract class BlockFunctions {
 			$stats["gs_latest_birth_gid"] = $row[0];
 	
 			// NOTE: Get the person who lived the longest
-			$sql = "SELECT death.d_year-birth.d_year AS age, death.d_gid FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".GedcomConfig::$GEDCOMID."' and birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL ORDER BY age DESC limit 1";
+			$sql = "SELECT death.d_year-birth.d_year AS age, death.d_gid FROM ".TBLPREFIX."dates AS death, ".TBLPREFIX."dates AS birth WHERE birth.d_gid=death.d_gid AND death.d_file='".GedcomConfig::$GEDCOMID."' and birth.d_file=death.d_file AND birth.d_fact='BIRT' AND death.d_fact='DEAT' AND birth.d_year>0 AND death.d_year>0 AND birth.d_type IS NULL AND death.d_type IS NULL AND birth.d_ext='' AND death.d_ext='' ORDER BY age DESC limit 1";
 			$res = NewQuery($sql);
 			$row = $res->FetchRow();
 			$res->FreeResult();
