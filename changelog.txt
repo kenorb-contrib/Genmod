@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed indexing errors due to wrong viewport
 - Fixed Longest living person should not be based on "before" or "after" dates
 - Fixed URL in repo facts print incorrect
 - Fixed date error in calendar
