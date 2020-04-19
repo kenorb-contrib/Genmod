@@ -86,6 +86,7 @@ abstract class MediaFS {
 				}
 			}
 		}
+		sort($dirs);
 		return $dirs;
 	}
 
