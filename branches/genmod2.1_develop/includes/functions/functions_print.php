@@ -140,7 +140,7 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	 }
 	 if ($view == "preview") print "<link rel=\"stylesheet\" href=\"".GM_PRINT_STYLESHEET."\" type=\"text/css\" media=\"print\" />\n\t";
 	 if ($BROWSERTYPE == "msie") print "<style type=\"text/css\">\nFORM { margin-top: 0px; margin-bottom: 0px; }\n</style>\n";
-	 print "<!-- Genmod v".GM_VERSION." -->\n";
+	 print "<!--  Genmod v".GM_VERSION." -->\n";
 	 if (isset($changelanguage)) {
 		  $terms = preg_split("/[&?]/", $QUERY_STRING);
 		  $vars = "";
@@ -152,6 +152,9 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 		  $query_string = $vars;
 	 }
 	 else $query_string = $QUERY_STRING;
+	// Viewport should be included also in preview mode
+	// print "<meta name=\"viewport\" content=\"width=1020, initial-scale=1.01\" />\n";
+	 print "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.1\" />\n";
 	 if ($view!="preview") {
 		 $old_META_AUTHOR = GedcomConfig::$META_AUTHOR;
 		 $old_META_PUBLISHER = GedcomConfig::$META_PUBLISHER;
@@ -181,8 +184,6 @@ function PrintHeader($title, $head="",$use_alternate_styles=true) {
 	 	  if (!empty(GedcomConfig::$META_PAGE_TYPE)) print "<meta name=\"page-type\" content=\"".GedcomConfig::$META_PAGE_TYPE."\" />\n";
 	 	  print ParseRobotsTXT();
 	 	  if (!empty(GedcomConfig::$META_REVISIT)) print "<meta name=\"revisit-after\" content=\"".GedcomConfig::$META_REVISIT."\" />\n";
-		  // print "<meta name=\"viewport\" content=\"width=1020, initial-scale=1.01\" />\n";
-		  print "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.1\" />\n";
 		  print "<meta name=\"generator\" content=\"Genmod v".GM_VERSION." - https://www.sourceforge.net/projects/genmod\" />\n";
 		 GedcomConfig::$META_AUTHOR = $old_META_AUTHOR;
 		 GedcomConfig::$META_PUBLISHER = $old_META_PUBLISHER;
@@ -340,6 +341,7 @@ function PrintSimpleHeader($title) {
 	if (!empty(GedcomConfig::$META_AUTHOR)) print "<meta name=\"author\" content=\"".GedcomConfig::$META_AUTHOR."\" />\n";
 	if (!empty(GedcomConfig::$META_PUBLISHER)) print "<meta name=\"publisher\" content=\"".GedcomConfig::$META_PUBLISHER."\" />\n";
 	if (!empty(GedcomConfig::$META_COPYRIGHT)) print "<meta name=\"copyright\" content=\"".GedcomConfig::$META_COPYRIGHT."\" />\n";
+	print "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.1\" />\n";
 	print "<meta name=\"keywords\" content=\"".GedcomConfig::$META_KEYWORDS;
 	$surnames = NameFunctions::GetCommonSurnamesIndex(GedcomConfig::$GEDCOMID);
 	foreach($surnames as $surname=>$count) print ", $surname";

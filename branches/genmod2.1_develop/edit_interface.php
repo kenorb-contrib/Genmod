@@ -1395,7 +1395,9 @@ switch ($action) {
 		$gedrec = EditFunctions::HandleUpdates($gedrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $gedrec);
-			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			//$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			// $addsourcevalue = substr(preg_replace_callback("/\n(\d) /", function($matches){return "\n".SumNums($1, 1)." ";}, $addsourcevalue),1);
+			$addsourcevalue = substr(preg_replace_callback("/\n(\d)/", function($matches){return $matches[1]+1;}, $addsourcevalue),1);
 			if (!empty($addsourcevalue)) $addsourcevalue = trim("2".$addsourcevalue)."\r\n";
 		}
 		if ($addsource) $gedrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $gedrec); 
@@ -1493,7 +1495,8 @@ switch ($action) {
 		$l1source = GetSubRecord(1, "1 SOUR", $newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
-			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			//$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			$addsourcevalue = substr(preg_replace_callback("/\n(\d)/", function($matches){return $matches[1]+1;}, $addsourcevalue),1);
 			if (!empty($addsourcevalue)) $addsourcevalue = trim("2".$addsourcevalue)."\r\n";
 		}
 		if ($addsource) $newrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $newrec); 
@@ -1811,7 +1814,8 @@ switch ($action) {
 		$l1source = GetSubRecord(1, "1 SOUR", $newrec);
 		if ($addsource == "2") {
 			$addsourcevalue = GetSubRecord(1, "1 SOUR", $newrec);
-			$addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			// $addsourcevalue = substr(preg_replace("/\n(\d) /e", "'\n'.SumNums($1, 1).' '", $addsourcevalue),1);
+			$addsourcevalue = substr(preg_replace_callback("/\n(\d)/", function($matches){return $matches[1]+1;}, $addsourcevalue),1);
 			if (!empty($addsourcevalue)) $addsourcevalue = trim("2".$addsourcevalue)."\r\n";
 		}
 		if ($addsource) $newrec = preg_replace("/2 SOUR @XXX@\r\n/", $addsourcevalue, $newrec); 
