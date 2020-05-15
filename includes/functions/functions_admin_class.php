@@ -313,9 +313,10 @@ abstract class AdminFunctions {
 			}
 			// Correct the level
 			$oldlevel = $mediarec[0];
-			$mediarec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $mediarec);
-			$mediarec = preg_replace("/0 @.+@ OBJE\s*\r\n/", "", $mediarec);
-			$mediarec = $level." OBJE\r\n".$mediarec."\r\n";
+			// $mediarec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $mediarec);
+			$mediarec = substr(preg_replace_callback("/\n(\d)/", function($matches) use($level) {return $matches[1]+$level;}, $mediarec),1);
+			$mediarec = preg_replace("/@.+@ OBJE/", "", $mediarec);
+			$mediarec = $level." OBJE".$mediarec."\r\n";
 			$gedrec = preg_replace("/$level OBJE @$mmid@\s*/", $mediarec, $gedrec);
 		}
 		return $gedrec;
@@ -340,8 +341,10 @@ abstract class AdminFunctions {
 			}
 			// Correct the level
 			$oldlevel = $noterec[0];
-			$noterec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $noterec);
-			$noterec = preg_replace("/^0 @.+@ NOTE/", $level." NOTE", $noterec);
+			// $noterec = preg_replace("/\n(\d) /e", "'\n'.SumNums($1, $level).' '", $noterec);
+			$noterec = substr(preg_replace_callback("/\n(\d)/", function($matches) use($level) {return $matches[1]+$level;}, $noterec),1);
+			$noterec = preg_replace("/@.+@ NOTE/", "", $noterec);
+			$noterec = $level." NOTE".$noterec."\r\n";
 			$gedrec = preg_replace("/$level NOTE @$nid@\s*/", $noterec, $gedrec);
 		}
 		return $gedrec;
