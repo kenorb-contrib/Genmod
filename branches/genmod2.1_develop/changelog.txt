@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- fixed error in search controller
 - fixed incorrect embedding of notes and media in gedcom export
 - Fixed unsorted dirlist in add media
 - Fixed indexing errors due to wrong viewport
