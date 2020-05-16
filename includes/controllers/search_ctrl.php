@@ -948,7 +948,7 @@ class SearchController extends BaseController {
 					$this->printsource[] = $source->key;
 					$this->sour_printed[$source->key] = "1";
 				}
-				else if ($this->hit == true) $this->source_hide[$source->key] = 1;
+				else if ($this->hit == true) $this->sour_hide[$source->key] = 1;
 			}
 			SwitchGedcom();
 		}
