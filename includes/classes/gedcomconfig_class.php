@@ -108,6 +108,7 @@ abstract class GedcomConfig {
 	public static $MEDIA_EXTERNAL = true;					// Set whether or not to change links starting with http, ftp etc.
 	public static $MEDIA_DIRECTORY = "media/";				// Directory where media files are stored
 	public static $MEDIA_DIRECTORY_LEVELS = "0";			// The number of sub-directories to keep when getting names of media files
+	public static $MEDIA_DIRECTORY_HIDE = ".svn, _svn, ., .., CVS, @eaDir"; // Directories to exclude from mediatrees, at any level.
 	public static $SHOW_HIGHLIGHT_IMAGES = true;			// Show highlighted photos on pedigree tree and individual pages.
 	public static $USE_THUMBS_MAIN = false;					// For the main image on the individual page, whether or not to use the full res 
 															// image or the thumbnail

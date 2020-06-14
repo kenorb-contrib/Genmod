@@ -298,6 +298,7 @@ if ($action=="update") {
 	$newconf["max_descendancy_generations"] = $_POST["NEW_MAX_DESCENDANCY_GENERATIONS"];
 	$newconf["max_pedigree_generations"] = $_POST["NEW_MAX_PEDIGREE_GENERATIONS"];
 	$newconf["media_directory"] = $_POST["NEW_MEDIA_DIRECTORY"];
+	$newconf["media_directory_hide"] = $_POST["NEW_MEDIA_DIRECTORY_HIDE"];
 	$newconf["media_directory_levels"] = $_POST["NEW_MEDIA_DIRECTORY_LEVELS"];
 	$newconf["media_external"] = $boolarray[$_POST["NEW_MEDIA_EXTERNAL"]];
 	$newconf["media_facts_add"] = $_POST["NEW_MEDIA_FACTS_ADD"];
@@ -797,6 +798,10 @@ if (!isset($themeselect)) $themeselect="";
 	<tr>
 		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_DIRECTORY_LEVELS_help", "qm", "MEDIA_DIRECTORY_LEVELS"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_DIRECTORY_LEVELS;?></div></td>
 		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_DIRECTORY_LEVELS" value="<?php print GedcomConfig::$MEDIA_DIRECTORY_LEVELS?>" size="5" tabindex="<?php $i++; print $i?>" /></td>
+	</tr>
+	<tr>
+		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("MEDIA_DIRECTORY_HIDE_help", "qm", "MEDIA_DIRECTORY_HIDE"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_MEDIA_DIRECTORY_HIDE;?></div></td>
+		<td class="NavBlockField AdminNavBlockField"><input type="text" name="NEW_MEDIA_DIRECTORY_HIDE" value="<?php print GedcomConfig::$MEDIA_DIRECTORY_HIDE?>" size="50" tabindex="<?php $i++; print $i?>" /></td>
 	</tr>
 	<tr>
 		<td class="NavBlockLabel AdminNavBlockLabel"><div class="HelpIconContainer"><?php PrintHelpLink("THUMBNAIL_WIDTH_help", "qm", "THUMBNAIL_WIDTH"); print "</div><div class=\"AdminNavBlockOptionText\">"; print GM_LANG_THUMBNAIL_WIDTH;?></div></td>

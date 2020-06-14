@@ -78,6 +78,7 @@
 "MAX_VIEW_RATE";"Maximum page view rate"
 "MEDIA_DIRECTORY";"MultiMedia directory"
 "MEDIA_DIRECTORY_LEVELS";"Multi-Media directory levels to keep"
+"MEDIA_DIRECTORY_HIDE";"MultiMedia directories to hide from directory lists, at any level"
 "MEDIA_EXTERNAL";"Keep links"
 "MEDIA_FACTS_ADD";"Multimedia Object Add Facts"
 "MEDIA_FACTS_UNIQUE";"Unique Multimedia Object Facts"
