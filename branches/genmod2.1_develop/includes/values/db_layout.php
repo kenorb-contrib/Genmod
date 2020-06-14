@@ -237,6 +237,7 @@ $db_original[TBLPREFIX."gedconf"]["row"]["gc_nick_delim"]["details"] = "VARCHAR 
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_media_external"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_media_directory"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_media_directory_levels"]["details"] = "INT (2)";
+$db_original[TBLPREFIX."gedconf"]["row"]["gc_media_directory_hide"]["details"] = "VARCHAR (64) CHARACTER SET #charset# COLLATE #collate# ";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_show_highlight_images"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_use_thumbs_main"]["details"] = "TINYINT(1)";
 $db_original[TBLPREFIX."gedconf"]["row"]["gc_thumbnail_width"]["details"] = "INT (5)";

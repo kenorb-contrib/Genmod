@@ -66,11 +66,12 @@ abstract class MediaFS {
 			//print "Getting : ".$directory."<br />";
 			$canwrite = true;
 			$exclude_dirs = array(INDEX_DIRECTORY, "./languages/", "./fonts/", "./hooks/", "./images/", "./includes", "./languages/", "./modules/", "./places/", "./reports/", "./ufpdf/", "./themes/", "./blocks/", "./install/", "./includes/", "./pgvnuke/");
+			$exclude_mediadirs = explode(",",str_replace(", ",",",GedcomConfig::$MEDIA_DIRECTORY_HIDE));
 			if ($level <= GedcomConfig::$MEDIA_DIRECTORY_LEVELS) {
 				$d = @dir($directory);
 				if (is_object($d)) {
 					while (false !== ($entry = $d->read())) {
-						if ($entry != ".." && $entry != "." && $entry != "CVS" && $entry != ".svn" && $entry != "_svn" && ($incthumbdir || $entry != "thumbs")) {
+						if (!in_array($entry, $exclude_mediadirs) && ($incthumbdir || $entry != "thumbs")) {
 							$entry = $directory.$entry;
 							if(is_dir($entry)) {
 								$entry .= "/";
