@@ -608,6 +608,7 @@ abstract class PlotFunctions {
 		global $legend, $xdata, $ydata, $xmax, $xgrenzen, $zmax, $zgrenzen, $xgiven,$zgiven, $percentage;
 		global $colors;
 		global $showShadow, $valuePos, $graphSize, $value_angle, $screenRes, $windowRes;
+		global $GM_BASE_DIRECTORY;
 	
 		$b= array();
 	
@@ -677,7 +678,7 @@ abstract class PlotFunctions {
 		}
 		$accbar = new GroupBarPlot($groupBarArray);
 	
-		$graphFile = tempnam($_SERVER['DOCUMENT_ROOT']."/index/", "GM");
+		$graphFile = tempnam($GM_BASE_DIRECTORY."index/", "GM");
 		unlink($graphFile);
 		$graph-> Add($accbar);
 		$graph-> Stroke($graphFile);
