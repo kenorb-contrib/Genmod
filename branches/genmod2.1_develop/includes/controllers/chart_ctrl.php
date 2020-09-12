@@ -82,8 +82,8 @@ abstract class ChartController extends BaseController {
 		else $this->show_spouse = $_REQUEST["show_spouse"];
 		if ($this->show_spouse == "") $this->show_spouse = 0;
 		
-		if (!isset($_REQUEST["box_width"]) || $_REQUEST["box_width"] == "") $this->box_width = "100";
-		else $this->box_width = $_REQUEST["box_width"];
+		if (!isset($_REQUEST["box_width"]) || (int)$_REQUEST["box_width"] == "") $this->box_width = "100";
+		else $this->box_width = (int)$_REQUEST["box_width"];
 		$this->box_width = max($this->box_width, 50);
 		$this->box_width = min($this->box_width, 300);
 		
