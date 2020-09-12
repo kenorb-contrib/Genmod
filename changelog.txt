@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Added validation of input for charts box width
 - Added gedcom config option to exclude folders from media tree
 - Fixed text out of box on registration message
 - Fixed error in search controller
