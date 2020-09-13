@@ -145,8 +145,8 @@ else define("MB_FUNCTIONS", false);
 if (version_compare(phpversion(), "5.3") < 0) set_magic_quotes_runtime(0);
 
 
-if (!empty($_SERVER["SCRIPT_NAME"])) define("SCRIPT_NAME", $_SERVER["SCRIPT_NAME"]);
-else if (!empty($_SERVER["PHP_SELF"])) define("SCRIPT_NAME", $_SERVER["PHP_SELF"]);
+if (!empty($_SERVER["SCRIPT_NAME"])) define("SCRIPT_NAME", basename($_SERVER["SCRIPT_NAME"]));
+else if (!empty($_SERVER["PHP_SELF"])) define("SCRIPT_NAME", basename($_SERVER["PHP_SELF"]));
 if (!empty($_SERVER["QUERY_STRING"])) $QUERY_STRING = $_SERVER["QUERY_STRING"];
 else $QUERY_STRING="";
 $QUERY_STRING = preg_replace(array("/&/","/</"), array("&amp;","&lt;"), $QUERY_STRING);
