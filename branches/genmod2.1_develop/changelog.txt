@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed error in mfile is mimetype is empty (PHP 7.4)
 - Fixed wrong url from website base
 - Fixed error for tempfil in statistics plot
 - Added validation of input for charts box width

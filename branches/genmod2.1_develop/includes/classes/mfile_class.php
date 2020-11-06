@@ -222,8 +222,10 @@ class MFile {
 					}
 				}
 			}
-			$this->f_mimetype = $mimetype["mime_type"];
-			$this->f_mimedescr = $mimetype["description"];
+			if ($mimetype) {
+				$this->f_mimetype = $mimetype["mime_type"];
+				$this->f_mimedescr = $mimetype["description"];
+			}
 			
 			// Get the extension
 			$et = preg_match("/(\.\w+)$/", $this->f_file, $ematch);
