@@ -887,7 +887,7 @@ abstract class EditFunctions {
 			}
 		}
 		// MARRiage TYPE : hide text field and show a selection list
-		if ($fact=="TYPE" and $tags[0]=="MARR") {
+		if ($fact=="TYPE" and isset($tags[0]) and $tags[0]=="MARR") {
 			print "<script type='text/javascript'><!--\n";
 			print "document.getElementById('".$element_id."').style.display='none'";
 			print "\n//-->\n</script>";
