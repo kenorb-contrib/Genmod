@@ -444,7 +444,7 @@ function utf8_to_utf16be(&$txt, $bom = true) {
             $out .= chr($cp >> 8);
             $out .= chr($cp & 0xFF);
           }
-          continue;
+          break;
 
         case 3:
           $cp = (($q[0] ^ 0xE0) << 12) | (($q[1] ^ 0x80) << 6) | ($q[2] ^ 0x80);
@@ -460,7 +460,7 @@ function utf8_to_utf16be(&$txt, $bom = true) {
             $out .= chr($cp >> 8);
             $out .= chr($cp & 0xFF);
           }
-          continue;
+          break;
 
         case 4:
           $cp = (($q[0] ^ 0xF0) << 18) | (($q[1] ^ 0x80) << 12) | (($q[2] ^ 0x80) << 6) | ($q[3] ^ 0x80);
@@ -483,7 +483,7 @@ function utf8_to_utf16be(&$txt, $bom = true) {
             $out .= chr($s2 >> 8);
             $out .= chr($s2 & 0xFF);
           }
-          continue;
+          break;
       }
     }
   }
@@ -545,7 +545,7 @@ function utf8_to_codepoints(&$txt) {
           else {
             $out[] = $cp;
           }
-          continue;
+          break;
 
         case 3:
           $cp = (($q[0] ^ 0xE0) << 12) | (($q[1] ^ 0x80) << 6) | ($q[2] ^ 0x80);
@@ -560,7 +560,7 @@ function utf8_to_codepoints(&$txt) {
           else {
             $out[] = $cp;
           }
-          continue;
+          break;
 
         case 4:
           $cp = (($q[0] ^ 0xF0) << 18) | (($q[1] ^ 0x80) << 12) | (($q[2] ^ 0x80) << 6) | ($q[3] ^ 0x80);
@@ -575,7 +575,7 @@ function utf8_to_codepoints(&$txt) {
           else {
             $out[] = $cp;
           }
-          continue;
+          break;
       }
     }
   }

@@ -9,6 +9,9 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed error on footnotes in PDF generator (PHP 7.4)
+- Fixed event appears double in calendar URL
+- Fixed several style inconsistencies
 - Fixed error on edit records (PHP 7.4)
 - Fixed error when printing help text that does not exist (PHP 7.4)
 - Fixed error in mfile is mimetype is empty (PHP 7.4)
