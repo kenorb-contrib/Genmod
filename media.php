@@ -300,7 +300,7 @@ if ($disp1 == "block") {
 		print "\n<div id=\"ManageMediaFilterBlock\" class=\"BlockContainer ManageMediaBlockContainer\">";
 			print "<div class=\"BlockHeader ManageMediaBlockHeader\">".GM_LANG_filter."</div>";
 				print "<div class=\"BlockContent ManageMediaBlockContent\">";
-				print "<input type=\"text\" name=\"filter\" value=\"".$filter."\" /><br />";
+				print "<input class=\"ManageMediaBlockInputText\" type=\"text\" name=\"filter\" value=\"".$filter."\" /><br />";
 				print "<input type=\"button\" value=\"".GM_LANG_filter."\" onclick=\"document.managemedia.action.value='filter'; document.managemedia.submit(); return false;\" />";
 			print "</div>";
 		print "</div>";
@@ -353,7 +353,7 @@ if ($disp1 == "block") {
 				print "<div class=\"BlockContent ManageMediaBlockContent\">";
 					// Create
 					print "<input type=\"radio\" name=\"dir_action\" value=\"create\" checked=\"checked\"/>";
-					print GM_LANG_create_dir."<br /><input type=\"text\" name=\"new_dir\" /><br />";
+					print GM_LANG_create_dir."<br /><input type=\"text\" class=\"ManageMediaBlockInputText\" name=\"new_dir\" /><br />";
 					print GM_LANG_under."<br />";
 					print "<div class=\"ManageMediaBlockDirList\">";
 						print "<select name=\"parent_dir\">";

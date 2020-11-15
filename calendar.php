@@ -199,7 +199,6 @@ if ($view!="preview") {
 			print "<td class=\"NavBlockField\"";
 			if ($HIDE_LIVE_PEOPLE >= $gm_user->GetUserAccessLevel()) print ">";
 			else print " colspan=\"3\">";
-			print "<input type=\"hidden\" name=\"filterev\" value=\"".$calendar_controller->filterev."\" />";
 			print "<select name=\"filterev\" onchange=\"document.dateform.submit();\">\n";
 			
 			print "<option value=\"bdm\"";

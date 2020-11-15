@@ -2421,6 +2421,10 @@ td.UploadGedcomNavBlockLabel {
 .ManageMediaBlockContent {
 	line-height: 1.6em;
 }
+.ManageMediaBlockInputText {
+	box-sizing: border-box;
+	width: 100%;
+}
 #ManageMediaFilterBlock {
 	text-align: center;
 }
