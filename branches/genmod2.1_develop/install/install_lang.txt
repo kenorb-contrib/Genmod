@@ -143,3 +143,4 @@
 "session_path";"Session save path set to: "
 "missing_fields_keys_restored";"Missing fields and keys restored"
 "obsolete_row_deleted";"Obsolete row deleted from database:"
+"DB_host_error";"Cannot connect to database. Try 127.0.0.1 instead of LOCALHOST"

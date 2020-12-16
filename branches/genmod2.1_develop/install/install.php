@@ -38,7 +38,7 @@
 
 define('GM_VERSION', "2.1");
 define('GM_VERSION_RELEASE', "Beta 2");
-define('DEBUG', false);
+define('DEBUG', true);
 $min_php_version = "5.2";
 $min_mysql_version = "5.1";
 $stylesheet = "install_style.css";
@@ -115,12 +115,16 @@ foreach ($oldconfig as $key => $value) {
 
 // NOTE: Check if this is an upgrade or new installation
 if (array_key_exists($LOCATION, $newconfigparms)) $upgrade = true;
-
 if ($step > 2) {
-	if ($link = @($GLOBALS["___mysqli_ston"] = mysqli_connect($DBHOST,  $DBUSER,  $DBPASS))) ((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE " . $DBNAME));
+	if ($link = @($GLOBALS["___mysqli_ston"] = mysqli_connect($DBHOST,  $DBUSER,  $DBPASS))) {
+		((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE " . $DBNAME));
+	}
 	else {
 		$step = 2;
 		$error = GM_LANG_error.": ". ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false));
+		if (strtolower($DBHOST) == "localhost") {
+			$error .= "<br />".GM_LANG_DB_host_error;
+		}
 	}
 	if (!$upgrade && in_array($INDEX_DIRECTORY, $index_inuse)) {
 		$step = 2;
