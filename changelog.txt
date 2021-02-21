@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed error if mimetype returns false (PHP 7.4)
 - Added warning if install with DB at LOCALHOST fails
 - Fixed error on footnotes in PDF generator (PHP 7.4)
 - Fixed event appears double in calendar URL
