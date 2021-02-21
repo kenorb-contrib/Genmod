@@ -30,6 +30,7 @@
 require("config.php");
 
 if (!isset($pid)) $pid = "";
+if (!isset($type)) $type = "";
 if (!isset($changed)) $changed = false;
 $pid = CleanInput($pid);
 PrintSimpleHeader($pid);
