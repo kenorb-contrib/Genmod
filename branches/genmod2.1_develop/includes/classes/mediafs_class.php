@@ -799,12 +799,14 @@ abstract class MediaFS {
 				}
 				$mimetypedetect = New MimeTypeDetect();
 				$mime = $mimetypedetect->FindMimeType($filename);
-				self::$fdetails["mimetype"] = $mime["mime_type"];
-				self::$fdetails["mimedesc"] = $mime["description"];
-				$exts = preg_split("/;/", $mime["extension"]);
-				$ext = $exts[0];
-				if (!empty($ext)) $ext = substr($ext,1);
-				self::$fdetails["extension"] = $ext;
+				if (is_array($mime)) {
+					self::$fdetails["mimetype"] = $mime["mime_type"];
+					self::$fdetails["mimedesc"] = $mime["description"];
+					$exts = preg_split("/;/", $mime["extension"]);
+					$ext = $exts[0];
+					if (!empty($ext)) $ext = substr($ext,1);
+					self::$fdetails["extension"] = $ext;
+				}
 				return self::$fdetails;
 			}
 			else return false;
