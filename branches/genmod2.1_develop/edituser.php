@@ -79,7 +79,7 @@ if ($action=="edituser2") {
 			$newuser = CloneObj($olduser);
 
 			if (empty($pass1)) $newuser->password = $olduser->password;
-			else $newuser->password = crypt($pass1);
+			else $newuser->password = password_hash($pass1, PASSWORD_DEFAULT);
 			UserController::DeleteUser($oldusername, "changed");
 			$newuser->username = $username;
 			$newuser->firstname = $firstname;
