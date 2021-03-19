@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed replaced crypt function with password_hash and verify
 - Fixed error if gedrecord display is called without type
 - Fixed error if mimetype returns false (PHP 7.4)
 - Added warning if install with DB at LOCALHOST fails

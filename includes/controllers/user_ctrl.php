@@ -152,7 +152,7 @@ abstract class UserController {
 	* authenticate a username and password
 	*
 	* This function takes the given <var>$username</var> and <var>$password</var> and authenticates
-	* them against the database.  The passwords are encrypted using the crypt() function.
+	* them against the database.  The passwords are encrypted using the password_hash() function.
 	* The username is stored in the <var>$_SESSION["gm_user"]</var> session variable.
 	* @param string $username the username for the user attempting to login
 	* @param string $password the plain text password to test
@@ -163,7 +163,7 @@ abstract class UserController {
 		$user =& User::GetInstance($username);
 
 		if (!empty($user->username)) {
-			if (crypt($password, $user->password) == $user->password) {
+			if (password_verify($password, $user->password)) {
 	        	if ((($user->verified == "Y") and ($user->verified_by_admin == "Y")) or ($user->canadmin != "")){
 					$sql = "UPDATE ".TBLPREFIX."users SET u_loggedin='Y', u_sessiontime='".time()."' WHERE u_username='$username'";
 					$res = NewQuery($sql);

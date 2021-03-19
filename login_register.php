@@ -97,7 +97,7 @@ switch ($action) {
 			$olduser = CloneObj($newuser);
 			UserController::DeleteUser($user_name, "reqested new password for");
 			
-			$newuser->password = crypt($user_new_pw, $user_new_pw);
+			$newuser->password = password_hash($user_new_pw, PASSWORD_DEFAULT);
 			//$newuser->reg_timestamp = date("U");
 			UserController::addUser($newuser, "reqested new password for");
 
@@ -371,7 +371,7 @@ switch ($action) {
 			$user->verified_by_admin = "";
 			$user->reg_timestamp = date("U");
 			srand((double)microtime()*1000000);
-			$user->reg_hashcode = crypt(rand(), $user_password01);
+			$user->reg_hashcode = password_hash(rand(), PASSWORD_DEFAULT);
 			$user->gedcomid = array();
 			$user->rootid = array();
 			$user->canedit = array();
@@ -384,7 +384,7 @@ switch ($action) {
 				$user->gedcomid[GedcomConfig::$GEDCOMID] = $user_gedcomid;
 				$user->rootid[GedcomConfig::$GEDCOMID] = $user_gedcomid;
 			}
-			$user->password = crypt($user_password01, $user_password01);
+			$user->password = password_hash($user_password01, PASSWORD_DEFAULT);
 			if ((isset($canadmin)) && ($canadmin == "yes")) $user->canadmin = true;
 			else $user->canadmin = false;
 			$user->visibleonline = true;
@@ -535,8 +535,8 @@ switch ($action) {
 		print str_replace("#user_name#", $user_name, GM_LANG_pls_note08);
 		$user =& User::GetInstance($user_name);
 		if (!$user->is_empty) {
-			$pw_ok = ($user->password == crypt($user_password, $user->password));
-			$hc_ok = ($user->reg_hashcode == $user_hashcode);
+			$pw_ok = password_verify($user_password, $user->password);
+			$hc_ok = ($user_hashcode == $user->reg_hashcode);
 			if (($pw_ok) and ($hc_ok)) {
 				$newuser = CloneObj($user);
 				$olduser = CloneObj($user);

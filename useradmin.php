@@ -131,7 +131,7 @@ if ($action=="createuser") {
 			$user->gedcomid=array();
 			$user->rootid=array();
 			$user->canedit=array();
-			$user->password=crypt($pass1);
+			$user->password=password_hash($pass1, PASSWORD_DEFAULT);
 			if ((isset($canadmin))&&($canadmin=="yes")) $user->canadmin=true;
 			else $user->canadmin=false;
 			if ((isset($visibleonline))&&($visibleonline=="yes")) $user->visibleonline=true;
@@ -227,7 +227,7 @@ if ($action=="edituser2") {
 			$newuser = CloneObj($olduser);
 
 			if (empty($pass1)) $newuser->password=$olduser->password;
-			else $newuser->password=crypt($pass1);
+			else $newuser->password=password_hash($pass1, PASSWORD_DEFAULT);
 			UserController::DeleteUser($oldusername, "changed");
 			$newuser->username=$uusername;
 			$newuser->firstname=$ufirstname;

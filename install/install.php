@@ -403,7 +403,7 @@ if ($step == 4) {
 		$user["username"]=$username;
 		$user["firstname"]=$firstname;
 		$user["lastname"]=$lastname;
-		$user["password"]=crypt($pass1);
+		$user["password"]=password_hash($pass1, PASSWORD_DEFAULT);
 		$user["canedit"] = array();
 		$user["rootid"] = array();
 		$user["gedcomid"] = array();
