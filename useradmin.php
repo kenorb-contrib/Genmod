@@ -260,10 +260,10 @@ if ($action=="edituser2") {
 				if (isset($$varname)) $newuser->rootid[$gedcomid]=$$varname;
 				$varname = "canedit_$gedcomid";
 				if (isset($$varname)) $newuser->canedit[$gedcomid]=$$varname;
-				else $user->canedit[$gedcomid]="none";
+				else $newuser->canedit[$gedcomid]="none";
 				$varname = "privgroup_$gedcomid";
 				if (isset($$varname)) $newuser->privgroup[$gedcomid]=$$varname;
-				else $user->privgroup[$gedcomid]="access";
+				else $newuser->privgroup[$gedcomid]="access";
 				$varname = "new_gedadmin_$gedcomid";
 				if (isset($$varname) && $$varname == "Y") $newuser->gedcomadmin[$gedcomid] = true;
 				else $newuser->gedcomadmin[$gedcomid] = false;
