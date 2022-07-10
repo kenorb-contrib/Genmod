@@ -9,6 +9,8 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed Change family members function not working anymore
+- Added user first/last name to print _GMU userid
 - Fixed useradmin error on password change
 - Fixed replaced crypt function with password_hash and verify
 - Fixed error if gedrecord display is called without type

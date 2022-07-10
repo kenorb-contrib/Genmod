@@ -120,7 +120,7 @@ if ($action=="newentry") {
 //print " newfile:".$newfile;
 			}
 			if ($tag[$i] == "FORM") {
-				if ($text[$i] == "") $text[$i] = pathinfo($filename, PATHINFO_EXTENSION);
+				if (!isset($text[$i]) || $text[$i] == "") $text[$i] = pathinfo($filename, PATHINFO_EXTENSION);
 			}
 			if ($tag[$i] == "TITL") {
 				$title = $text[$i];

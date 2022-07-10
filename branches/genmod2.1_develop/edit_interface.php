@@ -841,6 +841,8 @@ switch ($action) {
 			}
 			if (remElement) {
 				remElement.style.display = 'block';
+			}
+			if (pediElement) {
 				pediElement.style.display = 'block';
 			}
 		}

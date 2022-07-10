@@ -30,6 +30,17 @@ if (!isset($action)) $action = "";
 
 switch($action) {
 	
+	case "check_captcha":
+		if (isset($return) && $return = "bool") {
+			if (isset($captcha) && !empty($captcha) && $_SESSION["phpcaptcha"] == $captcha) print "1";
+			else print "0";
+		}
+		else {
+			if (isset($captcha) && !empty($captcha) && $_SESSION["phpcaptcha"] == $captcha) print "";
+			else print "<span class=\"Error\">".GM_LANG_enter_captcha."</span>";
+		}
+	break;
+	
 	case "lastused":
 		if (isset($id) && isset($type)) $_SESSION["last_used"][$type] = $id;
 		print "";
@@ -69,8 +80,10 @@ switch($action) {
 	break;
 
 	case "checkuser":
-		$u =& User::GetInstance($username);
-		if (!$u->is_empty) print "<span class=\"Error\">".GM_LANG_duplicate_username."</span>";
+		if(isset($username)) {
+			$u =& User::GetInstance($username);
+			if (!$u->is_empty) print "<span class=\"Error\">".GM_LANG_duplicate_username."</span>";
+		}
 		else print "";
 	break;
 

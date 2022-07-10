@@ -226,8 +226,9 @@ abstract class FactFunctions {
 				$prted = self::PrintAssoRelaRecord($factobj, $pid, $prted) || $prted;
 				// -- find _GMU field
 				$ct = preg_match("/2 _GMU (.*)/", $factobj->factrec, $match);
-				if ($ct>0) {
-					print "<br /><span class=\"".($prted?"AssoIndent ":"")."FactDetailLabel\">".GM_FACT__GMU.": </span>".$match[1];
+				if ($ct>0) {			
+					$cuser =& User::GetInstance($match[1]);
+					print "<br /><span class=\"".($prted?"AssoIndent ":"")."FactDetailLabel\">".GM_FACT__GMU.": </span>".$match[1].(!$cuser->is_empty ? " ".PrintReady("(".$cuser->firstname." ".$cuser->lastname.")") : "");
 					$prted = false;
 				}
 				if ($fact!="ADDR") {

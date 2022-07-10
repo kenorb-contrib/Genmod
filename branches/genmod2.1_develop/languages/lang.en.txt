@@ -826,6 +826,7 @@
 "english_loaded";"English language file has been loaded successfully"
 "english_not_loaded";"English language file has not been loaded successfully"
 "enter_body";"Please enter some message text before sending."
+"enter_captcha";"You must enter the correct Captcha code."
 "enter_comments";"Please enter your relationship to the data in the Comments field."
 "enter_db_pass";"For security, you must enter the #gm_lang[DBUSER]# and #gm_lang[DBPASS]# before changing configuration values."
 "enter_email";"You must enter an email address."

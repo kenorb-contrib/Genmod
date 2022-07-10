@@ -31,12 +31,3 @@ if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 // If you enter additional PHP code, be sure to let it start before the last line, otherwise PHP won't recognize it.
 // So, if you enter Java Script, just copy it after the last line.
 ?>
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://www." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "sjouke.nl/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-var pageTracker = _gat._getTracker("UA-4848104-1");
-pageTracker._initData();
-pageTracker._trackPageview();
-</script>
