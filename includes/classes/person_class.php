@@ -1619,14 +1619,16 @@ class Person extends GedcomRecord {
 		if (NameFunctions::HasChinese($desc) || NameFunctions::HasCyrillic($desc)) $addname = "&nbsp;(".$this->GetSortableAddName($namenum).")";
 		else $addname = "";
 		
+		$majorfact = PersonFunctions::PrintFirstMajorFact($this, false, $break);
 		if ($paste) {
-			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', false, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', ''); return false;\" class=\"ListItem\"><span class=\"ListItemName\">";
+			print "<a href=\"#\" onclick=\"sndReq(document.getElementById('dummy'), 'lastused', true, 'type', '".$this->datatype."', 'id', '".$this->key."'); pasteid('".$this->xref."', '".PrintReady($desc)."<br />".$majorfact."'); return false;\" class=\"ListItem\"><span class=\"ListItemName\">";
 		}
 		else {
 			print "<a href=\"individual.php?pid=".$this->xref."&amp;gedid=".$this->gedcomid."\" class=\"ListItem\"><span class=\"ListItemName\">";
 		}
 		print NameFunctions::CheckNN($desc).$addname."</span><span class=\"ListItemXref\">".$this->addxref."</span><span class=\"ListItemMajorFact\">";
-		PersonFunctions::PrintFirstMajorFact($this, true, $break);
+		// PersonFunctions::PrintFirstMajorFact($this, true, $break);
+		print $majorfact;
 		print "</span>";
 		if (!empty($fact)) {
 			print " <span class=\"ListItemAddFact\">(";

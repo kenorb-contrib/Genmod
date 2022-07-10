@@ -245,58 +245,68 @@ switch ($action) {
 			<script language="JavaScript" type="text/javascript">
 			<!--
 			function checkform(frm) {
+				nosub = false;
 				if (frm.user_name.value == "") {
-				    alert("<?php print GM_LANG_enter_username; ?>");
-				    frm.user_name.focus();
-				    return false;
+					alert("<?php print GM_LANG_enter_username; ?>");
+					frm.user_name.focus();
+					nosub = true;
 				}
-				if (frm.user_password01.value == "") {
-				    alert("<?php print GM_LANG_enter_password; ?>");
-				    frm.user_password01.focus();
-				    return false;
+				if (nosub == false && frm.user_password01.value == "") {
+					alert("<?php print GM_LANG_enter_password; ?>");
+					frm.user_password01.focus();
+					nosub = true;
 				}
-				if (frm.user_password02.value == "") {
-				    alert("<?php print GM_LANG_confirm_password; ?>");
-				    frm.user_password02.focus();
-				    return false;
+				if (nosub == false && frm.user_password02.value == "") {
+					alert("<?php print GM_LANG_confirm_password; ?>");
+					frm.user_password02.focus();
+					nosub = true;
 				}
-			    	if (frm.user_password01.value != frm.user_password02.value) {
+				if (nosub == false && frm.user_password01.value != frm.user_password02.value) {
 					alert("<?php print GM_LANG_password_mismatch; ?>");
 					frm.user_password01.value = "";
 					frm.user_password02.value = "";
 					frm.user_password01.focus();
-					return false;
+					nosub = true;
 				}
-				if (frm.user_password01.value.length < 6) {
-					 alert("<?php print GM_LANG_passwordlength; ?>");
-					 frm.user_password01.value = "";
-					 frm.user_password02.value = "";
-					 frm.user_password01.focus();
-					 return false;
+				if (nosub == false && frm.user_password01.value.length < 6) {
+					alert("<?php print GM_LANG_passwordlength; ?>");
+					frm.user_password01.value = "";
+					frm.user_password02.value = "";
+					frm.user_password01.focus();
+					nosub = true;
 				}
-				if (frm.user_firstname.value == "") {
-					 alert("<?php print GM_LANG_enter_fullname; ?>");
-					 frm.user_firstname.focus();
-					 return false;
+				if (nosub == false && frm.user_firstname.value == "") {
+					alert("<?php print GM_LANG_enter_fullname; ?>");
+					frm.user_firstname.focus();
+					nosub = true;
 				}
-				if (frm.user_lastname.value == "") {
-					 alert("<?php print GM_LANG_enter_fullname; ?>");
-					 frm.user_lastname.focus();
-					 return false;
+				if (nosub == false && frm.user_lastname.value == "") {
+					alert("<?php print GM_LANG_enter_fullname; ?>");
+					frm.user_lastname.focus();
+					nosub = true;
 				}
-				if ((frm.user_email.value == "")||(frm.user_email.value.indexOf('@')==-1)) {
-					 alert("<?php print GM_LANG_enter_email; ?>");
-					 frm.user_email.focus();
-					 return false;
+				if (nosub == false && (frm.user_email.value == "" || frm.user_email.value.indexOf('@')==-1)) {
+					alert("<?php print GM_LANG_enter_email; ?>");
+					frm.user_email.focus();
+					nosub = true;
 				}
-				if (frm.user_comments.value == "") {
+				if (nosub == false && frm.user_comments.value == "") {
 					alert("<?php print GM_LANG_enter_comments; ?>");
 					frm.user_comments.focus();
+					nosub = true;
+				}
+				if (nosub == false) {
+					if (frm.captchatext.value == "" || frmerrcp.value != "") {
+						alert("<?php print GM_LANG_enter_captcha; ?>");
+						frm.captchatext.focus();
+						nosub = true;
+					}
+				}
+				if (nosub == true) {
 					return false;
 				}
 				return true;
 			}
-			
 			var pastefield;
 			function paste_id(value) {
 				pastefield.value=value;
@@ -304,13 +314,13 @@ switch ($action) {
 			//-->
 			</script>
 			<div class="LoginPageContainer">
-			<form name="registerform" method="post" action="login_register.php" onsubmit="t = new Date(); document.registerform.time.value=t.toUTCString(); return checkform(this);">
+			<form name="registerform" id="registerform" method="post" action="login_register.php">
 				<input type="hidden" name="action" value="register" />
 				<input type="hidden" name="time" value="" />
 				<table class="NavBlockTable RegisterPageTable">
 				<?php $i = 1;?>
 				<tr><td class="NavBlockHeader" colspan="2"><?php PrintHelpLink("register_info_0".GedcomConfig::$WELCOME_TEXT_AUTH_MODE."", "qm", "requestaccount"); print GM_LANG_requestaccount;?><?php if (strlen($message) > 0) print "<br /><span class=\"Warning\">".$message."</span>"; ?></td></tr>
-				<tr><td class="NavBlockLabel"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username;?></td><td class="NavBlockField"><input type="text" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', true, 'username', this.value);" /> * <span id="errus"></span></td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("username_help", "qm", "username"); print GM_LANG_username;?></td><td class="NavBlockField"><input type="text" id="user_name" name="user_name" value="<?php if (!$user_name_false) print $user_name;?>" tabindex="<?php print $i;?>" onchange="sndReq('errus', 'checkuser', true, 'username', this.value);" /> * <span id="errus"></span></td></tr>
 				<tr><td class="NavBlockLabel"><?php PrintHelpLink("edituser_password_help", "qm", "password"); print GM_LANG_password;?></td><td class="NavBlockField"><input type="password" name="user_password01" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<tr><td class="NavBlockLabel"><?php PrintHelpLink("edituser_conf_password_help", "qm", "confirm");print GM_LANG_confirm;?></td><td class="NavBlockField"><input type="password" name="user_password02" value="" tabindex="<?php print $i++;?>" /> *</td></tr>
 				<tr><td class="NavBlockLabel"><?php PrintHelpLink("new_user_firstname_help", "qm", "firstname");print GM_LANG_firstname;?></td><td class="NavBlockField"><input type="text" name="user_firstname" value="<?php if (!$user_firstname_false) print $user_firstname;?>" tabindex="<?php print $i++;?>" /> *</td></tr>
@@ -339,6 +349,7 @@ switch ($action) {
 				<tr><td class="NavBlockLabel"><?php PrintHelpLink("register_gedcomid_help", "qm", "gedcomid");print GM_LANG_gedcomid;?></td><td class="NavBlockField" valign="top" ><input type="text" size="10" name="user_gedcomid" id="user_gedcomid" value="" tabindex="<?php print $i++;?>" /><?php LinkFunctions::PrintFindIndiLink("user_gedcomid",""); ?></td></tr>
 				<?php } ?>
 				<tr><td class="NavBlockLabel"><?php PrintHelpLink("register_comments_help", "qm", "comments");print GM_LANG_comments;?></td><td class="NavBlockField" valign="top" ><textarea cols="50" rows="5" name="user_comments" tabindex="<?php print $i++;?>"><?php if (!$user_comments_false) print $user_comments;?></textarea> *</td></tr>
+				<tr><td class="NavBlockLabel"><?php PrintHelpLink("register_captcha_help", "qm", "comments"); CaptchaFunctions::initCaptcha();?><img src="imageflush.php?image_type=png" /></td><td class="NavBlockField" valign="top" ><input type="text" name="captchatext" id="captchatext" value="" tabindex="<?php print $i++;?>" onchange="sndReq('errcp', 'check_captcha', true, 'captcha', this.value);" /> * <span id="errcp"></span></td></tr>
 				<tr><td class="NavBlockFooter" colspan="2"><input type="submit" value="<?php print GM_LANG_requestaccount; ?>" tabindex="<?php print $i++;?>" /></td></tr>
 				<tr><td align="left" colspan="2" ><?php print GM_LANG_mandatory;?></td></tr>
 				</table>
@@ -346,6 +357,16 @@ switch ($action) {
 			</div>
 			<script language="JavaScript" type="text/javascript">
 			<!--
+			
+			const form = document.getElementById('registerform');
+			form.addEventListener('submit', (event) => {
+				// stop form submission
+				sndReq('errcp', 'check_captcha', true, 'captcha', document.getElementById('captchatext').value);
+				var success = checkform(form);
+				if (success === false) {
+					event.preventDefault();
+				}
+			});
 				document.registerform.user_name.focus();
 			//-->
 			</script>
@@ -354,7 +375,7 @@ switch ($action) {
 		}
 	case "registernew" :
 		$QUERY_STRING = "";
-		if (isset($user_name)) {
+		if (isset($user_name) && isset($captchatext) && isset($_SESSION["phpcaptcha"]) && $captchatext == $_SESSION["phpcaptcha"]) {
 			PrintHeader("Genmod - " . GM_LANG_registernew);
 			print "<div class=\"LoginPageContainer\">";
 			$user_created_ok = false;
@@ -493,6 +514,10 @@ switch ($action) {
 			print "</div>";
 		}
 		else {
+			if (!isset($captchatext) || !isset($_SESSION["phpcaptcha"]) || $captchatext != $_SESSION["phpcaptcha"]) {
+				header("Location: login_register.php?action=register");
+				exit;
+			}
 			if (LOGIN_URL == "") header("Location: login.php");
 			else header("Location: ".LOGIN_URL);
 			header("Location: login.php");
