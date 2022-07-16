@@ -9,6 +9,7 @@
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed Merge records forgets first common fact
 - Fixed Change family members function not working anymore
 - Added user first/last name to print _GMU userid
 - Fixed useradmin error on password change

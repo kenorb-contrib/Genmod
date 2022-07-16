@@ -29,18 +29,23 @@
  * Inclusion of the configuration file
 */
 require("config.php");
-
 $trace = false;
+
 if (empty($action)) $action="choose";
 if (empty($gid1)) $gid1="";
 else $gid1 = strtoupper($gid1);
 if (empty($gid2)) $gid2="";
 else $gid2 = strtoupper($gid2);
 if (empty($mergeged)) $mergeged = GedcomConfig::$GEDCOMID;
-if (empty($keep1)) $keep1=array();
-if (empty($keep2)) $keep2=array();
-if (empty($skip1)) $skip1=array();
-if (empty($skip2)) $skip2=array();
+
+if (isset($_POST["keep1"])) $keep1 = $_POST["keep1"];
+else $keep1 = array();
+if (isset($_POST["keep2"])) $keep2 = $_POST["keep2"];
+else $keep2 = array();
+if (isset($_POST["skip1"])) $skip1 = $_POST["skip1"];
+else $skip1 = array();
+if (isset($_POST["skip2"])) $skip2 = $_POST["skip2"];
+else $skip2 = array();
 $errorstring = "";
 $error = 0;
 
@@ -158,23 +163,24 @@ if ($action != "choose") {
 				}
 			}
 			if ($action == "merge") {
-/*					print "gedrec1: ".$orggedrec1;
-				print "<br />gedrec2: ".$gedrec2;
-				print "<br />facts1: ";
-				print_r($facts1);
-				print "<br /><br />keep1: ";
-				print_r($keep1);
-				print "<br /><br />skip1: ";
-				print_r($skip1);
-				print "<br /><br />facts2: ";
-				print_r($facts2);
-				print "<br /><br />keep2: ";
-				print_r($keep2);
-				print "<br /><br />skip2: ";
-				print_r($skip2);
-				print "<br /><br />errfacts: ";
-				print_r($errfacts);
-*/					
+				if ($trace) {
+					print "gedrec1: ".$orggedrec1;
+					print "<br /><br />gedrec2: ".$gedrec2;
+					print "<br /><br />facts1: ";
+					print_r($facts1);
+					print "<br /><br />keep1: ";
+					print_r($keep1);
+					print "<br /><br />skip1: ";
+					print_r($skip1);
+					print "<br /><br />facts2: ";
+					print_r($facts2);
+					print "<br /><br />keep2: ";
+					print_r($keep2);
+					print "<br /><br />skip2: ";
+					print_r($skip2);
+					print "<br /><br />errfacts: ";
+					print_r($errfacts);
+				}
 				$change_id = EditFunctions::GetNewXref("CHANGE");
 				$change_type = "MERGE";
 				print "<div id=\"AdminColumnMiddle\">";
@@ -304,7 +310,7 @@ if ($action != "choose") {
 					}
 				}
 				
-				// Now remove the subrecs that are not kept in ged1
+				// Now remove the subrecs that are not kept in ged1 but keep the subrecs that were equal in both ged1 and 2				
 				for($i=0; ($i<count($facts1)); $i++) {
 					if (!in_array($i, $keep1) && $facts1[$i]["fact"] != "CHAN" && $facts1[$i]["fact"] != "NOTETEXT") {
 						if ($trace) print "7. Remove ".$gid1." fact ".$facts1[$i]["subrec"]."<br />";
@@ -344,6 +350,7 @@ if ($action != "choose") {
 				foreach($facts1 as $i=>$fact1) {
 					foreach($facts2 as $j=>$fact2) {
 						if (Str2Upper($fact1["subrec"])==Str2Upper($fact2["subrec"])) {
+							if ($trace) print "skip1 waarde ".$i." skip2 waarde ".$j." subrec ".$fact2["subrec"]."<br />";
 							$skip1[] = $i;
 							$skip2[] = $j;
 							$equal_count++;
