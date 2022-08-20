@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: functions_fact_class.php 49 2019-03-02 09:47:12Z Boudewijn $
+ * @version $Id: functions_fact_class.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

@@ -1,5 +1,5 @@
 <GMReport access="PRIV_USER" icon="place" type="general">
-	<!-- $Id: changelist.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: changelist.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_changes_report" /></GMRTitle>
 	<GMRDescription>Prints a list of individuals matching specific change criteria</GMRDescription>
 	<GMRInput name="changeRangeStart" lookup="DATE" type="text" default="NOW-30"><GMRvar var="GM_LANG_changedate2" /></GMRInput>

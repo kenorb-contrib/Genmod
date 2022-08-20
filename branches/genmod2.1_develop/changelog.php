@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: changelog.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: changelog.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 $search = @$HTTP_GET_VARS["search"];
 if (empty($search)) $search = @$_GET["search"];

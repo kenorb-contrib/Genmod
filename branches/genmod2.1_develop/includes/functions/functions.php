@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: functions.php 43 2018-08-15 15:38:10Z Boudewijn $
+ * @version $Id: functions.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 /**

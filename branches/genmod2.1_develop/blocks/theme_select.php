@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: theme_select.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: theme_select.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 $GM_BLOCKS["print_block_theme_select"]["name"]      = GM_LANG_theme_select_block;

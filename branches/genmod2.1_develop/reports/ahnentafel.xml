@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="ancestry" language="english" type="indi">
-	<!-- $Id: ahnentafel.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: ahnentafel.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_ahnentafel_report" /></GMRTitle>
 	<GMRDescription>Prints an Ahnentafel report for the selected individual</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="GM_LANG_enter_pid" /></GMRInput>

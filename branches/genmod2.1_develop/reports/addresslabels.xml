@@ -1,5 +1,5 @@
 <GMReport access="PRIV_USER" icon="place" type="general">
-	<!-- $Id: addresslabels.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: addresslabels.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_address_labels" /></GMRTitle>
 	<GMRDescription>Prints address labels</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />

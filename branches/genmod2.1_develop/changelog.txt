@@ -5,10 +5,11 @@
 	This and other information can be found online at
 	http://www.sourceforge.net/projects/genmod
 
-	# $Id: changelog.txt 48 2019-03-02 09:25:15Z Boudewijn $
+	# $Id: changelog.txt 29 2022-07-17 13:18:20Z Boudewijn $
 =====================================================================
 
 Version 2.1 beta 1
+- Fixed merge multimedia missing
 - Fixed Merge records forgets first common fact
 - Fixed Change family members function not working anymore
 - Added user first/last name to print _GMU userid

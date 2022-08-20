@@ -1,5 +1,5 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- @version $Id: ISR_Central_Ramla.txt 13 2016-04-27 09:26:01Z Boudewijn $ $ -->
+<!-- @version $Id: ISR_Central_Ramla.txt 29 2022-07-17 13:18:20Z Boudewijn $ $ -->
 ** Lod Region
 Lod
 Modi'in-Makkabbim-Re'ut

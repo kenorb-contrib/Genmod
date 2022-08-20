@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: user_messages.php 27 2016-06-28 19:27:16Z Boudewijn $
+ * @version $Id: user_messages.php 29 2022-07-17 13:18:20Z Boudewijn $
  * @package Genmod
  * @subpackage Blocks
  */

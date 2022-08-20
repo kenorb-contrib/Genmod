@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_merge.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: edit_merge.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 /**
  * Inclusion of the configuration file
@@ -38,14 +38,18 @@ if (empty($gid2)) $gid2="";
 else $gid2 = strtoupper($gid2);
 if (empty($mergeged)) $mergeged = GedcomConfig::$GEDCOMID;
 
-if (isset($_POST["keep1"])) $keep1 = $_POST["keep1"];
-else $keep1 = array();
+// keep2 might be empty, if so set it here 
 if (isset($_POST["keep2"])) $keep2 = $_POST["keep2"];
 else $keep2 = array();
+/*
+if (isset($_POST["keep1"])) $keep1 = $_POST["keep1"];
+else $keep1 = array();
+
 if (isset($_POST["skip1"])) $skip1 = $_POST["skip1"];
 else $skip1 = array();
 if (isset($_POST["skip2"])) $skip2 = $_POST["skip2"];
 else $skip2 = array();
+*/
 $errorstring = "";
 $error = 0;
 
@@ -135,7 +139,7 @@ if ($action != "choose") {
 			}
 			if ($action == "merge") {
 				// before we do anything, we check for double selecting unique facts
-				$mtype = $object1->type;
+				$mtype = ($object1->type == "OBJE" ? "MEDIA" : $object1->type);
 				$type = trim($mtype)."_FACTS_UNIQUE";
 				$unique = explode(",", GEDCOMCONFIG::$$type);
 				$factcount = array();

@@ -2,7 +2,7 @@
 /**
  * Functions used in admin pages
  *
- * $Id: functions_admin_class.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * $Id: functions_admin_class.php 29 2022-07-17 13:18:20Z Boudewijn $
  *
  * Genmod: Genealogy Viewer
  * Copyright (C) 2005 - 2012 Genmod Development Team

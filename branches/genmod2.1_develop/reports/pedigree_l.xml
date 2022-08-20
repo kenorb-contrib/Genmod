@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="pedigree" type="indi">
-	<!-- $Id: pedigree_l.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: pedigree_l.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_pedigree_chart" /> (<GMRvar var="GM_LANG_landscape" />)</GMRTitle>
 	<GMRDescription>Prints a pedigree chart in landscape mode</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="18" style="" />

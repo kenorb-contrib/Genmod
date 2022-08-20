@@ -3,7 +3,7 @@
 // File:        JPGRAPH_GB2312.PHP
 // Description: Chinese font conversions
 // Created:     2003-05-30
-// Ver:         $Id: jpgraph_gb2312.php 34 2016-09-19 16:46:18Z Boudewijn $
+// Ver:         $Id: jpgraph_gb2312.php 29 2022-07-17 13:18:20Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================

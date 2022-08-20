@@ -3,7 +3,7 @@
 // File:        JPGRAPH_FLAGS.PHP
 // Description: Class Jpfile. Handles plotmarks
 // Created:     2003-06-28
-// Ver:         $Id: jpgraph_flags.php 34 2016-09-19 16:46:18Z Boudewijn $
+// Ver:         $Id: jpgraph_flags.php 29 2022-07-17 13:18:20Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================

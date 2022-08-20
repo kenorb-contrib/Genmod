@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: wiewaswie.php 34 2016-09-19 16:46:18Z Boudewijn $
+ * @version $Id: wiewaswie.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 class WieWasWieSearchModule extends BaseExternalSearch {

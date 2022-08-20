@@ -1,5 +1,5 @@
 <GMReport access="PRIV_USER" icon="place" type="general">
-	<!-- $Id: addresslist.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: addresslist.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_address_list" /></GMRTitle>
 	<GMRDescription>Prints a list of addresses</GMRDescription>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />

@@ -342,7 +342,7 @@ foreach($_REQUEST as $key=>$value) {
 			exit;
 		}
 		//-- don't let any html in
-		if (!empty($value)) ${$key} = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $value);
+		if (isset($value)) ${$key} = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $value);
 	}
 	else {
 		foreach($value as $key1=>$val) {
@@ -355,7 +355,7 @@ foreach($_REQUEST as $key=>$value) {
 					exit;
 				}
 				//-- don't let any html in
-				if (!empty($val)) ${$key}[$key1] = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $val);
+				if (isset($val)) ${$key}[$key1] = preg_replace(array("/</","/>/"), array("&lt;","&gt;"), $val);
 			}
 		}
 	}

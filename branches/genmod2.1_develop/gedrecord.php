@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: gedrecord.php 26 2016-06-18 14:16:50Z Boudewijn $
+ * @version $Id: gedrecord.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 /**

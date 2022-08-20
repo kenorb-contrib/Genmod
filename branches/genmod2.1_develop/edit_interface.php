@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_interface.php 34 2016-09-19 16:46:18Z Boudewijn $
+ * @version $Id: edit_interface.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 /**

@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Controllers
- * @version $Id: detail_ctrl.php 19 2016-05-15 10:50:03Z Boudewijn $
+ * @version $Id: detail_ctrl.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
@@ -163,7 +163,7 @@ abstract class DetailController extends BaseController{
 		<?php
 		if (!$this->IsPrintPreview()) {
 			// Print message is any changes to links are present
-			if ($this->show_changes && $this->HasUnapprovedLinks()) print "<br />".GM_LANG_unapproved_link;
+			if ($this->show_changes && $this->HasUnapprovedLinks()) print "<br />".GM_LANG_unapproved_link."<br />";
 			print "<div id=\"TabDoor\">";
 			print "<dl>";
 			foreach ($this->tabs as $index => $tab) {
