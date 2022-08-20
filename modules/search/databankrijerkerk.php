@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: databankrijerkerk.php 22 2016-05-21 06:28:46Z Boudewijn $
+ * @version $Id: databankrijerkerk.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 class RijerkerkSearchModule extends BaseExternalSearch {

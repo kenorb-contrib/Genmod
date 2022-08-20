@@ -3,7 +3,7 @@
 // File:        JPGRAPH_IMGTRANS.PHP
 // Description: Extension for JpGraph to do some simple img transformations
 // Created:     2003-09-06
-// Ver:         $Id: jpgraph_imgtrans.php 34 2016-09-19 16:46:18Z Boudewijn $
+// Ver:         $Id: jpgraph_imgtrans.php 29 2022-07-17 13:18:20Z Boudewijn $
 //
 // Copyright (c) Asial Corporation. All rights reserved.
 //========================================================================

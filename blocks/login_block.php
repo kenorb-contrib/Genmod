@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: login_block.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: login_block.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 $GM_BLOCKS["print_login_block"]["name"]        	= GM_LANG_login_block;

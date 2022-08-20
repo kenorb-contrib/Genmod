@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: markiezenhof.php 26 2016-06-18 14:16:50Z Boudewijn $
+ * @version $Id: markiezenhof.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 class MarkiezenhofSearchModule extends BaseExternalSearch {

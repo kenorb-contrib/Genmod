@@ -1,5 +1,5 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- $Id: CAN.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- $Id: CAN.txt 29 2022-07-17 13:18:20Z Boudewijn $ -->
 Alberta
 British Columbia
 Colombie-Britannique

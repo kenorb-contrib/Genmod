@@ -1,5 +1,5 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- $Id: FIN_Vastra-Finlands-lan_Satakunda.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- $Id: FIN_Vastra-Finlands-lan_Satakunda.txt 29 2022-07-17 13:18:20Z Boudewijn $ -->
 Björneborg
 Harjavalta
 Huittinen

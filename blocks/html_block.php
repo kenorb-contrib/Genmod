@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: html_block.php 37 2017-01-31 08:44:35Z Boudewijn $
+ * @version $Id: html_block.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 $GM_BLOCKS["print_html_block"]["name"]        = GM_LANG_html_block_name;

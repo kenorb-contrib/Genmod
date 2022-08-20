@@ -11,7 +11,7 @@
 * xsd:anyType and user-defined types.
 *
 * @author   Dietrich Ayala <dietrich@ganx4.com>
-* @version  $Id: class.soap_val.php 34 2016-09-19 16:46:18Z Boudewijn $
+* @version  $Id: class.soap_val.php 29 2022-07-17 13:18:20Z Boudewijn $
 * @access   public
 */
 class soapval extends nusoap_base {

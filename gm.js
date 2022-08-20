@@ -20,7 +20,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: gm.js 27 2016-06-28 19:27:16Z Boudewijn $
+ * @version $Id: gm.js 29 2022-07-17 13:18:20Z Boudewijn $
  */
 if (!document.getElementById)	// Check if browser supports the getElementByID function
 {

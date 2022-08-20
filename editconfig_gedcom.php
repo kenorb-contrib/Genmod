@@ -24,7 +24,7 @@
  * @author GM Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: editconfig_gedcom.php 44 2018-08-16 14:40:42Z Boudewijn $
+ * @version $Id: editconfig_gedcom.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 /**

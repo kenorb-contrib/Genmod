@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: baseexternalsearch_class.php 22 2016-05-21 06:28:46Z Boudewijn $
+ * @version $Id: baseexternalsearch_class.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 abstract class BaseExternalSearch {

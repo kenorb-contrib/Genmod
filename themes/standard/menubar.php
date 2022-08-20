@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: menubar.php 37 2017-01-31 08:44:35Z Boudewijn $
+ * @version $Id: menubar.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 /**

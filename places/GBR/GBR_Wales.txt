@@ -1,4 +1,4 @@
-<!-- @version $Id: GBR_Wales.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @version $Id: GBR_Wales.txt 29 2022-07-17 13:18:20Z Boudewijn $ -->
 <!-- @see http://www.wirksworth.org.uk/A26-CHAP.htm#Wales -->
 Anglesey (AGY) -1974
 Breconshire (BRE) -1974

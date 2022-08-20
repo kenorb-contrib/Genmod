@@ -24,7 +24,7 @@
  * @package Genmod
  * @subpackage Admin
  * @see config.php
- * @version $Id: editconfig.php 30 2016-07-08 09:16:21Z Boudewijn $
+ * @version $Id: editconfig.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
  
 /**

@@ -24,7 +24,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: install.php 43 2018-08-15 15:38:10Z Boudewijn $
+ * @version $Id: install.php 29 2022-07-17 13:18:20Z Boudewijn $
  * @package Genmod
  * @subpackage Installation
  */

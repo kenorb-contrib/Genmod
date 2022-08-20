@@ -6,7 +6,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: lang_codes_std.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: lang_codes_std.php 29 2022-07-17 13:18:20Z Boudewijn $
  *
  * RFC1766 (HTML language codes) refers to ISO standard 639, and specifies that the 
  * 2-character language code of the ISO standard should be used, and that an ISO 

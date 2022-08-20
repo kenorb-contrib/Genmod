@@ -4,7 +4,7 @@
     Version 1.0
     Copyright 2005 - 2007 Genmod Development team
 
-    # $Id: readme.txt 13 2016-04-27 09:26:01Z Boudewijn $
+    # $Id: readme.txt 29 2022-07-17 13:18:20Z Boudewijn $
 =======================================================
 
 CONTENTS

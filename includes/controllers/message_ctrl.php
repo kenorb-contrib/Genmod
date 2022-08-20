@@ -27,7 +27,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * @package Genmod
  * @subpackage DB
- * @version $Id: message_ctrl.php 27 2016-06-28 19:27:16Z Boudewijn $
+ * @version $Id: message_ctrl.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 if (stristr($_SERVER["SCRIPT_NAME"],basename(__FILE__))) {
 	require "../../intrusion.php";

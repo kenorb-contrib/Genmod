@@ -1,4 +1,4 @@
-<!-- $Id: NOR_Oslo.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- $Id: NOR_Oslo.txt 29 2022-07-17 13:18:20Z Boudewijn $ -->
 <!-- Oslo er både fylke og kommune - Listen under er bydeler i Oslo -->
 <!-- De to siste er ikke definert som egne bydeler -->
 Alna

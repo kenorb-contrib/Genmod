@@ -4,7 +4,7 @@
  * @see http://www.foseid.priv.no/gustav/iso3166/iso3166-nb.txt
  * @package Genmod
  * @subpackage Languages
- * @version $Id: countries.no.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: countries.no.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 if (preg_match("/lang\...\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
 		print "You cannot access a language file directly.";

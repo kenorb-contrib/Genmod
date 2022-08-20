@@ -1,6 +1,6 @@
 Genmod LANGUAGE FILE CHANGELOG
 
-# $Id: LANG_CHANGELOG.txt 13 2016-04-27 09:26:01Z Boudewijn $
+# $Id: LANG_CHANGELOG.txt 29 2022-07-17 13:18:20Z Boudewijn $
 
 For changes prior to 2005.03.15, please refer to LANG_CHANGELOG_bef.20050315.txt
 The LANG_CHANGELOG.txt file was getting too big to work with easily.

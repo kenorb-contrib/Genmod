@@ -3,7 +3,7 @@
  // File:        JPGRAPH_TABLE.PHP
  // Description: Classes to create basic tables of data
  // Created:     2006-01-25
- // Ver:         $Id: jpgraph_table.php 34 2016-09-19 16:46:18Z Boudewijn $
+ // Ver:         $Id: jpgraph_table.php 29 2022-07-17 13:18:20Z Boudewijn $
  //
  // Copyright (c) Asial Corporation. All rights reserved.
  //========================================================================

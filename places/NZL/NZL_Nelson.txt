@@ -1,4 +1,4 @@
 <!-- THIS FILE MUST BE SAVED IN UTF-8 ENCODING (or some special characters will be lost) -->
-<!-- @version $Id: NZL_Nelson.txt 13 2016-04-27 09:26:01Z Boudewijn $ -->
+<!-- @version $Id: NZL_Nelson.txt 29 2022-07-17 13:18:20Z Boudewijn $ -->
 <!-- @see http://xtabs.stats.govt.nz/eng/statsbyarea/area_main.asp -->
 Nelson

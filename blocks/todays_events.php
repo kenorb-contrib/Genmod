@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Blocks
- * @version $Id: todays_events.php 27 2016-06-28 19:27:16Z Boudewijn $
+ * @version $Id: todays_events.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 $GM_BLOCKS["print_todays_events"]["name"]		= GM_LANG_todays_events_block;

@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage classes
- * @version $Id: genealogieonline.php 13 2016-04-27 09:26:01Z Boudewijn $
+ * @version $Id: genealogieonline.php 29 2022-07-17 13:18:20Z Boudewijn $
  */
 
 class GenealogieOnlineSearchModule extends BaseExternalSearch {

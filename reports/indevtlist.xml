@@ -1,5 +1,5 @@
 <GMReport access="PRIV_PUBLIC" icon="place" type="general">
-	<!-- $Id: indevtlist.xml 13 2016-04-27 09:26:01Z Boudewijn $ -->
+	<!-- $Id: indevtlist.xml 29 2022-07-17 13:18:20Z Boudewijn $ -->
 	<GMRTitle><GMRvar var="GM_LANG_ind_evt_report" /></GMRTitle>
 	<GMRDescription>Prints a list of individuals matching specific name and/or individual event criteria</GMRDescription>
 	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="GM_LANG_name" /></GMRInput>
