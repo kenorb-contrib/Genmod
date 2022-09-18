@@ -3,7 +3,7 @@
  * Popup window for viewing images
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Media
- * @version $Id: imageview.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: imageview.php,v 1.8 2008/11/23 07:17:11 sjouke Exp $
  */
 
 /**
@@ -31,6 +31,12 @@
 require("config.php");
 
 if (!isset($filename)) $filename = "";
+// Check if the extension is legal
+$filename = urldecode($filename);
+if (!$MediaFS->IsValidMedia($filename)) {
+	WriteToLog("ImageView-> Illegal display attempt. File: ".$filename, "W", "S");
+	exit;
+}
 
 print_simple_header($gm_lang["imageview"]);
 ?>
@@ -128,11 +134,11 @@ print_simple_header($gm_lang["imageview"]);
 	function resizeViewport() {
 		if (IE) {
 			pagewidth = document.documentElement.offsetWidth;
-			pageheight = document.documentElement.offsetHeight;
+			pageheight = document.documentElement.offsetHeight-140;
 		}
 		else {
 			pagewidth = window.outerWidth-25;
-			pageheight = window.outerHeight-25;
+			pageheight = window.outerHeight-25-140;
 		}
 		viewport = document.getElementById("imagecropper");
 		viewport.style.width=(pagewidth-35)+"px";
@@ -163,9 +169,10 @@ print_simple_header($gm_lang["imageview"]);
 -->
 </script>
 <?php
+//$filename = FilenameDecode($filename);
 print "<form name=\"zoomform\" onsubmit=\"setzoom(document.getElementById('zoomval').value); return false;\" action=\"imageview.php\">";
 if (strstr($filename, "://")) $filename = preg_replace("/ /", "%20", $filename);
-if ((empty($filename))||(!@fclose(@fopen(filename_decode($filename),"r")))) {
+if (!$MEDIA_IN_DB && (empty($filename) || !@fclose(@fopen($filename,"r")))) {
 	print "<span class=\"error\">".$gm_lang["file_not_found"]."&nbsp;".$filename."</span>";
 	print "<br /><br /><div class=\"center\"><a href=\"javascript:// ".$gm_lang["close_window"]."\" onclick=\"self.close();\">".$gm_lang["close_window"]."</a></div>\n";
 }
@@ -173,14 +180,34 @@ else {
 	print "<font size=\"6\"><a href=\"#\" onclick=\"zoomin(); return false;\">+</a> <a href=\"#\" onclick=\"zoomout();\">-</a> </font>";
 	print "<input type=\"text\" size=\"2\" name=\"zoomval\" id=\"zoomval\" value=\"100\" />%\n";
 	print "<input type=\"button\" value=\"".$gm_lang["reset"]."\" onclick=\"resetimage(); return false;\" />\n";
-	$imgsize = @getimagesize(filename_decode($filename));
-	if ($imgsize) {
-		$imgwidth = $imgsize[0]+2;
-		$imgheight = $imgsize[1]+2;
+	
+	if (!strstr($filename, "://")) {
+		if (!$MEDIA_IN_DB) $details = $MediaFS->GetFileDetails($filename);
+		else {
+			// we must strip showblob?file= from the filename, to get the real file
+			$fn = preg_replace("/showblob.php\?file=/", "", $filename);
+			$fn = preg_replace("/&.*/", "", $fn);
+			$details = $MediaFS->GetDBFileDetails($fn);
+		}
+		if (!empty($details["width"]) && !empty($details["height"])) {
+			$imgwidth = $details["width"]+2;
+			$imgheight = $details["height"]+2;
+		}
+		else {
+			$imgwidth = 50;
+			$imgheight = 50;
+		}
 	}
 	else {
-		$imgwidth = 50;
-		$imgheight = 50;
+		$details = @getimagesize($filename);
+		if (!empty($details[0]) && !empty($details[1])) {
+			$imgwidth = $details[0]+2;
+			$imgheight = $details[1]+2;
+		}
+		else {
+			$imgwidth = 50;
+			$imgheight = 50;
+		}
 	}
 	print "<script language=\"JavaScript\" type=\"text/javascript\">\n";
 	print "var imgwidth = $imgwidth-5;\n var imgheight = $imgheight-5;\n";
@@ -192,7 +219,7 @@ else {
 	print '</div>';
 }
 print "</form>\n";
-print "<div style=\"position: relative; \">\n";
+print "<div style=\"position: relative bottom; \">\n";
 print_simple_footer();
 print "</div>\n";
 ?>

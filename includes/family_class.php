@@ -3,7 +3,7 @@
  * Class file for a Family
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: family_class.php,v 1.10 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: family_class.php,v 1.27 2008/02/08 22:47:32 sjouke Exp $
  */
 /**
  * Inclusion of the base file for a gedcom record
@@ -40,65 +40,75 @@ class Family extends GedcomRecord {
 	var $wife = null;
 	var $children = array();
 	var $disp = true;
+	var $famdeleted = false;
+	var $famnew = false;
 	var $marr_rec = null;
 	var $marr_date = null;
 	var $marr_type = null;
+	var $show_changes = false;
+	var $show_primary = false;
+	var $media_count = null;
 	
 	/**
 	 * constructor
 	 * @param string $gedrec	the gedcom record
 	 */
 	function Family($gedrec, $changed=false) {
-		global $gm_changes, $GEDCOM;
+		global $GEDCOM, $show_changes, $Users;
 		
 		parent::GedcomRecord($gedrec);
 		$this->disp = displayDetailsById($this->xref, "FAM");
-		$husbrec = get_sub_record(1, "1 HUSB", $gedrec);
+
+		if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEdit($Users->GetUserName())) $this->show_changes = true;
+
+		if ($changed) $this->famnew = true;
+
+		if ($this->show_changes && GetChangeData(true, $this->xref, true, "", "")) {
+			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
+			if (empty($rec[$GEDCOM][$this->xref])) $this->famdeleted = true;
+		}
+		$husbrec = GetSubRecord(1, "1 HUSB", $gedrec);
 		if (!empty($husbrec)) {
 			//-- get the husbands ids
-			$husb = get_gedcom_value("HUSB", 1, $husbrec);
-			if ($changed) $indirec = change_present($husb);
-			else $indirec = find_person_record($husb);
+			$husb = GetGedcomValue("HUSB", 1, $husbrec);
+			if ($this->show_changes && GetChangeData(true, $husb, true, "", "INDI")) {
+				$rec = GetChangeData(false, $husb, true, "gedlines");
+				$indirec = $rec[$GEDCOM][$husb];
+			}
+			else $indirec = FindPersonRecord($husb);
 			$this->husb = new Person($indirec);
 		}
-		$wiferec = get_sub_record(1, "1 WIFE", $gedrec);
+		$wiferec = GetSubRecord(1, "1 WIFE", $gedrec);
 		if (!empty($wiferec)) {
 			//-- get the wifes ids
-			$wife = get_gedcom_value("WIFE", 1, $wiferec);
-			if ($changed) $indirec = change_present($wife);
-			else $indirec = find_person_record($wife);
+			$wife = GetGedcomValue("WIFE", 1, $wiferec);
+			if ($this->show_changes && GetChangeData(true, $wife, true, "", "INDI")) {
+				$rec = GetChangeData(false, $wife, true, "gedlines");
+				$indirec = $rec[$GEDCOM][$wife];
+			}
+			else $indirec = FindPersonRecord($wife);
 			$this->wife = new Person($indirec);
+		}
+
+		if ($this->show_changes && GetChangeData(true, $this->xref, true, "", "CHIL")) {
+			$rec = GetChangeData(false, $this->xref, true, "gedlines", "CHIL");
+			$gedrec = $rec[$GEDCOM][$this->xref];
 		}
 		$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $gedrec, $smatch, PREG_SET_ORDER);
 		for($i=0; $i<$num; $i++) {
 			//-- get the childs ids
 			$chil = trim($smatch[$i][1]);
-			
 			// NOTE: Check if the indi has a change
-			if (change_present($chil, true, false)) {
-				$indirec = change_present($chil);
+			if ($this->show_changes && GetChangeData(true, $chil, true, "", "INDI")) {
+				$rec = GetChangeData(false, $chil, true, "gedlines", "INDI");
+				$indirec = $rec[$GEDCOM][$chil];
 				$this->children[] = new Person($indirec, true);
 			}
 			else {
-				$indirec = find_person_record($chil);
+				$indirec = FindPersonRecord($chil);
 				$this->children[] = new Person($indirec);
 			}
 		}
-		/**
-		// // NOTE: Get any changes to this family
-		// if (change_present($this->xref, true, false)) {
-			// $alloldsubs = get_all_subrecords($gedrec);
-			// $famrecnew = change_present($this->xref);
-			// $diffsubs = array_diff(get_all_subrecords($famrecnew), $alloldsubs);
-			// foreach ($diffsubs as $key => $value) {
-				// ?><pre><?php
-				// print_r($value);
-				// ?></pre><?php
-				// // $indirec = change_present($chil);
-				// // $this->children[] = new Person($indirec, true);
-			// }
-		// }
-		*/
 	}
 	
 	/**
@@ -117,6 +127,26 @@ class Family extends GedcomRecord {
 	function getWifeId() {
 		if (!is_null($this->wife)) return $this->wife->getXref();
 		else return "";
+	}
+
+	/**
+	 * get the number of level 1 media items 
+	 * @return string
+	 */
+	function getNumberOfMedia() {
+		
+		if (!is_null($this->media_count)) return $this->media_count;
+		
+		if ($this->show_changes) $gedrec = $this->getchangedGedcomRecord();
+		else $gedrec = $this->gedrec;
+		$i = 1;
+		do {
+			$rec = getsubrecord(1, "1 OBJE", $gedrec, $i);
+			if (!empty($rec)) $this->media_count++;
+			$i++;
+		}
+		while (!empty($rec));
+		return $this->media_count;
 	}
 	
 	/**
@@ -140,6 +170,17 @@ class Family extends GedcomRecord {
 	function getChildren() {
 		return $this->children;
 	}
+	/**
+	 * get the children IDs
+	 * @return array 	array of children Ids
+	 */
+	function getChildrenIds() {
+		$children = array();
+		foreach ($this->children as $id => $child) {
+			$children[$id] = $child->getXref();
+		}
+		return $children;
+	}
 	
 	/**
 	 * get the number of children in this family
@@ -155,17 +196,18 @@ class Family extends GedcomRecord {
 	 * return a new family object for it
 	 */
 	function getUpdatedFamily() {
-		global $GEDCOM, $gm_changes, $gm_username;
+		global $GEDCOM, $gm_username;
 		if ($this->changed) return null;
-		if (userCanEdit($gm_username)&&($this->disp)) {
-			if (change_present($this->xref, true, false)) {
-				$newrec = change_present($this->xref);
-				if (!empty($newrec)) {
-					$newfamily = new Family($newrec, true);
-					return $newfamily;
-				}
-			}
-		}
+//		if (userCanEdit($gm_username)&&($this->disp)) {
+//			if (GetChangeData(true, $this->xref, true, false)) {
+//				$rec = GetChangeData(false, $this->xref, true, "gedlines");
+//				$newrec = $rec[$GEDCOM][$this->xref];
+//				if (!empty($newrec)) {
+//					$newfamily = new Family($newrec, true);
+//					return $newfamily;
+//				}
+//			}
+//		}
 		return null;
 	}
 	/**
@@ -196,9 +238,9 @@ class Family extends GedcomRecord {
 	 * parse marriage record
 	 */
 	function _parseMarriageRecord() {
-		$this->marr_rec = get_sub_record(1, "1 MARR", $this->gedrec);
-		$this->marr_date = get_sub_record(2, "2 DATE", $this->marr_rec);
-		$this->marr_type = get_sub_record(2, "2 TYPE", $this->marr_rec);
+		$this->marr_rec = GetSubRecord(1, "1 MARR", $this->gedrec);
+		$this->marr_date = GetSubRecord(2, "2 DATE", $this->marr_rec);
+		$this->marr_type = GetSubRecord(2, "2 TYPE", $this->marr_rec);
 	}
 	
 	/**

@@ -3,7 +3,7 @@
  * Controller for the Individual Page
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,25 +23,17 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: individual_ctrl.php,v 1.29 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: individual_ctrl.php,v 1.89 2009/03/16 19:51:12 sjouke Exp $
  */
  
 /**
  * Inclusion of the configuration file
 */
 require_once("config.php");
-
 /**
  * Inclusion of the base controller file
 */
 require_once 'includes/controllers/basecontrol.php';
-
-/**
- * Inclusion of the language files
-*/
-require_once($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require_once($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
-
 /**
  * Inclusion of the menu file
 */
@@ -63,25 +55,30 @@ $nonfacts[] = "WIFE";
 $nonfacts[] = "RFN";
 $nonfacts[] = "";
 $nonfamfacts[] = "UID";
-$nonfamfacts[] = "";
+$nonfamfacts[] = "RESN";
 
 /**
  * Main controller class for the individual page.
  */
 class IndividualControllerRoot extends BaseController {
 	
+	var $classname = "IndividualControllerRoot";
 	var $action = "";
 	var $pid = "";
 	var $default_tab = 0;
-	var $accept_success = false;
-	var $accept_change = false;
-	var $reject_change = false;
-	var $show_changes = "yes";
+	var $show_changes = false;
 	var $SEX_COUNT = 0;
 	var $name_count = 0;
-	var $total_names = 0;
+	var $TOTAL_NAMES = 0;
 	var $canedit = false;
+	var $caneditown = false;
 	var $close_relatives = false;
+	var $newindi = false;
+	var $PageTitle = "";
+	var $show_menu_other = false;
+	var $show_menu_edit = false;
+	var $indi_username = "";
+	var $user = array();
 	
 	/**
 	 * constructor
@@ -98,35 +95,75 @@ class IndividualControllerRoot extends BaseController {
 	 * Initialization function
 	 */
 	function init() {
-		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $SHOW_GEDCOM_RECORD;
-		global $ENABLE_CLIPPINGS_CART;
+		global $GEDCOM_DEFAULT_TAB, $USE_RIN, $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES;
+		global $ENABLE_CLIPPINGS_CART, $show_changes, $GEDCOM, $gm_username, $Users, $SHOW_ID_NUMBERS;
 		// NOTE: Determine the person ID
 		if (!empty($_REQUEST["pid"])) $this->pid = strtoupper($_REQUEST["pid"]);
-		$this->pid = clean_input($this->pid);
-		
+		$this->pid = CleanInput($this->pid);
+
+		if (!empty($_REQUEST["action"])) $this->action = $_REQUEST["action"];
+				
+		if ((!isset($show_changes) || $show_changes != "no") && $Users->UserCanEditOwn($gm_username, $this->pid)) $this->show_changes = true;
 		// NOTE: Determine which tab should be shown global value
 		$this->default_tab = $GEDCOM_DEFAULT_TAB;
 		
+		// NOTE: Get the user details
+		$this->uname = $Users->GetUserName();
+		if (!empty($this->uname)) {
+			$this->user = $Users->getUser($this->uname);
+			if ($this->user->default_tab != $this->default_tab && $this->user->default_tab != 9) $this->default_tab = $this->user->default_tab;
+			// Only display the user link for authenticated users
+			$this->indi_username = $Users->getUserByGedcomId($this->pid, $GEDCOM);
+			$link = "";
+			if ($this->indi_username) {
+				if ($Users->UserIsAdmin($gm_username)) $link = "<a href=\"useradmin.php?action=edituser&username=".$this->indi_username."\">";
+				$link .= "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["indis"]["small"]."\" border=\"0\" alt=\"".PrintReady($gm_lang["gm_username"]." ".$this->indi_username)."\" />";
+				if ($Users->UserIsAdmin($gm_username)) $link .= "</a>";
+				$this->indi_username = $link;
+			}
+		}
+		if ($Users->UserCanEdit($gm_username)) $this->canedit = true;
+		
+		// Note this is for Quick Update
+		if ($Users->UserCanEditOwn($gm_username, $this->pid)) $this->caneditown = true;
+
 		// NOTE: Get the persons GEDCOM record
-		$indirec = find_person_record($this->pid);
+		$indirec = FindPersonRecord($this->pid);
 		if (($USE_RIN)&&($indirec==false)) {
-			$this->pid = find_rin_id($this->pid);
-			$indirec = find_person_record($this->pid);
+			$this->pid = FindRinId($this->pid);
+			$indirec = FindPersonRecord($this->pid);
+		}
+		
+		// Recheck editing permissions based on 1 RESN. This will only affect the editing menu
+		if (FactEditRestricted($this->pid, $indirec, 1)) {
+			$this->canedit = false;
+			$this->caneditown = false;
+		}
+		
+		if(empty($indirec) && $this->show_changes) {
+//			$rec = GetChangeData(false, $this->pid, true, "gedlines", "INDI");
+			$rec = GetChangeData(false, $this->pid, true, "gedlines", "");
+			if (isset($rec[$GEDCOM][$this->pid])) {
+				$indirec = $rec[$GEDCOM][$this->pid];
+				$this->newindi = true;
+			}
+			else {
+				$rec = GetChangeData(false, $this->pid, true, "gedlines", "FAMC");
+				if (isset($rec[$GEDCOM][$this->pid])) {
+					$indirec = $rec[$GEDCOM][$this->pid];
+					$this->newindi = true;
+				}
+			}
 		}
 		if ($indirec == "") {
 			$indirec = "0 @".$this->pid."@ INDI\r\n";
 		}
-		// NOTE: Get the user details
-		$this->uname = getUserName();
-		if (!empty($this->uname)) {
-			$this->user = getUser($this->uname);
-			if ($this->user["default_tab"] != $this->default_tab) $this->default_tab = $this->user["default_tab"];
-		}
-		else {
-			$this->user["canedit"] = false;
-		}
+		
 		// NOTE: Create the person Object
-		$this->indi = new Person($indirec);
+		if ($this->newindi) $this->indi = new Person($indirec, true);
+		else $this->indi = new Person($indirec);
+	//	print_r($this->indi);
+		$this->close_relatives = $this->indi->close_relatives;
 		
 		if (!$this->indi->exist) {
 			$this->PageTitle = $gm_lang["person_not_found"];
@@ -147,20 +184,31 @@ class IndividualControllerRoot extends BaseController {
 			}
 			
 			// NOTE: Display page title
-			$this->PageTitle = $this->indi->name." - ".$this->indi->xref." - ".$gm_lang["indi_info"];
+			if ($this->indi->disp) {
+				$this->PageTitle = $this->indi->name;
+			} else {
+				$this->PageTitle = $gm_lang["private"];
+			}
+			if ($SHOW_ID_NUMBERS) {
+				$this->PageTitle .= " - ".$this->indi->xref;
+			}
+			$this->PageTitle .= " - ".$gm_lang["indi_info"];
 			
 			// NOTE: Can we display the highlighted object?
 			// NOTE: If we can, the HighlightedObject is filled
 			$this->canShowHighlightedObject = $this->canShowHighlightedObject();
 			
 			// NOTE: Can we show the gedcom record?
-			if ($SHOW_GEDCOM_RECORD && $this->indi->disp) $this->canShowGedcomRecord = true;
+			if ($Users->userCanViewGedlines() && $this->indi->disp) $this->canShowGedcomRecord = true;
 			else $this->canShowGedcomRecord = false;
 			
+			// NOTE: Can we edit the gedcom record?
+			if ($Users->userCanEditGedlines() && $this->indi->disp) $this->canEditGedcomRecord = true;
+			else $this->canEditGedcomRecord = false;
+			
 			// NOTE: What menus can we show?
-			if ($this->indi->disp && ($SHOW_GEDCOM_RECORD || $ENABLE_CLIPPINGS_CART>=getUserAccessLevel())) 
-				$this->show_menu_other = true;
-			else $this->show_menu_other = false;
+			if ($this->indi->disp && (!empty($this->uname) || $Users->userCanViewGedlines() || $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel())) $this->show_menu_other = true;
+			if ($this->indi->exist && !$this->indi->indideleted && ($this->canedit || $this->caneditown)) $this->show_menu_edit = true;
 			
 			// NOTE: Parse all facts into arrays
 			$this->indi->parseFacts();
@@ -170,8 +218,10 @@ class IndividualControllerRoot extends BaseController {
 			
 			//-- remove any duplicate and sort facts
 			$indifacts = $this->indi->indifacts;
-			usort($indifacts, "compare_facts");
-			
+//			print_r($indifacts);
+//			usort($indifacts, "CompareFacts");
+			SortFacts($indifacts);
+
 			//-- remove duplicate facts
 			$indinewfacts = array();
 			foreach ($indifacts as $key => $value) $indinewfacts[$key] = serialize($value[1]);
@@ -183,7 +233,7 @@ class IndividualControllerRoot extends BaseController {
 			foreach ($this->indi->globalfacts as $key => $value) {
 				$fact = trim($value[0]);
 				if ($fact=="SEX") $this->SEX_COUNT++;
-				if ($fact=="NAME") $this->total_names++;
+				if ($fact=="NAME") $this->TOTAL_NAMES++;
 			}
 			
 			// NOTE: Get the parents and siblings
@@ -191,6 +241,10 @@ class IndividualControllerRoot extends BaseController {
 			
 			// NOTE: Get the spouses and kids
 			$this->indi->getSpouseFamily($this->pid);
+			
+			// NOTE: Get the parents other families
+			$this->indi->getParentOtherFamily($this->pid);
+			
 		}
 		
 	}
@@ -202,24 +256,19 @@ class IndividualControllerRoot extends BaseController {
 	 * @return boolean
 	 */
 	function canShowHighlightedObject() {
-		global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN;
-		
-		if (($this->indi->disp) && ($MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES)) {
+		global $MULTI_MEDIA, $SHOW_HIGHLIGHT_IMAGES, $USE_THUMBS_MAIN, $MEDIA_DIRECTORY;
+
+		if ($this->indi->disp && $MULTI_MEDIA && $SHOW_HIGHLIGHT_IMAGES && ShowFact("OBJE", $this->pid, "OBJE")) {
 			$firstmediarec = $this->indi->findHighlightedMedia();
 			if ($firstmediarec) {
-				if ($USE_THUMBS_MAIN) $filename = $firstmediarec["thumb"];
-				else $filename = $firstmediarec["file"];
-				if (empty($filename)) $filename = $firstmediarec["thumb"];
-				if (!empty($filename)) {
-					if (file_exists($filename)) {
-						$imgsize = getimagesize($filename);
-						if ($imgsize[1] > 150) $height = 150;
-						else $height = $imgsize[1];
-					}
-					else $height = 150;
-					if (file_exists($filename)) $this->HighlightedObject = "<img src=\"$filename\" class=\"image\" height=\"".$height."\" alt=\"".$firstmediarec["file"]."\" />";
-					else $this->HighlightedObject = "";
-				}
+				// new from here
+				$media = new MediaItem($firstmediarec["id"]);
+				if ($USE_THUMBS_MAIN && $firstmediarec["use_thum"] != "Y") $filename = $media->m_fileobj->f_thumb_file;
+				else $filename = $media->m_fileobj->f_main_file;
+				if ($media->m_fileobj->f_height != 0 && $media->m_fileobj->f_height < 150) $height = $media->m_fileobj->f_height;
+				else $height = 150;
+				if ($media->m_fileobj->f_file_exists) $this->HighlightedObject = '<img src="'.$filename.'" class="image" height="'.$height.'" alt="'.$media->m_titl.'" />';
+				else $this->HighlightedObject = "";
 				return true;
 			}
 		}
@@ -232,86 +281,168 @@ class IndividualControllerRoot extends BaseController {
 	 * @return Menu
 	 */
 	function &getEditMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $TOTAL_NAMES;
-		global $NAME_LINENUM, $SEX_LINENUM, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOM, $TOTAL_NAMES;
+		global $NAME_LINENUM, $SEX_LINENUM, $gm_lang, $USE_QUICK_UPDATE, $show_changes;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		//-- main edit menu
 		$menu = new Menu($gm_lang["edit"]);
-		if (!empty($GM_IMAGES["edit_indi"]["small"]))$menu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["edit_indi"]["small"]);
-		$menu->addClass("submenuitem$ff", "submenuitem_hover$ff", "submenu$ff");
-		if (!record_locked($this->pid)) {
-			$menu->addOnclick("return quickEdit('".$this->pid."');");
+		if ($this->canedit || $this->caneditown) {
 			// NOTE: Quickedit sub menu
-			$submenu = new Menu($gm_lang["quick_update_title"]);
-			$submenu->addOnclick("return quickEdit('".$this->pid."', '', 'edit_quickupdate');");
-			$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-			$menu->addSubmenu($submenu);
-			if ($this->user["canedit"]) {
-				// NOTE: Raw editing
-				$submenu = new Menu($gm_lang["edit_raw"]);
-				$submenu->addOnclick("return edit_raw('".$this->pid."', 'edit_raw');");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+			if ($USE_QUICK_UPDATE) {
+				$submenu = new Menu($gm_lang["quick_update_title"]);
+				$submenu->addLink("quickEdit('".$this->pid."', '', 'edit_quickupdate');");
 				$menu->addSubmenu($submenu);
-				// NOTE: Reorder families
-				if (count($this->indi->getSpouseFamilyIds())>0) {
-					$submenu = new Menu($gm_lang["reorder_families"]);
-					$submenu->addOnclick("return reorder_families('".$this->pid."', 'reorder_families');");
-					$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-					$menu->addSubmenu($submenu);
-				}
-				// NOTE: Delete person
-				$submenu = new Menu($gm_lang["delete_person"]);
-				$submenu->addOnclick("if (confirm('".$gm_lang["confirm_delete_person"]."')) return deleteperson('".$this->pid."', 'delete_person'); else return false;");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+				if ($this->canedit) $menu->addSeperator();
+			}
+				
+			if ($this->canedit) {
+				// Add a new father
+				$submenu = new Menu($gm_lang["add_father"]);
+				$submenu->addLink("addnewparent('".$this->pid."', 'HUSB', 'add_father');");
 				$menu->addSubmenu($submenu);
+				
+				// Add a new mother
+				$submenu = new Menu($gm_lang["add_mother"]);
+				$submenu->addLink("addnewparent('".$this->pid."', 'WIFE', 'add_mother');");
+				$menu->addSubmenu($submenu);
+			
+				// Add link as child to existing family
+				$submenu = new Menu($gm_lang["link_as_child"]);
+				$submenu->addLink("add_famc('".$this->pid."', 'link_as_child');");
+				$menu->addSubmenu($submenu);
+			
+				// Add link as child to new family
+				$submenu = new Menu($gm_lang["newfam_as_child"]);
+				$submenu->addLink("add_newfamc('".$this->pid."', 'newfam_as_child');");
+				$menu->addSubmenu($submenu);
+				
+				// Add a new wife
 				$menu->addSeperator();
-				// NOTE: Edit name
-				if ($TOTAL_NAMES<2) {
-					$submenu = new Menu($gm_lang["edit_name"]);
-					$submenu->addOnclick("return edit_name('".$this->pid."', 'NAME', 1, 'edit_name');");
-					$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+				if ($this->indi->getSex() != "F") {
+					$submenu = new Menu($gm_lang["add_new_wife"]);
+					$submenu->addLink("addspouse('".$this->pid."','WIFE', 'add_new_wife');");
 					$menu->addSubmenu($submenu);
 				}
+			
+				// Add a new husband
+				if ($this->indi->getSex() != "M") {
+					$submenu = new Menu($gm_lang["add_new_husb"]);
+					$submenu->addLink("addspouse('".$this->pid."','HUSB', 'add_new_husb');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Link a new wife
+				if ($this->indi->getSex() != "F") {
+					$submenu = new Menu($gm_lang["link_new_wife"]);
+					$submenu->addLink("linkspouse('".$this->pid."','WIFE', 'link_new_wife');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Link a new husband
+				if ($this->indi->getSex() != "M") {
+					$submenu = new Menu($gm_lang["link_new_husb"]);
+					$submenu->addLink("linkspouse('".$this->pid."','HUSB', 'link_new_husb');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Add link as husband
+				if ($this->indi->getSex() != "F") {
+					$submenu = new Menu($gm_lang["link_as_husband"]);
+					$submenu->addLink("add_fams('".$this->pid."','HUSB', 'link_as_husband');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Add link as wife
+				if ($this->indi->getSex() != "M") {
+					$submenu = new Menu($gm_lang["link_as_wife"]);
+					$submenu->addLink("add_fams('".$this->pid."','WIFE', 'link_as_wife');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Add link as husband to new family
+				if ($this->indi->getSex() != "F") {
+					$submenu = new Menu($gm_lang["newlink_as_husband"]);
+					$submenu->addLink("add_newfams('".$this->pid."','HUSB', 'newlink_as_husband');");
+					$menu->addSubmenu($submenu);
+				}
+			
+				// Add link as wife to new family
+				if ($this->indi->getSex() != "M") {
+					$submenu = new Menu($gm_lang["newlink_as_wife"]);
+					$submenu->addLink("add_newfams('".$this->pid."','WIFE', 'newlink_as_wife');");
+					$menu->addSubmenu($submenu);
+				}
+				
+				// Reorder families
+				$menu->addSeperator();
+				$thisopt = false;
+				if (isset($this->indi->spouses) && count($this->indi->spouses) > 1) {
+					$submenu = new Menu($gm_lang["reorder_families"]);
+					$submenu->addLink("reorder_families('".$this->pid."', 'reorder_families');");
+					$menu->addSubmenu($submenu);
+					$thisopt = true;
+				}
+			
+				// NOTE: Set family relations and primary
+				if (count($this->indi->getChildFamilies())>0) {
+					$submenu = new Menu($gm_lang["relation_fams_short"]);
+					$submenu->addLink("relation_families('".$this->pid."', 'relation_families');");
+					$menu->addSubmenu($submenu);
+					$thisopt = true;
+				}
+				
+				// Reorder_media. Only show if #media > 1
+				if ($this->indi->getNumberOfMedia() > 1) {
+					$submenu = new Menu($gm_lang['reorder_media']);
+					$submenu->addLink("reorder_media('".$this->pid."', 'reorder_media');");
+					$menu->addSubmenu($submenu);
+				}
+				
+				if ($thisopt) $menu->addSeperator();
+				// NOTE: Edit name
+				if ($this->TOTAL_NAMES == 1) {
+					$submenu = new Menu($gm_lang["edit_name"]);
+					$submenu->addLink("edit_name('".$this->pid."', 'NAME', 1, 'edit_name');");
+					$menu->addSubmenu($submenu);
+				}
+			
 				// NOTE: Add name
 				$submenu = new Menu($gm_lang["add_name"]);
-				$submenu->addOnclick("return add_name('".$this->pid."', 'add_name');");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+				$submenu->addLink("add_name('".$this->pid."', 'add_name');");
 				$menu->addSubmenu($submenu);
+				$menu->addSeperator();
+			
 				// NOTE: Gender
 				if ($this->SEX_COUNT<2) {
+					if ($SEX_LINENUM=="new") $execute = "add_new_record('".$this->pid."', 'SEX', 'sex_edit');";
+					else $execute = "edit_record('".$this->pid."', 'SEX', 1, 'edit_gender');";
 					$submenu = new Menu($gm_lang["edit"]." ".$gm_lang["sex"]);
-					if ($SEX_LINENUM=="new") $submenu->addOnclick("return add_new_record('".$this->pid."', 'SEX', 'sex_edit');");
-					else $submenu->addOnclick("return edit_record('".$this->pid."', 1, 'edit_gender');");
-					$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+					$submenu->addLink($execute);
+					$menu->addSubmenu($submenu);
+					$menu->addSeperator();
+				}
+				
+				// NOTE: Delete person
+				$submenu = new Menu($gm_lang["delete_person"]);
+				$submenu->addLink("if (confirm('".$gm_lang["confirm_delete_person"]."')) deleteperson('".$this->pid."', 'delete_person');");
+				$menu->addSubmenu($submenu);
+			
+				// NOTE: Raw editing
+				if ($this->canEditGedcomRecord) {
+					$submenu = new Menu($gm_lang["edit_raw"]);
+					$submenu->addLink("edit_raw('".$this->pid."', 'edit_raw');");
 					$menu->addSubmenu($submenu);
 				}
-			}
-		}
-		if (change_present($this->pid, true)) {
-			$menu->addSeperator();
-			if ($this->show_changes=="no") {
-				$label = $gm_lang["show_changes"];
-				$link = "individual.php?pid=".$this->pid."&amp;show_changes=yes";
-			}
-			else {
-				$label = $gm_lang["hide_changes"];
-				$link = "individual.php?pid=".$this->pid."&amp;show_changes=no";
-			}
-			$submenu = new Menu($label, $link);
-			$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-			$menu->addSubmenu($submenu);
 			
-			if (userCanAccept($this->uname)) {
-				$submenu = new Menu($gm_lang["accept_all"], "individual.php?pid=".$this->pid."&amp;action=accept");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-				$menu->addSubmenu($submenu);
-				$submenu = new Menu($gm_lang["reject_all"], "individual.php?pid=".$this->pid."&amp;action=reject");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-				$menu->addSubmenu($submenu);
 			}
 		}
+		if ($this->canedit) $menu->addSeperator();
+		if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+		else $submenu = new Menu($gm_lang['hide_changes']);
+		$submenu->addLink('showchanges();');
+		$menu->addSubmenu($submenu);
 		return $menu;
 	}
 	
@@ -321,48 +452,32 @@ class IndividualControllerRoot extends BaseController {
 	 * @return Menu
 	 */
 	function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $THEME_DIR, $GM_BASE_DIRECTORY;
-		global $SHOW_GEDCOM_RECORD, $ENABLE_CLIPPINGS_CART, $gm_lang;
-		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
-		else $ff="";
+		global $ENABLE_CLIPPINGS_CART, $gm_lang, $Users;
+		
 		//-- main other menu item
 		$menu = new Menu($gm_lang["other"]);
-		if ($SHOW_GEDCOM_RECORD) {
-			if (!empty($GM_IMAGES["gedcom"]["small"]))
-				$menu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["gedcom"]["small"]);
-			if ($this->show_changes=="yes"  && $this->user["canedit"])
-				$menu->addOnclick("return show_gedcom_record('new');");
-			else
-				$menu->addOnclick("return show_gedcom_record('');");
-		}
-		else {
-			if (!empty($GM_IMAGES["clippings"]["small"]))
-				$menu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["clippings"]["small"]);
-			$menu->addLink("clippings.php?action=add&amp;id=".$this->pid."&amp;type=indi");
-		}
-		$menu->addClass("submenuitem$ff", "submenuitem_hover$ff", "submenu$ff");
-		if ($this->canShowGedcomRecord) {
-			$submenu = new Menu($gm_lang["view_gedcom"]);
-			if (!empty($GM_IMAGES["gedcom"]["small"]))
-				$submenu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["gedcom"]["small"]);
-			if ($this->show_changes=="yes"  && $this->user["canedit"]) $submenu->addOnclick("return show_gedcom_record('new');");
-			else $submenu->addOnclick("return show_gedcom_record();");
-			$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-			$menu->addSubmenu($submenu);
-		}
-		if ($this->indi->disp && $ENABLE_CLIPPINGS_CART>=getUserAccessLevel()) {
-			$submenu = new Menu($gm_lang["add_to_cart"], "clippings.php?action=add&amp;id=".$this->pid."&amp;type=indi");
-			if (!empty($GM_IMAGES["clippings"]["small"]))
-				$submenu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["clippings"]["small"]);
-			$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-			$menu->addSubmenu($submenu);
-		}
-		if ($this->indi->disp && !empty($this->uname)) {
-			$submenu = new Menu($gm_lang["add_to_my_favorites"], "individual.php?action=addfav&amp;pid=".$this->pid."&amp;gid=".$this->pid);
-			if (!empty($GM_IMAGES["gedcom"]["small"]))
-				$submenu->addIcon($GM_IMAGE_DIR."/".$GM_IMAGES["gedcom"]["small"]);
-			$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-			$menu->addSubmenu($submenu);
+		
+		if ($this->indi->exist) {
+			// Show Gedcom Record
+			if ($this->canShowGedcomRecord) {
+				if ($this->show_changes  && $this->canedit) $execute = "show_gedcom_record('new');";
+				else $execute = "show_gedcom_record();";
+				$submenu = new Menu($gm_lang["view_gedcom"]);
+				$submenu->addLink($execute);
+				$menu->addSubmenu($submenu);
+			}
+			// Clippings Cart
+			if ($this->indi->disp && $ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
+				$submenu = new Menu($gm_lang["add_to_cart"]);
+				$submenu->addLink("clippings.php?action=add&id=".$this->pid."&type=indi");
+				$menu->addSubmenu($submenu);
+			}
+			// Add favorite
+			if ($this->indi->disp && !empty($this->uname)) {
+				$submenu = new Menu($gm_lang["add_to_my_favorites"]);
+				$submenu->addLink("individual.php?action=addfav&pid=".$this->pid."&gid=".$this->pid);
+				$menu->addSubmenu($submenu);
+			}
 		}
 		return $menu;
 	}
@@ -375,14 +490,13 @@ class IndividualControllerRoot extends BaseController {
 	 * @param string $factrec	the raw gedcom record of the name to print
 	 * @param int $linenum		the line number from the original INDI gedcom record where this name record started, used for editing
 	 */
-	function print_name_record($factrec, $count) {
+	function print_name_record($factrec, $count, $showedit=true) {
 		global $gm_lang, $factarray, $NAME_REVERSE;
 		
 		if ((!showFact("NAME", $this->pid))||(!showFactDetails("NAME", $this->pid))) return false;
 		
 		$lines = split("\n", $factrec);
 		$this->name_count++;
-		
 		// NOTE: If there is more than one name, print the aka tag
 		if ($this->name_count>1) print "\n\t\t<span class=\"label\">".$gm_lang["aka"]." </span><br />\n";
 		
@@ -392,9 +506,11 @@ class IndividualControllerRoot extends BaseController {
 			if ($nt>0){
 				print "\n\t\t<span class=\"label\">".$gm_lang["name"].": </span><br />";
 				$name = trim($nmatch[1]);
-				if ($NAME_REVERSE) $name = reverse_name($name);
+				if (HasChinese($name, true)) $add = "";
+				else $add = " ";
+				if ($NAME_REVERSE || HasChinese($name, true)) $name = ReverseName($name);
 				$name = preg_replace("'/,'", ",", $name);
-	   			$name = preg_replace("'/'", " ", $name);
+	   			$name = preg_replace("'/'", $add, $name);
 				// handle PAF extra NPFX [ 961860 ]
 				$ct = preg_match("/2 NPFX (.*)/", $factrec, $match);
 				if ($ct>0) {
@@ -415,17 +531,18 @@ class IndividualControllerRoot extends BaseController {
 				print ":</span><span class=\"field\"> ";
 				if (isset($nmatch[$i][2])) {
 			  		$name = trim($nmatch[$i][2]);
+					if ($NAME_REVERSE || HasChinese($name, true)) $name = ReverseName($name);
 			  		$name = preg_replace("'/,'", ",", $name);
 					$name = preg_replace("'/'", " ", $name);
-					print PrintReady(check_NN($name));
+					print PrintReady(CheckNN($name));
 				}
 				print " </span><br />";
 			}
 		}
-		if ($this->total_names>1 && !$this->isPrintPreview() && $this->canedit) {
+		if ($this->TOTAL_NAMES>1 && !$this->isPrintPreview() && $this->canedit && $showedit) {
 			if ($this->name_count==2) print_help_link("delete_name_help", "qm", "delete_name");
-	   		print "&nbsp;&nbsp;&nbsp;<a href=\"#\" class=\"font9\" onclick=\"edit_name('".$this->pid."', 'NAME', '".$count."', 'edit_name'); return false;\">".$gm_lang["edit_name"]."</a> | ";
-			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->pid."', 'NAME', '".$count."', 'delete_name'); return false;\">".$gm_lang["delete_name"]."</a>\n";
+	   		print "<a href=\"#\" class=\"font9\" onclick=\"edit_name('".$this->pid."', 'NAME', '".$this->name_count."', 'edit_name'); return false;\">".$gm_lang["edit_name"]."</a> | ";
+			print "<a class=\"font9\" href=\"#\" onclick=\"delete_record('".$this->pid."', 'NAME', '".$this->name_count."', 'delete_name'); return false;\">".$gm_lang["delete_name"]."</a>\n";
 			print "<br />\n";
 		}
 		$ct = preg_match("/\d (NOTE)|(SOUR)/", $factrec);
@@ -438,7 +555,6 @@ class IndividualControllerRoot extends BaseController {
 			print_fact_notes($factrec, 2);
 			print "</div><br />";
 		}
-		print "</td>\n";
 	}
 	
 	/**
@@ -456,7 +572,8 @@ class IndividualControllerRoot extends BaseController {
 		
 		$this->indi->sexdetails["add"] = false;
 		$ft = preg_match("/\d\s(\w+)(.*)/", $factrec, $match);
-		$sex = strtoupper(trim($match[2]));
+		if ($ft > 0) $sex = strtoupper(trim($match[2]));
+		else $sex = "";
 		if (empty($sex)) $sex = "U";
 		switch ($sex) {
 			case "M":
@@ -487,7 +604,7 @@ class IndividualControllerRoot extends BaseController {
 		if (empty($this->uname)) return;
 		if (!empty($_REQUEST["gid"])) {
 			$gid = strtoupper($_REQUEST["gid"]);
-			$indirec = find_person_record($gid);
+			$indirec = FindPersonRecord($gid);
 			if ($indirec) {
 				$favorite = array();
 				$favorite["username"] = $this->uname;

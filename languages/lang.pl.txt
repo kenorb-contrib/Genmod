@@ -678,7 +678,7 @@
 "mail04_line03";"Recomendacja:"
 "mail04_line04";"Teraz kliknij na odnośnik poniżej, zaloguj się korzystając z nowego hasła i zmień je aby zachować odpowiedni poziom bezpieczeństwa."
 "mail04_subject";"Wniosek o dane z #SERVER_NAME#"
-"pwreqinfo";"Witaj...<br /><br />Wiadomość została wysłana pod adres (#user[email]#) zawierająca nowe hasło.<br /><br />Sprawdź pocztę, ponieważ wiadomość ta powinna dojść w przeciągu kilku minut.<br /><br />Rekomendacja:<br /><br />Po otrzymaniu maila powinieneś (powinnaś) zalogować się korzystając z nowego hasła i zmienić je aby zachować odpowiedni poziom bezpieczeństwa."
+"pwreqinfo";"Witaj...<br /><br />Wiadomość została wysłana pod adres zawierająca nowe hasło.<br /><br />Sprawdź pocztę, ponieważ wiadomość ta powinna dojść w przeciągu kilku minut.<br /><br />Rekomendacja:<br /><br />Po otrzymaniu maila powinieneś (powinnaś) zalogować się korzystając z nowego hasła i zmienić je aby zachować odpowiedni poziom bezpieczeństwa."
 "editowndata";"Moje konto"
 "savedata";"Zapisz zmiany"
 "datachanged";"Dane użytkownika zostały zmienione!"

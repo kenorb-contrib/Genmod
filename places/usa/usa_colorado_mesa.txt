@@ -1,0 +1,16 @@
+<!-- @version $Id: USA_Colorado_Mesa.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Clifton
+Collbran
+De Beque
+Fruita
+Fruitvale
+Gateway
+Glade Park
+Grand Junction
+Loma
+Mack
+Mesa
+Molina
+Palisade
+Whitewater

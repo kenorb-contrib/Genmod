@@ -2,10 +2,10 @@
 /**
  * Functions used Tools to cleanup and manipulate Gedcoms before they are imported
  *
- * $Id: functions_tools.php,v 1.2 2005/11/04 23:24:05 roland-d Exp $
+ * $Id: functions_tools.php,v 1.8 2008/01/06 11:16:37 roland-d Exp $
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,8 @@
  * @see validategedcom.php
  */
  
-if (strstr($_SERVER["SCRIPT_NAME"],"functions")) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+if (strstr($_SERVER["SCRIPT_NAME"],"functions_tools.php")) {
+	require "../intrusion.php";
 }
 
 /**
@@ -39,8 +38,8 @@ if (strstr($_SERVER["SCRIPT_NAME"],"functions")) {
  * @return boolean	returns true if we need to cleanup the head, false if we don't
  * @see head_cleanup()
  */
-function need_head_cleanup() {
-	global $fcontents;
+function need_head_cleanup($fcontents) {
+//	global $fcontents;
 
 	$pos1 = strpos($fcontents, "0 HEAD");
 	if ($pos1>2) return true;
@@ -72,12 +71,12 @@ function head_cleanup() {
  * @return boolean	return true if the cleanup is needed
  * @see line_endings_cleanup()
  */
-function need_line_endings_cleanup() {
-	global $fcontents;
+function need_line_endings_cleanup($fcontents) {
+//	global $fcontents;
 
 	$ct = preg_match("/\r\n(\r\n)+/", $fcontents);
-	$ct += preg_match("/\r\r+/", $fcontents);
-	$ct += preg_match("/\n\n+/", $fcontents);
+	$ct += preg_match("/(\r\r+|\n\n+)/", $fcontents);
+//	$ct += preg_match("/\n\n+/", $fcontents);
 	if ($ct>0) {
 		return true;
 	}
@@ -114,9 +113,9 @@ function line_endings_cleanup() {
  * @return boolean	returns true if the cleanup is needed
  * @see place_cleanup()
  */
-function need_place_cleanup()
+function need_place_cleanup($fcontents)
 {
-	global $fcontents;
+//	global $fcontents;
 	//$ct = preg_match("/SOUR.+(Family Tree Maker|FTW)/", $fcontents);
 	//if ($ct==0) return false;
 	$ct = preg_match_all ("/^1 (CAST|DSCR|EDUC|IDNO|NATI|NCHI|NMR|OCCU|PROP|RELI|SSN|TITL|_MILI|_FA1|_FA2|_FA3|_FA4|_FA5|_FA6)(\s*)$[\s]+(^2 TYPE(.*)[\s]+)?(^2 DATE(.*)[\s]+)?^2 PLAC (.*)$/m",$fcontents,$matches, PREG_SET_ORDER);
@@ -175,30 +174,30 @@ function fixreplaceval($val1,$val7,$val3,$val5)
  * @return boolean	returns true if the cleanup is needed
  * @see date_cleanup()
  */
-function need_date_cleanup()
+function need_date_cleanup($fcontents)
 {
-	global $fcontents;
-  $ct = preg_match_all ("/DATE[^\d]+(\d\d\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
+//	global $fcontents;
+  $ct = preg_match_all ("/\n\d DATE[^\d]+(\d\d\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
 	if($ct>0) {
 		//print_r($matches);
 	  	return $matches[0];
   	}
 	else
 	{
-  		$ct = preg_match_all ("/DATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
+  		$ct = preg_match_all ("/\n\d DATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
 		if($ct>0) {
 			//print_r($matches);
 			$matches[0]["choose"] = true;
 			return $matches[0];
 		}
 		else {
-			$ct = preg_match_all ("/DATE ([^\d]+) [0-9]{1,2}, (\d\d\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
+			$ct = preg_match_all ("/\n\d DATE ([^\d]+) [0-9]{1,2}, (\d\d\d\d)/",$fcontents,$matches, PREG_SET_ORDER);
 			if($ct>0) {
 				//print_r($matches);
 				return $matches[0];
 			}
 			else {
-				$ct = preg_match_all("/DATE (\d\d)[^\s]([^\d]+)[^\s](\d\d\d\d)/", $fcontents, $matches, PREG_SET_ORDER);
+				$ct = preg_match_all("/\n\d DATE (\d\d)[^\s]([^\d]+)[^\s](\d\d\d\d)/", $fcontents, $matches, PREG_SET_ORDER);
 				if($ct>0) {
 					//print_r($matches);
 					return $matches[0];
@@ -227,8 +226,8 @@ function changemonth($monval)
 }
 
 function fix_date($datestr) {
-	$date = parse_date($datestr);
-	if (isset($date[0])) return $date[0]["day"]." ".str2upper($date[0]["month"])." ".$date[0]["year"];
+	$date = ParseDate($datestr);
+	if (isset($date[0])) return $date[0]["day"]." ".Str2Upper($date[0]["month"])." ".$date[0]["year"];
 	else return $datestr;
 }
 /**
@@ -241,23 +240,22 @@ function date_cleanup($dayfirst=1)
 	global $fcontents;
 
 	// convert all dates with anything but spaces as delimmeters
-	$fcontents = preg_replace("/DATE (\d\d)[^\s]([^\d]+)[^\s](\d\d\d\d)/", "DATE $1 $2 $3", $fcontents);
+	$fcontents = preg_replace("/\n(\d)\sDATE (\d\d)[^\s]([^\d]+)[^\s](\d\d\d\d)/", "\n$1 DATE $2 $3 $4", $fcontents);
   //convert all dates in YYYY-MM-DD or YYYY/MM/DD or YYYY\MM\DD format to DD MMM YYYY format
-	$fcontents = preg_replace("/DATE[^\d]+(\d\d\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d)/e", "'DATE $3 '.changemonth('$2').' $1'", $fcontents);
-	$fcontents = preg_replace("/DATE ([^\d]+ [0-9]{1,2}, \d\d\d\d)/e", "'DATE '.fix_date('$1').''", $fcontents);
+	$fcontents = preg_replace("/\n(\d)\sDATE[^\d]+(\d\d\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d)/e", "'\n$1 DATE $4 '.changemonth('$3').' $2'", $fcontents);
+	$fcontents = preg_replace("/\n(\d)\sDATE ([^\d]+ [0-9]{1,2}, \d\d\d\d)/e", "'\n$1 DATE '.fix_date('$2').''", $fcontents);
 
 	//day first in date format
 	if($dayfirst==1)
 	{
   	//convert all dates in DD-MM-YYYY or DD/MM/YYYY or DD\MM\YYYY to DD MMM YYYY format
-	  $fcontents = preg_replace("/DATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/e", "'DATE $1 '.changemonth('$2').' $3'", $fcontents);
+	  $fcontents = preg_replace("/\n(\d)\sDATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/e", "'\n$1 DATE $2 '.changemonth('$3').' $4'", $fcontents);
 	}
 	else if ($dayfirst==2) //month first
 	{
 	  //convert all dates in MM-DD-YYYY or MM/DD/YYYY or MM\DD\YYYY to DD MMM YYYY format
-		$fcontents = preg_replace("/DATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/e", "'DATE $2 '.changemonth('$1').' $3'", $fcontents);
+		$fcontents = preg_replace("/\n(\d)\sDATE[^\d]+(\d\d)[\/\\\\\-\.](\d\d)[\/\\\\\-\.](\d\d\d\d)/e", "'\n$1 DATE $3 '.changemonth('$2').' $4'", $fcontents);
 	}
-
 	return true;
 }
 
@@ -269,9 +267,9 @@ function date_cleanup($dayfirst=1)
  * @return boolean	returns true if the cleanup is needed
  * @see macfile_cleanup()
  */
-function need_macfile_cleanup()
+function need_macfile_cleanup($fcontents)
 {
-	global $fcontents;
+//	global $fcontents;
   //check to see if need macfile cleanup
   $ct = preg_match_all ("/\x0d[\d]/m",$fcontents,$matches);
   if($ct > 0)
@@ -308,7 +306,7 @@ function xref_change($tag="RIN")
   $ct = preg_match_all("/0 @(.*)@ INDI/", $fcontents, $match, PREG_SET_ORDER);
   for($i=0; $i<$ct; $i++) {
   	$xref = trim($match[$i][1]);
-  	$indirec = find_gedcom_record($xref);
+  	$indirec = FindGedcomRecord($xref);
   	if ($indirec!==false) {
 		  $rt = preg_match("/1 NAME (.*)/", $indirec, $rmatch);
 			if($rt>0)
@@ -338,8 +336,8 @@ function xref_change($tag="RIN")
  * @return boolean 	returns true if the file claims to be ANSI encoded
  * @see convert_ansi_utf8()
  */
-function is_ansi() {
-	global $fcontents;
+function is_ansi($fcontents) {
+//	global $fcontents;
 
 	return preg_match("/1 CHAR (ANSI|ANSEL)/", $fcontents);
 }

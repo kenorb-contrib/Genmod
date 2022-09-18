@@ -3,7 +3,7 @@
  * Flush an image to the browser
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Charts
- * @version $Id: imageflush.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: imageflush.php,v 1.4 2008/11/22 09:40:37 sjouke Exp $
  */
  
 /**
@@ -51,18 +51,30 @@ $image_type = strtolower($image_type);
 if ($image_type=="jpg") $image_type="jpeg";
 if ($image_type=="") $image_type="png";
 //ImageFlushError($image_type);
+//LERMAN - do the following
+// get name of SESSION variable containing an image file name
+$tempVarName = @$_GET["image_name"];
+if (empty($tempVarName)) $tempVarName = "graphFile";
 
-// read image_data from SESSION variable
+// read image_data from SESSION variable or from file pointed to by SESSION variable
 //session_start();
-$image_data = @$_SESSION['image_data'];
-$image_data = @unserialize($image_data);
-unset($_SESSION['image_data']);
-if (empty($image_data)) ImageFlushError("Error : \$_SESSION['image_data'] is empty");
+if (isset($_SESSION["image_data"])) {
+	$image_data = @$_SESSION['image_data'];
+	$image_data = @unserialize($image_data);
+	unset($_SESSION['image_data']);
+} else if (isset($_SESSION[$tempVarName])) {
+        $image_data = file_get_contents($_SESSION[$tempVarName]);
+        unlink($_SESSION[$tempVarName]);
+        unset($_SESSION[$tempVarName]);
+}
 
-// send data to browser
-Header("Content-Type: image/$image_type");
-Header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
-Header('Expires: Thu, 19 Nov 1981 08:52:00 GMT');
-Header('Pragma: no-cache');
-print $image_data;
+if (empty($image_data)) ImageFlushError("Error : \$_SESSION['image_data'] or \$_SESSION['".$tempVarName."'] is empty");
+else {
+	// send data to browser
+	Header("Content-Type: image/$image_type");
+	Header('Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0');
+	Header('Expires: Thu, 19 Nov 1981 08:52:00 GMT');
+	Header('Pragma: no-cache');
+	print $image_data;
+}
 ?>

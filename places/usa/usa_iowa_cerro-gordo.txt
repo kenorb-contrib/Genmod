@@ -1,0 +1,12 @@
+<!-- @version $Id: USA_Iowa_Cerro-Gordo.txt,v 1.1 2005/10/23 22:09:29 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Clear Lake
+Dougherty
+Mason City
+Meservey
+Plymouth
+Rock Falls
+Rockwell
+Swaledale
+Thornton
+Ventura

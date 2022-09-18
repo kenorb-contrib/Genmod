@@ -868,7 +868,7 @@
 "mail04_line03";"Suosittelu:"
 "mail04_line04";"Klikkaa aihe linkkiä, kirjoitaudu sissään uudella salasanalla ja vaihda salasana niin että tietosuoja säilyy."
 "mail04_subject";"Tietopyyntö koneelta #SERVER_NAME#"
-"pwreqinfo";"Hei...<br /><br />Sähköposti, jossa on uusi salasana, on lähetetty osoitteeseen (#user[email]#).<br /><br />Tutki sähköpostitiliäsi parin minuutin kuluttua. Sinun tulisi saada posti siihen mennessä.<br /><br />Suosittelu:<br />Saatuasi sähköpostisi sinun tulee kirjoitautua ja muuttaa salasanasi lisätäksesi tietosuoja kokonaisuutta."
+"pwreqinfo";"Hei...<br /><br />Sähköposti, jossa on uusi salasana, on lähetetty osoitteeseen.<br /><br />Tutki sähköpostitiliäsi parin minuutin kuluttua. Sinun tulisi saada posti siihen mennessä.<br /><br />Suosittelu:<br />Saatuasi sähköpostisi sinun tulee kirjoitautua ja muuttaa salasanasi lisätäksesi tietosuoja kokonaisuutta."
 "editowndata";"Käyttäjätilini"
 "savedata";"Talleta muutokset"
 "datachanged";"Käyttätiedot muutettu!"

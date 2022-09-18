@@ -3,7 +3,7 @@
  * Check lang files
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Languages
- * @version $Id: checklang.php,v 1.1 2005/10/23 21:21:41 roland-d Exp $
+ * @version $Id: checklang.php,v 1.3 2008/01/06 10:49:46 roland-d Exp $
  */
 
 /**
@@ -32,8 +32,8 @@ require("config.php");
 /**
  * Inclusion of the language files
 */
-require($GM_BASE_DIRECTORY . $factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
+//require($GM_BASE_DIRECTORY . $factsfile["english"]);
+//if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
 
 print_header("checklang");
 

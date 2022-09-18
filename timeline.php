@@ -5,7 +5,7 @@
  * Use the $pids array to set which individuals to show on the chart
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: timeline.php,v 1.3 2006/01/10 18:31:39 roland-d Exp $
+ * @version $Id: timeline.php,v 1.11 2008/11/28 06:59:48 sjouke Exp $
  */
 
 /**
@@ -33,7 +33,16 @@
 */
 require_once("includes/controllers/timeline_ctrl.php");
 
-print_header($gm_lang["timeline_title"]);
+$title = "";
+if ($SHOW_ID_NUMBERS) {
+	foreach($controller->people as $p=>$indi) {
+		if (!empty($title)) $title .= '/';
+		$title .= $indi->getXref();
+	}
+	if (!empty ($title)) $title .= " - ";
+}
+$title .= $gm_lang["timeline_title"];
+print_header($title);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -139,8 +148,8 @@ function MM(e) {
 			}
 			yearform = document.getElementById('yearform'+personnum);
 			ageform = document.getElementById('ageform'+personnum);
-			yearform.innerHTML = year+"      "+month+" <?php print get_first_letter($gm_lang["month"]);?>   "+day+" <?php print get_first_letter($gm_lang["day"]);?>";
-			ageform.innerHTML = (ba*yage)+" <?php print get_first_letter($gm_lang["year"]);?>   "+(ba*mage)+" <?php print get_first_letter($gm_lang["month"]);?>   "+(ba*dage)+" <?php print get_first_letter($gm_lang["day"]);?>";
+			yearform.innerHTML = year+"      "+month+" <?php print GetFirstLetter($gm_lang["month"]);?>   "+day+" <?php print GetFirstLetter($gm_lang["day"]);?>";
+			ageform.innerHTML = (ba*yage)+" <?php print GetFirstLetter($gm_lang["year"]);?>   "+(ba*mage)+" <?php print GetFirstLetter($gm_lang["month"]);?>   "+(ba*dage)+" <?php print GetFirstLetter($gm_lang["day"]);?>";
 			var line = document.getElementById('ageline'+personnum);
 			temp = newx-oldx;
 			if (textDirection=='rtl') temp = temp * -1;
@@ -240,7 +249,7 @@ document.onmousemove = MM;
 document.onmouseup = MU;
 //-->
 </script>
-<h2><?php print $gm_lang["timeline_chart"]; ?></h2>
+<h3><?php print $gm_lang["timeline_chart"]; ?></h3>
 <form name="people" action="timeline.php">
 <?php
 $controller->checkPrivacy();
@@ -294,7 +303,7 @@ $controller->checkPrivacy();
 				?>
 				<a href="timeline.php?<?php print $controller->pidlinks; ?>&amp;scale=<?php print $controller->scale; ?>&amp;remove=<?php print $pid;?>" >
 				<span class="details1"><?php print $gm_lang["remove_person"]; ?></span></a>
-			<?php if (!empty($controller->birthyears[$pid])) { ?>
+			<?php if (!empty($indi->brec)) { ?>
 				<span class="details1"><br />
 				<?php print_help_link("show_age_marker_help", "qm"); ?>
 				<?php print $gm_lang["show_age"]; ?>
@@ -327,7 +336,7 @@ $controller->checkPrivacy();
 			<?php print_help_link("add_person_help", "qm"); ?>
 			<?php print $gm_lang["add_another"];?>&nbsp;
 			<input class="pedigree_form" type="text" size="5" id="newpid" name="newpid" />&nbsp;
-			<?php print_findindi_link("newpid","");?>
+			<?php PrintFindIndiLink("newpid","");?>
 			<br />
 			<br />
 			<div style="text-align: center"><input type="submit" value="<?php print $gm_lang["show"]; ?>" /></div>
@@ -367,7 +376,8 @@ if (count($controller->people)>0) {
 	print "\n\t\t<div id=\"scale{$controller->topyear}\" style=\"font-family: Arial; position:absolute; ".($TEXT_DIRECTION =="ltr"?"left: $basexoffset":"right: $basexoffset")."px; top:".floor($baseyoffset+(($controller->topyear-$controller->baseyear)*$controller->scale))."px; font-size: 7pt; text-align:".($TEXT_DIRECTION =="ltr"?"left":"right").";\">\n";
 	print $controller->topyear."--";
 	print "</div>";
-	usort($controller->indifacts, "compare_facts");
+//	usort($controller->indifacts, "CompareFacts");
+	SortFacts($controller->indifacts);
 	$factcount=0;
 	foreach($controller->indifacts as $indexval => $fact) {
 		$controller->print_time_fact($fact);

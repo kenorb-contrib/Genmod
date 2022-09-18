@@ -3,7 +3,7 @@
  * Display changelog file with clickable bugs and RFEs
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,11 @@
  *
  * @package Genmod
  * @subpackage Admin
- * @version $Id: changelog.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: changelog.php,v 1.3 2008/12/26 17:41:47 sjouke Exp $
  */
-
 $search = @$HTTP_GET_VARS["search"];
+if (empty($search)) $search = @$_GET["search"];
+
 print "<title>Genmod : changelog ($search)</title>\n";
 
 $text = file_get_contents("changelog.txt");

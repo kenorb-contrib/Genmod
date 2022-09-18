@@ -3,7 +3,7 @@
  * Functions for places selection (clickable maps, autocompletion...)
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,11 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: functions_places.php,v 1.3 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: functions_places.php,v 1.11 2008/09/10 10:50:51 sjouke Exp $
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],"functions")) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+	require "../intrusion.php";
 }
 ?>
 <link rel="stylesheet" type="text/css" href="places/dropdown.css" />
@@ -49,9 +48,9 @@ function print_place_subfields($element_id) {
 
 	if ($element_id=="DEAT_PLAC") return; // known bug - waiting for a patch
 
-	$HEAD = find_gedcom_record("HEAD");
-	$HEAD_PLAC = get_sub_record(1, "1 PLAC", $HEAD);
-	$HEAD_PLAC_FORM = get_sub_record(1, "2 FORM", $HEAD_PLAC);
+	$HEAD = FindGedcomRecord("HEAD");
+	$HEAD_PLAC = GetSubRecord(1, "1 PLAC", $HEAD);
+	$HEAD_PLAC_FORM = GetSubRecord(1, "2 FORM", $HEAD_PLAC);
 	$HEAD_PLAC_FORM = substr($HEAD_PLAC_FORM, 6);
 	if (empty($HEAD_PLAC_FORM)) $HEAD_PLAC_FORM = $gm_lang["default_form"];
 	$plac_label = preg_split ("/,/", $HEAD_PLAC_FORM);
@@ -100,9 +99,21 @@ function print_place_subfields($element_id) {
 			for(i=0;i<sel.length;++i) if (sel.options[i].value==ctry) sel.options[i].selected=true;
 			// refresh country flag
 			img=document.getElementsByName('PLAC_CTRY_flag')[0];
-			img.src='images/flags/'+ctry+'.gif';
-			img.alt=ctry;
-			img.title=ctry;
+			// Get the current flag name
+			var flagnamelen = img.src.length;
+			var flagname = img.src.substr(flagnamelen - 7, 7);
+			if (flagname != ctry.toLowerCase()+'.gif') {
+				var testimg = new Image();		
+				testimg.onload = function () {
+					img.src='places/flags/'+ctry.toLowerCase()+'.gif';
+					img.alt=ctry;
+					img.title=ctry;
+				};
+				testimg.onerror = function () {
+					img.src='images/spacer.gif';
+				}
+				testimg.src = 'places/flags/'+ctry.toLowerCase()+'.gif';
+			}
 			// refresh country image
 			img=document.getElementsByName('PLAC_CTRY_img')[0];
 			if (document.getElementsByName(ctry)[0]) {
@@ -174,19 +185,23 @@ function print_place_subfields($element_id) {
 	}
 	// called when selecting a new country in country list
 	function setPlaceCountry(txt) {
-		document.getElementsByName('PLAC_CTRY_div')[0].style.height='32px';
-		document.getElementsByName('PLAC_STAE_div')[0].style.height='32px';
-		document.getElementsByName('PLAC_CNTY_div')[0].style.height='32px';
 		document.getElementsByName('PLAC_CTRY')[0].value=txt;
 		updatewholeplace('<?php print $element_id?>');
 		splitplace('<?php print $element_id?>');
+		place_value = document.getElementById('<?php print $element_id?>').value;
+		var place_array=place_value.split(",");
+		var len=place_array.length;
+		for (p=1; p<len; p++) {
+			q=len-p-1;
+			place_subtag='<?php print $element_id?>'+'_'+p;
+			if (document.getElementById(place_subtag)) {
+				//alert(place_subtag+':'+place_array[q]);
+				document.getElementById(place_subtag).value="";
+			}
+		}
 	}
 	// called when clicking on a new state/region on country map
 	function setPlaceState(txt) {
-		document.getElementsByName('PLAC_STAE_div')[0].style.height='32px';
-		document.getElementsByName('PLAC_CNTY_div')[0].style.height='32px';
-		div=document.getElementsByName('PLAC_CTRY_div')[0];
-		if (div.style.height!='auto') { div.style.height='auto'; return; } else div.style.height='32px';
 		document.getElementsByName('PLAC_STAE_div')[0].style.height='auto';
 		p=txt.indexOf(' ('); if (1<p) txt=txt.substring(0,p); // remove code (XX)
 		if (txt.length) document.getElementsByName('PLAC_STAE')[0].value=txt;
@@ -195,9 +210,6 @@ function print_place_subfields($element_id) {
 	}
 	// called when clicking on a new county on state map
 	function setPlaceCounty(txt) {
-		document.getElementsByName('PLAC_CNTY_div')[0].style.height='32px';
-		div=document.getElementsByName('PLAC_STAE_div')[0];
-		if (div.style.height!='auto') { div.style.height='auto'; return; } else div.style.height='32px';
 		document.getElementsByName('PLAC_CNTY_div')[0].style.height='auto';
 		p=txt.indexOf(' ('); if (1<p) txt=txt.substring(0,p); // remove code (XX)
 		if (txt.length) document.getElementsByName('PLAC_CNTY')[0].value=txt;
@@ -252,7 +264,6 @@ function print_place_subfields($element_id) {
 		if (isset($gm_lang[$key])) print $gm_lang[$key];
 		else print $plac_label[$i];
 		print "</small><br />";
-		if ($GLOBALS["DEBUG"]) print $subtagname."<br />\n";
 		print "<input type=\"text\" id=\"".$subtagid."\" name=\"".$subtagname."\" value=\"\" size=\"".$cols."\"";
 		print " tabindex=\"".($i+1)."\" ";
 		print " onblur=\"updatewholeplace('".$element_id."'); splitplace('".$element_id."');\" ";
@@ -262,15 +273,13 @@ function print_place_subfields($element_id) {
 		print " />\n";
 		// country selector
 		if ($i==$icountry) {
-			print " <img id=\"PLAC_CTRY_flag\" name=\"PLAC_CTRY_flag\" /> ";
+			print '<img id="PLAC_CTRY_flag" name="PLAC_CTRY_flag" src="images\spacer.gif" />';
 			print "<select id=\"".$subtagid."_select\" name=\"".$subtagname."_select\" class=\"submenuitem\"";
 			print " onchange=\"setPlaceCountry(this.value);\"";
-//			print " acdropdown=\"true\" autocomplete_complete=\"true\"";
 			print " >\n";
 			print "<option value=\"\">?</option>\n";
 			foreach ($countries as $alpha3=>$country) {
 				$txt=$alpha3." : ".$country;
-				if (strlen($txt)>32) $txt=substr($txt,0,32)."...";
 				print "<option value=\"".$alpha3."\">".$txt."</option>\n";
 			}
 			print "</select>\n";
@@ -282,11 +291,11 @@ function print_place_subfields($element_id) {
 				else $Link = $text;
 				print "&nbsp;".$Link."&nbsp;";
 			}
-			print_specialchar_link($subtagid, false);
+			print_specialchar_link($subtagid);
 		}
 		// clickable map
 		if ($i<$icountry or $i>$icounty) print "<br />\n";
-		else print "<div id='".$subtagname."_div' name='".$subtagname."_div' style='overflow:hidden; height:32px; width:auto; border-width:thin; border-style:none;'><img name='".$subtagname."_img' src='images/spacer.gif' usemap='usemap' border='0' alt='' title='' style='height:inherit; width:inherit;' /></div>";
+		else print "<div id='".$subtagname."_div' name='".$subtagname."_div' style='overflow:hidden; border-width:thin; border-style:none;'><img name='".$subtagname."_img' src='images/spacer.gif' usemap='usemap' border='0' alt='' title='' /></div>";
 	}
 	print "</div>";
 }

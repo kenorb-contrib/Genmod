@@ -3,7 +3,7 @@
  * Allow admin users to upload media files using a web interface.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Media
- * @version $Id: uploadmedia.php,v 1.3 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id: uploadmedia.php,v 1.8 2008/01/06 11:03:28 roland-d Exp $
  */
  
 /**
@@ -30,12 +30,14 @@
 require "config.php";
 
 if (!userCanEdit($gm_username)) {
-	header("Location: login.php?url=uploadmedia.php");
+	if (empty($LOGIN_URL)) header("Location: login.php?url=uploadmedia.php");
+	else header("Location: ".$LOGIN_URL."?url=uploadmedia.php");
 	exit;
 }
 
 if (isset($_SESSION["cookie_login"]) && $_SESSION["cookie_login"]==true) {
-	header("Location: login.php?ged=$GEDCOM&url=uploadmedia.php");
+	if (empty($LOGIN_URL)) header("Location: login.php?ged=$GEDCOM&url=uploadmedia.php");
+	else header("Location: ".$LOGIN_URL."?ged=$GEDCOM&url=uploadmedia.php");
 	exit;
 }
 
@@ -44,7 +46,7 @@ $upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_l
 ?>
 <center>
 <?php
-	print "<span class=\"subheaders\">".str2upper($gm_lang["upload_media"])."</span><br /><br />\n";
+	print "<span class=\"subheaders\">".Str2Upper($gm_lang["upload_media"])."</span><br /><br />\n";
 	if ((isset($action)) && ($action=="upload")) {
 		for($i=1; $i<6; $i++) {
 			if (substr($_POST["folder".$i],0,1) == "/") $_POST["folder".$i] = substr($_POST["folder".$i],1);
@@ -62,7 +64,7 @@ $upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_l
 						$filename = $MEDIA_DIRECTORY.$_POST["folder".$i].basename($_FILES['mediafile'.$i]['name']);
 						if (!is_dir($MEDIA_DIRECTORY.$_POST["folder".$i]."thumbs")) mkdir($MEDIA_DIRECTORY.$_POST["folder".$i]."thumbs");
 						$thumbnail = $MEDIA_DIRECTORY.$_POST["folder".$i]."thumbs/".basename($_FILES['mediafile'.$i]['name']);
-						$thumbgenned = generate_thumbnail($filename, $thumbnail);
+						$thumbgenned = GenerateThumbnail($filename, $thumbnail);
 						if (!$thumbgenned) $error .= $gm_lang["thumbgen_error"].$filename."<br />";
 						else print $thumbnail." ".$gm_lang["thumb_genned"]."<br />";
 					}
@@ -87,7 +89,7 @@ $upload_errors = array($gm_lang["file_success"], $gm_lang["file_too_big"], $gm_l
 		}
 	}
 	
-	if (!is_writable($MEDIA_DIRECTORY) || !$MULTI_MEDIA) {
+	if (!DirIsWritable($MEDIA_DIRECTORY) || !$MULTI_MEDIA) {
 		print "<span class=\"error\"><b>";
 		print $gm_lang["no_upload"];
 		print "</b></span>";

@@ -37,15 +37,14 @@
  *
  * @package Genmod
  * @subpackage Privacy
- * @version $Id: privacy.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: privacy.php,v 1.2 2007/04/12 07:04:35 sjouke Exp $
  */
 if (preg_match("/\Wprivacy\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+	require "intrusion.php";
 }
+
 if (preg_match("/_priv\.php$/", $_SERVER["SCRIPT_NAME"])>0) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+	require "intrusion.php";
 }
 
 /**

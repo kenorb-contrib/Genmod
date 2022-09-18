@@ -1,14 +1,18 @@
-<GMReport access="GM_PUBLIC" icon="sfamily">
-	<!-- $Id: familygroup.xml,v 1.1 2005/10/23 22:06:23 roland-d Exp $ -->
+<GMReport access="PRIV_PUBLIC" icon="sfamily">
+	<!-- $Id: familygroup.xml,v 1.5 2009/01/03 06:47:17 sjouke Exp $ -->
 	<GMRTitle><GMRvar var="gm_lang[family_group_report]" /></GMRTitle>
 	<GMRDescription>Prints a PAF style family group record</GMRDescription>
 	<!-- inputs for the report -->
 	<GMRInput name="famid" lookup="FAM" type="text" default=""><GMRvar var="gm_lang[enter_famid]" />:</GMRInput>
-	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[show_sources]" /></GMRInput>
+	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[SHOW_SOURCES]" /></GMRInput>
 	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="gm_lang[show_notes]" /></GMRInput>
 	<GMRInput name="photos" type="checkbox" default="0"><GMRvar var="gm_lang[show_photos]" /></GMRInput>
 	<GMRInput name="blanks" type="checkbox" default="0"><GMRvar var="gm_lang[show_basic]" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
 	<!-- stylesheets for this report -->
+
 	<GMRStyle name="header" font="LucidaSansUnicode" size="18" style="" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="label1" font="LucidaSansUnicode" size="9" style="" />
@@ -17,13 +21,13 @@
 	<GMRStyle name="footnote" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="footnotenum" font="LucidaSansUnicode" size="6" style="" />
 	<!-- start of main report document -->
-	<GMRDoc pageSize="A4" orientation="P" margin="24">
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
 		<!-- if the option to show blanks is selected then ignore the MARR, BIRT etc facts that are printed with the blanks -->
 		<GMRif condition="$blanks==1">
-			<GMRSetVar name="ignore" value="CHAN,NAME,SEX,SOUR,NOTE,OBJE,FAMC,FAMS,TITL,CHIL,HUSB,WIFE,MARR,BIRT,CHR,DEAT,BURI,_UID" />
+			<GMRSetVar name="ignore" value="CHAN,NAME,SEX,SOUR,NOTE,OBJE,FAMC,FAMS,TITL,CHIL,HUSB,WIFE,MARR,BIRT,CHR,DEAT,BURI,_UID,_GM_OBJS" />
 		</GMRif>
 		<GMRif condition="$blanks!=1">
-			<GMRSetVar name="ignore" value="CHAN,NAME,SEX,SOUR,NOTE,OBJE,FAMC,FAMS,TITL,CHIL,HUSB,WIFE,_UID" />
+			<GMRSetVar name="ignore" value="CHAN,NAME,SEX,SOUR,NOTE,OBJE,FAMC,FAMS,TITL,CHIL,HUSB,WIFE,_UID,_GM_OBJS" />
 		</GMRif>
 		<!-- set the default widths -->
 		<GMRSetVar name="width" value="0" />
@@ -39,7 +43,13 @@
 		</GMRif>
 		<GMRHeader>
 			<GMRCell width="$width" height="20" align="center" style="header"><GMRvar var="gm_lang[family_group_report]" /></GMRCell>
-			<GMRCell width="$width" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
 		</GMRHeader>
 		<GMRBody>
 			<GMRGedcom id="$famid">
@@ -68,7 +78,11 @@
 						<GMRif condition="$sources==1">
 							<GMRRepeatTag tag="SOUR">
 								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" /><GMRGedcomValue tag="DATA:TEXT" />
+									<GMRGedcom id="@SOUR">
+										<GMRGedcomValue tag="TITL" />
+									</GMRGedcom>
+									<GMRif condition="@PAGE!=''">: </GMRif>
+									<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 								</GMRFootnote>
 							</GMRRepeatTag>
 						</GMRif>
@@ -83,7 +97,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="BIRT:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -100,7 +118,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="CHR:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -115,12 +137,16 @@
 					<GMRFacts ignore="$ignore">
 						<GMRTextBox border="1" width="15" height="16"/>
 						<GMRTextBox border="1" width="$dwidth" height="16">
-							<GMRText style="pagenum"><GMRvar var="factarray[@fact]" />  </GMRText>
+							<GMRText style="pagenum"><GMRvar var="factarray[@fact]" /><GMRif condition="@fact=='MARR'"><GMRif condition="$showFamID"> (<GMRGedcomValue tag="_GMFS" />)</GMRif></GMRif>  </GMRText>
 							<GMRText style="text"><GMRGedcomValue tag="@fact:DATE" /></GMRText>
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="@fact:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -150,7 +176,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="DEAT:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -167,7 +197,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="BURI:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -223,9 +257,13 @@
 						<GMRText style="name"><GMRGetPersonName id="" /></GMRText>
 						<GMRif condition="$sources==1">
 							<GMRRepeatTag tag="SOUR">
-								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" /><GMRGedcomValue tag="DATA:TEXT" />
-								</GMRFootnote>
+									<GMRFootnote>
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
+									</GMRFootnote>
 							</GMRRepeatTag>
 						</GMRif>
 					</GMRTextBox>
@@ -239,7 +277,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="BIRT:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -256,7 +298,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="CHR:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -270,12 +316,16 @@
 					<GMRFacts ignore="$ignore">
 						<GMRTextBox border="1" width="15" height="16"/>
 						<GMRTextBox border="1" width="$dwidth" height="16">
-							<GMRText style="pagenum"><GMRvar var="factarray[@fact]" />  </GMRText>
+							<GMRText style="pagenum"><GMRvar var="factarray[@fact]" /><GMRif condition="@fact=='MARR'"><GMRif condition="$showFamID"> (<GMRGedcomValue tag="_GMFS" />)</GMRif></GMRif>  </GMRText>
 							<GMRText style="text"><GMRGedcomValue tag="@fact:DATE" /></GMRText>
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="@fact:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -305,7 +355,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="DEAT:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -322,7 +376,11 @@
 							<GMRif condition="$sources==1">
 								<GMRRepeatTag tag="BURI:SOUR">
 									<GMRFootnote>
-										<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 									</GMRFootnote>
 								</GMRRepeatTag>
 							</GMRif>
@@ -409,7 +467,11 @@
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="BIRT:SOUR">
 										<GMRFootnote>
-											<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+											<GMRGedcom id="@SOUR">
+												<GMRGedcomValue tag="TITL" />
+											</GMRGedcom>
+											<GMRif condition="@PAGE!=''">: </GMRif>
+											<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
@@ -426,7 +488,11 @@
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="CHR:SOUR">
 										<GMRFootnote>
-											<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+											<GMRGedcom id="@SOUR">
+												<GMRGedcomValue tag="TITL" />
+											</GMRGedcom>
+											<GMRif condition="@PAGE!=''">: </GMRif>
+											<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
@@ -441,12 +507,16 @@
 						<GMRFacts ignore="$ignore">
 							<GMRTextBox border="1" width="15" height="16"/>
 							<GMRTextBox border="1" width="$dwidth" height="16">
-								<GMRText style="pagenum"><GMRvar var="factarray[@fact]" />  </GMRText>
+								<GMRText style="pagenum"><GMRvar var="factarray[@fact]" /><GMRif condition="@fact=='MARR'"><GMRif condition="$showFamID"> (<GMRGedcomValue tag="_GMFS" />)</GMRif></GMRif>  </GMRText>
 								<GMRText style="text"><GMRGedcomValue tag="@fact:DATE" /></GMRText>
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="@fact:SOUR">
 										<GMRFootnote>
-											<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+											<GMRGedcom id="@SOUR">
+												<GMRGedcomValue tag="TITL" />
+											</GMRGedcom>
+											<GMRif condition="@PAGE!=''">: </GMRif>
+											<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
@@ -481,7 +551,11 @@
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="DEAT:SOUR">
 										<GMRFootnote>
-											<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+											<GMRGedcom id="@SOUR">
+												<GMRGedcomValue tag="TITL" />
+											</GMRGedcom>
+											<GMRif condition="@PAGE!=''">: </GMRif>
+											<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
@@ -498,7 +572,11 @@
 								<GMRif condition="$sources==1">
 									<GMRRepeatTag tag="BURI:SOUR">
 										<GMRFootnote>
-											<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="SOUR:PAGE" /><GMRGedcomValue tag="SOUR:DATA:TEXT" />
+											<GMRGedcom id="@SOUR">
+												<GMRGedcomValue tag="TITL" />
+											</GMRGedcom>
+											<GMRif condition="@PAGE!=''">: </GMRif>
+											<GMRGedcomValue tag="SOUR:PAGE"/> <GMRGedcomValue tag="SOUR:DATA:TEXT"/>
 										</GMRFootnote>
 									</GMRRepeatTag>
 								</GMRif>
@@ -550,14 +628,11 @@
 						<GMRText style="name"><GMRvar var="gm_lang[family]" /> <GMRGetPersonName id="$husbid" /> + <GMRGetPersonName id="$wifeid" /></GMRText>
 					</GMRTextBox>
 				</GMRPageHeader>
-				<GMRTextBox border="0" width="$width" height="20">
+				<GMRTextBox border="0" width="$width" height="20" newline="1">
 					<GMRText style="label1"><br /><GMRvar var="gm_lang[sources]" /><br /><br /></GMRText>
 					<GMRFootnoteTexts />
 				</GMRTextBox>
 			</GMRif>
 		</GMRBody>
-		<GMRFooter>
-			<GMRCell width="$width" height="10"><GMRNow /></GMRCell>
-		</GMRFooter>
 	</GMRDoc>
 </GMReport>

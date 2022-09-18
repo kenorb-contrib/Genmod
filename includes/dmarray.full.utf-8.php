@@ -1,4 +1,27 @@
 <?php
+/**
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package Genmod
+ * @subpackage Display
+ * @version $Id: dmarray.full.utf-8.php,v 1.4 2008/01/06 11:16:34 roland-d Exp $
+ */
+
 	$maxchar = 7;
 	$dmcoding = array();
 	$dmcoding["A"] = array(0, -1, -1);
@@ -110,8 +133,8 @@
 	$dmcoding["Ĺ"] = array(8, 8, 8);
 	$dmcoding["Ł"] = array(7, 7, 7, 8, 8, 8);
 	$dmcoding["LL"] = array(8, 8, 8, 58, 8, 8, 1, -1, -1);
-	$dmcoding["LLY"] = array(1, -1, -1);
-	$dmcoding["LY"] = array(1, -1, -1);
+	$dmcoding["LLY"] = array(8, 8, 8, 1, -1, -1);
+	$dmcoding["LY"] = array(8, 8, 8, 1, -1, -1);
 	$dmcoding["M"] = array(6, 6, 6);
 	$dmcoding["MĔ"] = array(66, 66, 66);
 	$dmcoding["MN"] = array(66, 66, 66);
@@ -120,7 +143,6 @@
 	$dmcoding["Ň"] = array(6, 6, 6);
 	$dmcoding["Ñ"] = array(6, 6, 6);
 	$dmcoding["NM"] = array(66, 66, 66);
-	$dmcoding["NY"] = array(6, 6, 6);
 	$dmcoding["O"] = array(0, -1, -1);
 	$dmcoding["Ò"] = array(0, -1, -1);
 	$dmcoding["Ó"] = array(0, -1, -1);
@@ -194,7 +216,6 @@
 	$dmcoding["TC"] = array(4, 4, 4);
 	$dmcoding["TCH"] = array(4, 4, 4);
 	$dmcoding["TH"] = array(3, 3, 3);
-	$dmcoding["TI"] = array(4, 4, 4);
 	$dmcoding["TRS"] = array(4, 4, 4);
 	$dmcoding["TRZ"] = array(4, 4, 4);
 	$dmcoding["TS"] = array(4, 4, 4);
@@ -205,9 +226,7 @@
 	$dmcoding["TTS"] = array(4, 4, 4);
 	$dmcoding["TTSCH"] = array(4, 4, 4);
 	$dmcoding["TTSZ"] = array(4, 4, 4);
-	$dmcoding["TTY"] = array(3, 3, 3);
 	$dmcoding["TTZ"] = array(4, 4, 4);
-	$dmcoding["TY"] = array(3, 3, 3);
 	$dmcoding["TZ"] = array(4, 4, 4);
 	$dmcoding["TZS"] = array(4, 4, 4);
 	$dmcoding["U"] = array(0, -1, -1);
@@ -232,7 +251,7 @@
 	$dmcoding["UI"] = array(0, 1, -1);
 	$dmcoding["UJ"] = array(0, 1, -1);
 	$dmcoding["UY"] = array(0, 1, -1);
-	$dmcoding["UW"] = array(0, 1, -1);
+	$dmcoding["UW"] = array(0, 1, -1, 0, 7, 7);
 	$dmcoding["V"] = array(7, 7, 7);
 	$dmcoding["W"] = array(7, 7, 7, 7, -1, -1);
 	$dmcoding["X"] = array(5, 54, 54);
@@ -345,6 +364,7 @@
 	$dmcoding["בב"] = array(77, 77, 77);
 	$dmcoding["ב"] = array(7, 7, 7);
 	$dmcoding["גג"] = array(45, 45, 45, 55, 55, 55);
+	$dmcoding["גד"] = array(43, 43, 43, 53, 53, 53);
 	$dmcoding["גה"] = array(45, 45, 45, 55, 55, 55);
 	$dmcoding["גז"] = array(44, 44, 44, 45, 45, 45);
 	$dmcoding["גח"] = array(45, 45, 45, 55, 55, 55);

@@ -22,23 +22,15 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Help
- * @version $Id: help_text_vars.php,v 1.3 2006/02/11 14:00:24 roland-d Exp $
+ * @version $Id: help_text_vars.php,v 1.8 2007/10/14 07:47:32 sjouke Exp $
  */
 
 // The variables in this file are used to glue together other var's in the help_text.xx.php
 // Do NOT put any var's, that need to be translated, in this file
 if (strstr($_SERVER["SCRIPT_NAME"],"help_text_vars")) {
-	print "Now, why would you want to do that.  You're not hacking are you?";
-	exit;
+	require "intrusion.php";
 }
 
-/**
- * Inclusion of the language files
-*/
-/*
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
-*/
 $gm_lang["edit_RESN_help"]			= "#gm_lang[RESN_help]#";
 
 $gm_lang["help_aliveinyear.php"]	= "#gm_lang[alive_in_year_help]#";
@@ -49,11 +41,11 @@ $gm_lang["end_ahelp"]				= "<center class=\"error\">#gm_lang[end_admin_help]#</c
 $gm_lang["redast"]				= "<span class=\"error\"<b>*</b></span>";
 
 // lower to UPPER conversions
-$gm_lang["upper_mygedview"]			= str2upper($gm_lang["mygedview"]);
+$gm_lang["upper_mygedview"]			= Str2Upper($gm_lang["mygedview"]);
 
 // Header
 $gm_lang["header_help_items"]			= "<a name=\"header\">&nbsp;</a>#gm_lang[header_help]#<br /><a name=\"header_search\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_search_help]#<br /><a name=\"header_lang_select\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_lang_select_help]#<br /><a name=\"header_user_links\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_user_links_help]#<br /><a name=\"header_favorites\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_favorites_help]#<br /><a name=\"header_theme\"></a><a href=\"#header\">$UpArrow </a>#gm_lang[header_theme_help]#<br />";
-$gm_lang["menu_help_items"]			= "<a name=\"menu\">&nbsp;</a>#gm_lang[menu_help]#<a name=\"menu_fam\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_famtree_help]#<br /><a name=\"menu_myged\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_myged_help]#<a name=\"menu_charts\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_charts_help]#<a name=\"menu_lists\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_lists_help]#<a name=\"menu_annical\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_annical_help]#<a name=\"menu_clip\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_clip_help]#<a name=\"menu_search\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_search_help]#<a name=\"menu_rslog\"></a><a name=\"menu_help\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_help_help]#<br />";
+$gm_lang["menu_help_items"]			= "<a name=\"menu\">&nbsp;</a>#gm_lang[helpmenu]#<a name=\"menu_fam\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_famtree_help]#<br /><a name=\"menu_myged\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_myged_help]#<a name=\"menu_charts\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_charts_help]#<a name=\"menu_lists\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_lists_help]#<a name=\"menu_annical\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_annical_help]#<a name=\"menu_clip\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_clip_help]#<a name=\"menu_search\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_search_help]#<a name=\"menu_rslog\"></a><a name=\"menu_help\"></a><a href=\"#menu\">$UpArrow </a>#gm_lang[menu_help_help]#<br />";
 $gm_lang["index_portal_help_blocks"]		= "<a href=\"#top\">$UpArrow </a><a name=\"index_portal\">&nbsp;</a>#gm_lang[index_portal_head_help]##gm_lang[index_portal_help]#<br /><a name=\"index_welcome\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_welcome_help]#<br /><a name=\"index_login\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_login_help]#<br /><a name=\"index_events\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_events_help]#<br /><a name=\"index_onthisday\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_onthisday_help]#<br /><a name=\"index_favorites\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_favorites_help]#<br /><a name=\"index_stats\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_stats_help]#<br /><a name=\"index_common_surnames\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_common_names_help]#<br /><a name=\"index_media\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_media_help]#<br /><a name=\"index_loggedin\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[index_loggedin_help]#<br /><a name=\"recent_changes\"></a><a href=\"#index_portal\">$UpArrow </a>#gm_lang[recent_changes_help]#<br />";
 
 //Help
@@ -62,7 +54,7 @@ $gm_lang["def_help_items"]			= "<a name=\"def\">&nbsp;</a>#gm_lang[def_help]#<br
 
 // edit_user.php (My account)
 $gm_lang["edituser_user_contact_help"]		= "#gm_lang[edituser_contact_meth_help]#<br /><br /><b>#gm_lang[messaging]#</b><br />#gm_lang[mail_option1_help]#<br /><b>#gm_lang[messaging2]#</b><br />#gm_lang[mail_option2_help]#<br /><b>#gm_lang[mailto]#</b><br />#gm_lang[mail_option3_help]#<br /><b>#gm_lang[no_messaging]#</b><br />#gm_lang[mail_option4_help]#<br />";
-$gm_lang["help_edituser.php"]			= "~".str2upper($gm_lang["myuserdata"])."~<br /><br />#gm_lang[edituser_my_account_help]#<br />#gm_lang[more_help]#";
+$gm_lang["help_edituser.php"]			= "~".Str2Upper($gm_lang["myuserdata"])."~<br /><br />#gm_lang[edituser_my_account_help]#<br />#gm_lang[more_help]#";
 
 // user_admin.php
 $gm_lang["help_useradmin.php"]			= "#gm_lang[useradmin_help]#<br /><br />#gm_lang[is_user_help]#<br />#gm_lang[more_help]#";
@@ -138,7 +130,7 @@ $gm_lang["help_uploadgedcom.php"]		="#gm_lang[upload_gedcom_help]#<br /><br />#g
 //-- Validate Gedcom
 $gm_lang["help_validategedcom.php"]		="#gm_lang[validate_gedcom_help]#";
 //-- Edit Privacy
-$gm_lang["help_edit_privacy.php"]		="~".str2upper($gm_lang["edit_privacy_title"])."~<br /><br />#gm_lang[edit_privacy_help]##gm_lang[more_config_hjaelp]#<br />#gm_lang[readme_help]#";
+$gm_lang["help_edit_privacy.php"]		="~".Str2Upper($gm_lang["edit_privacy_title"])."~<br /><br />#gm_lang[edit_privacy_help]##gm_lang[more_config_hjaelp]#<br />#gm_lang[readme_help]#";
 
 //Specials for contents
 $vpos = strpos($gm_lang["enter_terms"], ":", 0);

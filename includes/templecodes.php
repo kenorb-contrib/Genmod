@@ -1,5 +1,29 @@
 <?php
-# $Id: templecodes.php,v 1.1 2005/10/23 21:48:42 roland-d Exp $
+/**
+ * Displays the details about a repository record.
+ * Also shows how many sources reference this repository.
+ *
+ * Genmod: Genealogy Viewer
+ * Copyright (C) 2005 - 2008 Genmod Development Team
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * @package Genmod
+ * @subpackage Display
+ * @version $Id: templecodes.php,v 1.2 2008/01/06 11:16:39 roland-d Exp $
+ */
 $TEMPLE_CODES = array();
 $TEMPLE_CODES["ABA"]=	"Aba, Nigeria";
 $TEMPLE_CODES["ACCRA"]=	"Accra, Ghana";

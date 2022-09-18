@@ -3,7 +3,7 @@
  * Popup window that will allow a user to search for a media
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: findmedia.php,v 1.2 2006/01/09 14:19:30 sjouke Exp $
+ * @version $Id: findmedia.php,v 1.10 2008/02/14 19:38:35 sjouke Exp $
  */
  
 /**
@@ -73,14 +73,14 @@ if ($embed) {
 }
 
 //-- only allow users with edit privileges to access script.
-if ((!userCanEdit($gm_username)) || (!$ALLOW_EDIT_GEDCOM)) {
+if ((!$Users->userCanEdit($gm_username)) || (!$ALLOW_EDIT_GEDCOM)) {
 	print $gm_lang["access_denied"];
 	print_simple_footer();
 	exit;
 }
 
 //-- check for admin once (used a bit in this script)
-$isadmin =  userIsAdmin($gm_username);
+$isadmin =  $Users->userIsAdmin($gm_username);
 
 //-- TODO add check for -- admin can manipulate files
 $fileaccess = false;
@@ -271,7 +271,7 @@ if ($action=="moveto") {
  */
 if ($action=="thumbnail") {
 	$filename = $_REQUEST["file"];
-	generate_thumbnail($directory.$filename,$thumbdir.$filename);
+	$MediaFS->GenerateThumbnail($directory.$filename,$thumbdir.$filename);
 	$action = "filter";
 }
 
@@ -338,7 +338,7 @@ if ($action=="filter") {
 		print "<a href=\"#\" onclick=\"return expand_layer('newdir');\"><img id=\"newnote_img\" src=\"images/plus.gif\" border=\"0\" width=\"11\" height=\"11\" alt=\"\" />".$gm_lang["add_directory"]."</a>\n";
 		print_help_link("new_dir_help","qm");
 		print "<br /><div id=\"newdir\" style=\"display: none;\"><table class=\"list_table\"><td class=\"list_value\"><input name=\"newdir\"/>";
-		print "<input type=\"submit\" value=\" &gt; \"</td></td></tr></table></div></div><form><center>";
+		print "<input type=\"submit\"  value=\" &gt; \"</td></td></tr></table></div></div><form><center>";
 	}
 
 	$applyfilter = ($filter != "");
@@ -351,7 +351,7 @@ if ($action=="filter") {
 
 			// simple filter to reduce the number of items to view
 			if ($applyfilter) {
-				$isvalid = (strpos(str2lower($imag),str2lower($filter)) !== false);
+				$isvalid = (strpos(Str2Lower($imag),Str2Lower($filter)) !== false);
 			} else { $isvalid = true; }
 
 			if ($isvalid) {
@@ -370,7 +370,7 @@ if ($action=="filter") {
 				if ($showthumb) {
 					print "\n\t\t\t<td class=\"list_value $TEXT_DIRECTION\">";
 					if (file_exists($thumbdir.$imag)) {
-						print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", urlencode($directory.$imag))."',$imgwidth, $imgheight);\"><img src=\"".filename_encode($thumbdir.$imag)."\" border=\"0\" width=\"50\"></a>\n";
+						print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", urlencode($directory.$imag))."',$imgwidth, $imgheight);\"><img src=\"".FilenameEncode($thumbdir.$imag)."\" border=\"0\" width=\"50\"></a>\n";
 					}
 					else {
 						print "<a href=\"findmedia.php?embed=$embed&directory=$directory&action=thumbnail&level=$level&file=$imag$thumbget\">".$gm_lang["gen_thumb"]."</a></td>";
@@ -380,9 +380,9 @@ if ($action=="filter") {
 				//-- name and size field
 				print "\n\t\t\t<td class=\"list_value $TEXT_DIRECTION\">";
 				if (!$embed){
-				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", filename_encode($directory.$imag))."');\">".filename_encode($imag)."</a> -- ";
+				print "&nbsp;<a href=\"#\" onclick=\"pasteid('".preg_replace("/'/", "\'", FilenameEncode($directory.$imag))."');\">".FilenameEncode($imag)."</a> -- ";
 				}else{ print "&nbsp;".$imag." -- ";}
-				print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", filename_encode($directory.$imag))."',$imgwidth, $imgheight);\">".$gm_lang["view"]."</a>";
+				print "<a href=\"#\" onclick=\"return openImage('".preg_replace("/'/", "\'", FilenameEncode($directory.$imag))."',$imgwidth, $imgheight);\">".$gm_lang["view"]."</a>";
 				print "<br /><sub>&nbsp;&nbsp;".$gm_lang["image_size"]. " -- " . $imgsize[0]."x".$imgsize[1]."</sub>\n";
 				// Sanity check 1 user must be admin and no point doing file admin if all in one dir
 				if ( $MEDIA_DIRECTORY_LEVELS && $fileaccess && $embed) {

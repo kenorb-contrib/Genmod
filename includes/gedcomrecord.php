@@ -3,7 +3,7 @@
  * Base class for all gedcom records
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage DataModel
- * @version $Id: gedcomrecord.php,v 1.4 2005/12/04 19:59:52 roland-d Exp $
+ * @version $Id: gedcomrecord.php,v 1.13 2009/03/16 19:51:12 sjouke Exp $
  */
 class GedcomRecord {
 	var $gedrec = "";
@@ -36,14 +36,19 @@ class GedcomRecord {
 	 * constructor for this class
 	 */
 	function GedcomRecord($gedrec) {
+
 		if (empty($gedrec)) return;
+
 		//-- set the gedcom record a privatized version
-		$this->gedrec = privatize_gedcom($gedrec);
-		$ct = preg_match("/0 @(.*)@ (.*)/", $this->gedrec, $match);
+		// Better not do this. All privacy is checked again in the classes
+//		$this->gedrec = privatize_gedcom($gedrec);
+		$this->gedrec = $gedrec;
+		$ct = preg_match("/0 @(.*)@ (\w+)/", $this->gedrec, $match);
 		if ($ct>0) {
 			$this->xref = trim($match[1]);
 			$this->type = trim($match[2]);
 		}
+		if (GetChangeData(true, $this->xref, true, "", "")) $this->changed = true;
 	}
 	/**
 	 * get the xref
@@ -63,6 +68,16 @@ class GedcomRecord {
 	function getGedcomRecord() {
 		return $this->gedrec;
 	}
+	// get changed gedcom record
+	function getchangedGedcomRecord() {
+		global $GEDCOM;
+		if (GetChangeData(true, $this->xref, true, "", "")) {
+			$rec = GetChangeData(false, $this->xref, true, "gedlines", "");
+			return $rec[$GEDCOM][$this->xref];
+		}					
+		else return $this->gedrec;
+	}
+	
 	/**
 	 * check if this object is equal to the given object
 	 * basically just checks if the IDs are the same
@@ -72,38 +87,6 @@ class GedcomRecord {
 		if (is_null($obj)) return false;
 		if ($this->xref==$obj->getXref()) return true;
 		return false;
-	}
-	
-	/**
-	 * Accept any edit changes into the database
-	 * Also update the indirec we will use to generate the page
-	 */
-	function acceptChanges() {
-		global $GEDCOMS, $GEDCOM, $controller;
-		if (!userCanAccept($controller->uname)) return;
-		if (accept_change("", $GEDCOMS[$GEDCOM]["id"], true)) {
-			$controller->show_changes="no";
-			$controller->accept_success = true;
-			$controller->accept_change = true;
-			$indirec = find_gedcom_record($controller->pid);
-			$controller->indi = new Person($indirec);
-		}
-	}
-	
-	/**
-	 * Accept any edit changes into the database
-	 * Also update the indirec we will use to generate the page
-	 */
-	function rejectChanges() {
-		global $GEDCOMS, $GEDCOM, $controller;
-		if (!userCanAccept($controller->uname)) return;
-		if (reject_change("", $GEDCOMS[$GEDCOM]["id"], true)) {
-			$controller->show_changes="no";
-			$controller->accept_success = true;
-			$controller->reject_change = true;
-			$indirec = find_gedcom_record($controller->pid);
-			$controller->indi = new Person($indirec);
-		}
 	}
 }
 ?>

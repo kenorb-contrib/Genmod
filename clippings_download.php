@@ -3,7 +3,7 @@
  * Download clipping gedcom files that could not be saved.
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: clippings_download.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: clippings_download.php,v 1.3 2008/01/06 10:50:11 roland-d Exp $
  * @package Genmod
  * @subpackage DB
  */
@@ -28,12 +28,6 @@
  * Inclusion of the configuration file
 */
 require "config.php";
-
-/**
- * Inclusion of the language files
-*/
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
 
 header("Content-Type: text/plain");
 header("Content-Disposition: attachment; filename=clipping.ged");

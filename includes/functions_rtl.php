@@ -6,7 +6,7 @@
  * routines and sorting functions.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: functions_rtl.php,v 1.3 2005/11/01 22:01:27 roland-d Exp $
+ * @version $Id: functions_rtl.php,v 1.5 2008/01/06 11:16:37 roland-d Exp $
  */
 
 /**
@@ -42,7 +42,7 @@ $RTLOrd = array(215,216,217,218,219);
 
 /**
  * $HNN and $ANN are used in
- * RTLUndefined, check_NN, get_common_surnames, print_block_name_top10 
+ * RTLUndefined, CheckNN, GetCommonSurnames, print_block_name_top10 
  *
  */  
 

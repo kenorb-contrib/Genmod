@@ -8,7 +8,7 @@
  * names gedcom.ged_conf.php.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,21 +27,19 @@
  * @package Genmod
  * @subpackage Admin
  * @see editconfig_gedcom.php
- * @version $Id: config_gedcom.php,v 1.4 2005/12/10 09:46:08 sjouke Exp $
+ * @version $Id: config_gedcom.php,v 1.28 2009/03/29 13:20:10 sjouke Exp $
  */
 
 if (preg_match("/\Wconfig_gedcom\.php/", $_SERVER["SCRIPT_NAME"])>0) {
-	print "Naughty, Naughty, Naughty!";
-	exit;
+	require "intrusion.php";
 }
 if (preg_match("/_conf\.php/", $_SERVER["SCRIPT_NAME"])>0) {
-	print "Naughty, Naughty, Naughty!";
-	exit;
+	require "intrusion.php";
 }
 
 //-- assign the default language.  User can override this setting if $ENABLE_MULTI_LANGUAGE = true
-$LANGUAGE = "english";
-
+$GEDDCOMLANG = "english";
+$DISPLAY_PINYIN = false;				//-- Option to add pinyin translation to chinese names and places
 $CALENDAR_FORMAT = "gregorian";			//-- Translate dates to the specified Calendar
 										//-- options are gregorian, julian, french, jewish, jewish_and_gregorian,
 										//-- hebrew, hebrew_and_gregorian
@@ -68,6 +66,7 @@ $SOURCE_ID_PREFIX = "S";					// -- This is the prefix prepend to newly generated
 $REPO_ID_PREFIX = "R";					// -- This is the prefix prepend to newly generated repository records
 $FAM_ID_PREFIX = "F";					// -- This is the prefix prepend to newly generated family records
 $MEDIA_ID_PREFIX = "M";					// -- This is the prefix prepend to newly generated media records
+$NOTE_ID_PREFIX = "N";					// -- This is the prefix prepend to newly generated note records
 $PEDIGREE_FULL_DETAILS = true;			// -- Show the birth and death details of an individual on the pedigree tree
 $PEDIGREE_LAYOUT = true;					// -- Set to true for Landscape mode, false for portrait mode
 $SHOW_EMPTY_BOXES = true;				// -- Show empty boxes on charts if the person is unknown
@@ -76,17 +75,17 @@ $LINK_ICONS = "mouseover";				// -- When should pedigree box extra links show up
 $ABBREVIATE_CHART_LABELS = false;		//-- should chart labels like "Birth" be abbreviated as "B"
 $SHOW_PARENTS_AGE = true;				// -- show age of parents on charts next to the birth date
 
-$HIDE_LIVE_PEOPLE   = true;				// -- a false value will show details of people who are still alive
 $REQUIRE_AUTHENTICATION = false;		// -- set this to try to force all visitors to login before they can view anything on the site
 $WELCOME_TEXT_AUTH_MODE = "1";			// -- Sets which predefined of custom welcome message will be displayed on the welcome page in authentication mode
 $WELCOME_TEXT_AUTH_MODE_4 = "";			// -- Customized welcome text to display on login screen if that option is chosen
 $WELCOME_TEXT_CUST_HEAD = false;		// -- Use standard GM header to display with custom welcome text
-$CHECK_CHILD_DATES  = true;             // -- When checking if a person is alive, check the children's birth dates in addition to the person's
-$SHOW_GEDCOM_RECORD = true;				// -- a true value will provide a link on detail pages that will
-										// --allow people to view the actual lines from the gedcom file
+$SHOW_GEDCOM_RECORD = 1;				// -- a value will provide a link on detail pages that will
+										// --allow the users with that rights to view the actual lines from the gedcom file
 $ALLOW_EDIT_GEDCOM = true;				//-- allow users with canEdit privileges to edit the gedcom
+$EDIT_GEDCOM_RECORD = 5;				// -- a true value will provide a link on detail pages that will
+										// --allow people the users with that rights to edit the actual lines from the gedcom file
 $POSTAL_CODE = true;              //-- allow users to choose where to print the postal code. True is after the city name, false is before the city name
-$ALPHA_INDEX_LISTS = true;				// -- for very long individual and family lists, set this to true to split the list into
+$ALPHA_INDEX_LISTS = 500;				// -- for very long individual and family lists, set this to the value above which lists must be split in
 										// -- pages by the first letter of their last name.
 
 $NAME_FROM_GEDCOM = false;				// -- By default Genmod uses the name stored in the indexes to get a person's name
@@ -98,7 +97,8 @@ $SHOW_MARRIED_NAMES = false;			// -- Option to show the married name for females
 $SHOW_ID_NUMBERS = true;				// -- Show gedcom id numbers on charts next to individual names
 $SHOW_FAM_ID_NUMBERS = true;			// -- Show gedcom id numbers on charts next to family names
 $SHOW_PEDIGREE_PLACES = "9";			// -- What level to show the birth and death places next to the birth and death dates on the pedigree and descendency charts.
-
+$LISTS_ALL = true;						// -- Should the "ALL" option show up in the indilist
+$INDI_EXT_FAM_FACTS	= false;			// -- Show note and object information for family facts in the individuals facts list
 $MULTI_MEDIA = true;            		// -- if you have no multi-media files, set this to false
 $MEDIA_EXTERNAL = true;            		// -- Set whether or not to change links starting with http, ftp etc.
 $MEDIA_DIRECTORY = "media/";			// -- Directory where media files are stored
@@ -107,6 +107,7 @@ $SHOW_HIGHLIGHT_IMAGES = true;			// -- show highlighted photos on pedigree tree 
 $USE_THUMBS_MAIN = false;				// -- for the main image on the individual page, whether or not to use the full res image or the thumbnail
 $THUMBNAIL_WIDTH = "100";				// -- the width to use when automatically generating thumbnails
 $AUTO_GENERATE_THUMBS = true;			// -- whether GM should try to automatically generate thumbnails
+$MERGE_DOUBLE_MEDIA=1;					// -- Option to merge similar embedded media references to one media object
 
 $HIDE_GEDCOM_ERRORS = false;			//-- a true value will disable error messages for undefined GEDCOM codes.  See the
 										//-- non-standard gedcom codes section of the readme file for more information.
@@ -120,6 +121,7 @@ $CONTACT_EMAIL   = "you@yourdomain.com";		    // -- this is who the user should 
 $CONTACT_METHOD = "messaging2";						// -- the method to allow users to contact you. options are: mailto, messaging, messaging2
 $WEBMASTER_EMAIL = "webmaster@yourdomain.com";		// -- this is who the user should contact in case of errors
 $SUPPORT_METHOD = "messaging2";						// -- the method to allow users to contact you. options are: mailto, messaging, messaging2
+$BCC_WEBMASTER = false;							// -- Send a Bcc of system generated messages to the webmaster
 $HOME_SITE_URL   = "http://www.Genmod.net";     // -- url for your home page
 $HOME_SITE_TEXT  = "About Genmod";                     // -- name of your site
 $FAVICON = "images/favicon.ico";                          // -- change to point to your favicon, either relative or absolute
@@ -141,13 +143,15 @@ $META_DESCRIPTION	= "";			//-- the page description, leave empty to use the gedc
 $META_PAGE_TOPIC	= "";			//-- the page topic, leave empty to use the gedcom title
 $META_AUDIENCE		= "All";			//-- the intended audience
 $META_PAGE_TYPE		= "Private Homepage";	//-- the type of page
-$META_ROBOTS		= "index, follow";		//-- instructions for robots
+$META_ROBOTS		= "index,follow";		//-- instructions for robots
 $META_REVISIT		= "10 days";			//-- how often crawlers should reindex the site
 $META_KEYWORDS		= "ancestry, genealogy, pedigree tree";		//-- any aditional keywords, the most common surnames list will be appended to anything you put in
 $META_TITLE			= "";			//-- optional text that can be added to the html page <title></title> line
 $META_SURNAME_KEYWORDS	= true;		//-- option to use the most common surnames in the keywords field
 
 $CHART_BOX_TAGS		= "";		//-- optional comma seperated gedcom tags to show in chart boxes
+$SHOW_NICK			= false;	//-- whether or not to show the nickname in parenthesis between first and last name
+$NICK_DELIM			= "()";		// if nicks are shown, they are contained between these two characters
 $USE_QUICK_UPDATE	= true;		//-- whether or not to use the quick update form
 $SHOW_QUICK_RESN	= false;	//-- whether or not to show RESN tags on the quick update form
 $QUICK_ADD_FACTS	= "BIRT,CHR,DEAT,BURI,CREM,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,FCOM,ORDN,NATU,EMIG,IMMI,GRAD,BAPL,CONL,ENDL,SLGC";		//-- comma delimited list of facts that can be added on the quick update form
@@ -161,13 +165,23 @@ $SHOW_RELATIVES_EVENTS = "_DEAT_SPOU,_BIRT_CHIL,_DEAT_CHIL,_BIRT_GCHI,_DEAT_GCHI
 $EXPAND_RELATIVES_EVENTS = false;
 $EDIT_AUTOCLOSE = false; //-- autoclose edit window when update successful
 $SOUR_FACTS_UNIQUE = "AUTH,ABBR,TITL,PUBL,TEXT";
-$SOUR_FACTS_ADD = "NOTE,OBJE,REPO";
+$SOUR_FACTS_ADD = "NOTE,OBJE,REPO,GNOTE";
+$SOUR_QUICK_ADDFACTS = "";
 $REPO_FACTS_UNIQUE = "NAME,ADDR";
-$REPO_FACTS_ADD = "PHON,EMAIL,FAX,WWW,NOTE";
-$INDI_FACTS_UNIQUE = "";
-$INDI_FACTS_ADD = "ADDR,AFN,BIRT,CHR,DEAT,BURI,CREM,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,_EMAIL,FAX,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,CAST,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI";
+$REPO_FACTS_ADD = "PHON,EMAIL,FAX,WWW,NOTE,GNOTE";
+$REPO_QUICK_ADDFACTS = "";
+$NOTE_FACTS_UNIQUE = "RIN";
+$NOTE_FACTS_ADD = "";
+$NOTE_QUICK_ADDFACTS = "";
+$INDI_FACTS_UNIQUE = "SEX,BIRT,DEAT,CREM";
+$INDI_FACTS_ADD = "ADDR,AFN,CHR,BURI,ADOP,BAPM,BARM,BASM,BLES,CHRA,CONF,EMAIL,FAX,PHON,FCOM,ORDN,NATU,EMIG,IMMI,CENS,PROB,WILL,GRAD,RETI,CAST,DSCR,EDUC,IDNO,NATI,NCHI,NMR,OCCU,PROP,RELI,RESI,SSN,TITL,BAPL,CONL,ENDL,SLGC,_MILI";
+$INDI_QUICK_ADDFACTS = "BIRT,DEAT,OCCU,RESI";
 $FAM_FACTS_UNIQUE = "NCHI,MARL,DIV,ANUL,DIVF,ENGA,MARB,MARC,MARS";
 $FAM_FACTS_ADD = "CENS,MARR,RESI,SLGS,MARR_CIVIL,MARR_RELIGIOUS,MARR_PARTNERS";
+$FAM_QUICK_ADDFACTS = "";
+$MEDIA_FACTS_UNIQUE = "TITL";
+$MEDIA_FACTS_ADD = "FILE,REFN,NOTE,SOUR,GNOTE";
+$MEDIA_QUICK_ADDFACTS = "";
 
 $RSS_FORMAT = "RSS1.0"; //-- format of RSS to use.
 // -- amount of time to execute before quitting in seconds

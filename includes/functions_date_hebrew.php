@@ -6,7 +6,7 @@
  * This file is only loaded if the year is hebrew, or if the $CALENDAR_FORMAT is hebrew or jewish
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,30 +24,29 @@
  *
  * @package Genmod
  * @subpackage Dates
- * @version $Id: functions_date_hebrew.php,v 1.2 2005/10/27 08:41:30 roland-d Exp $
+ * @version $Id: functions_date_hebrew.php,v 1.6 2008/01/06 11:16:35 roland-d Exp $
  */
 
 /**
  * security check to prevent hackers from directly accessing this file
  */
 if (strstr($_SERVER["SCRIPT_NAME"],"functions_date_hebrew.php")) {
-	print "Why do you want to do that?";
-	exit;
+	require "../intrusion.php";
 }
 
 //-- Hebrew date (escape value @#DHEBREW@) month (Jewish) or full date (Hebrew pages) translation  (meliza)  
-function convert_hdate($dstr_beg, $dstr_end, $day, $month, $year) {
+function ConvertHdate($dstr_beg, $dstr_end, $day, $month, $year) {
 	global $LANGUAGE, $CALENDAR_FORMAT, $monthtonum; 
 	
 	if ($month != "") $month = $monthtonum[$month];
 	
 	if ($LANGUAGE != "hebrew" && ($CALENDAR_FORMAT == "gregorian" || $CALENDAR_FORMAT == "jewish" || $CALENDAR_FORMAT == "jewish_and_gregorian")) {
-		if ($month != "") $hebrewMonthName = getJewishMonthName($month, $year);
+		if ($month != "") $hebrewMonthName = GetJewishMonthName($month, $year);
 		else $hebrewMonthName = "";
 		$datestr = $dstr_beg . $day . " " . $hebrewMonthName . " " . $year . " " . $dstr_end;
 	}
 	else {																	  //-- Hebrew page
-		$newdate = getHebrewJewishDates($year, $month, $day);
+		$newdate = GetHebrewJewishDates($year, $month, $day);
 		$datestr = $dstr_beg . $newdate . $dstr_end;
 	} 
 
@@ -56,24 +55,24 @@ function convert_hdate($dstr_beg, $dstr_end, $day, $month, $year) {
 
 //-- functions to take a Jewish date and display it in Hebrew.
 //-- provided by: KosherJava
-function getFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
+function GetFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
 	global $DISPLAY_JEWISH_GERESHAYIM, $TEXT_DIRECTION;
 	$USE_FULL_PARTIAL_JEWISH_DATES = true;
 	$sb = "<span lang=\"he-IL\" dir=\"rtl\">";
 	if($day != "") {
-		$sb .= getHebrewJewishDay($day);
+		$sb .= GetHebrewJewishDay($day);
 		$sb .= " ";
 	}
 	if($month != "") {
 		if($day != "") { //jewish date is exact
-			$sb .= getHebrewJewishMonth($month, $year);
+			$sb .= GetHebrewJewishMonth($month, $year);
 			$sb .= " ";
 		} else { //only month and not day
-			$sb .= getHebrewJewishMonth($month, $year);
+			$sb .= GetHebrewJewishMonth($month, $year);
 			if($USE_FULL_PARTIAL_JEWISH_DATES) {
 				if($altMonth != "" && $altMonth != $month) {
 					$sb .= " / ";
-					$sb .= getHebrewJewishMonth($altMonth, $altYear);
+					$sb .= GetHebrewJewishMonth($altMonth, $altYear);
 				}
 			}
 			$sb .= " ";
@@ -81,18 +80,18 @@ function getFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMo
 	}
 	if($USE_FULL_PARTIAL_JEWISH_DATES) {
 		if($month=="") {
-			$sb .= getHebrewJewishYear($year - 1);
+			$sb .= GetHebrewJewishYear($year - 1);
 			$sb .= " / ";
-			$sb .= getHebrewJewishYear($year);
+			$sb .= GetHebrewJewishYear($year);
 		} else if($altMonth!=0 && $month != $altMonth && $altYear !=0 && $altYear != $year && $day == "") {
-			$sb .= getHebrewJewishYear($year);
+			$sb .= GetHebrewJewishYear($year);
 			$sb .= " / ";
-			$sb .= getHebrewJewishYear($altYear);
+			$sb .= GetHebrewJewishYear($altYear);
 		} else {
-			$sb .= getHebrewJewishYear($year);
+			$sb .= GetHebrewJewishYear($year);
 		}
 	} else {
-		$sb .= getHebrewJewishYear($year);
+		$sb .= GetHebrewJewishYear($year);
 	}
 
 	$sb .= "</span>";
@@ -105,24 +104,24 @@ function getFullHebrewJewishDates($year, $month="", $day="", $altYear="", $altMo
 	return $sb;
 }
 
-function getHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
+function GetHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth="") {
 	global $DISPLAY_JEWISH_GERESHAYIM, $TEXT_DIRECTION;
 	$sb = "<span lang=\"he-IL\" dir=\"rtl\">";
 	if($day != "") {
-		$sb .= getHebrewJewishDay($day);
+		$sb .= GetHebrewJewishDay($day);
 		$sb .= " ";
 	}
 	if($month != "") {
 		if($day != "") { //jewish date is exact
-			$sb .= getHebrewJewishMonth($month, $year);
+			$sb .= GetHebrewJewishMonth($month, $year);
 			$sb .= " ";
 		} else { //only month and not day
-			$sb .= getHebrewJewishMonth($month, $year); //FIXME Since month is based on 1st of the Gregorian date,
+			$sb .= GetHebrewJewishMonth($month, $year); //FIXME Since month is based on 1st of the Gregorian date,
 			$sb .= " ";							//		Would be nice to return both months.
 		}
 	}
 	if($year != "") {
-		$sb .= getHebrewJewishYear($year);
+		$sb .= GetHebrewJewishYear($year);
 	}
 	$sb .= "</span>";
 	if($TEXT_DIRECTION == "ltr") { //only do this for ltr languages
@@ -135,7 +134,7 @@ function getHebrewJewishDates($year, $month="", $day="", $altYear="", $altMonth=
 	return $sb;
 }
 
-function getHebrewJewishYear($year) {
+function GetHebrewJewishYear($year) {
 	global $DISPLAY_JEWISH_THOUSANDS;
 
 	$jAlafim = "אלפים";                       //word ALAFIM in Hebrew for display on years evenly divisable by 1000
@@ -145,7 +144,7 @@ function getHebrewJewishYear($year) {
 	$tavTaz = array("ט\"ו", "ט\"ז");
 	$jOnes = array("", "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט");
 
-	$singleDigitYear = isSingleDigitJeiwshYear($year);
+	$singleDigitYear = IsSingleDigitJewishYear($year);
 	$thousands = $year / 1000;                                   //get # thousands
 
 	$sb = "";	
@@ -193,7 +192,7 @@ function getHebrewJewishYear($year) {
 	return $sb;
 }
 
-function getHebrewJewishMonth($month, $year) {
+function GetHebrewJewishMonth($month, $year) {
 	$jMonths = array("תשרי",
 			"חשון",
 			"כסלו",
@@ -211,7 +210,7 @@ function getHebrewJewishMonth($month, $year) {
 
 	if (empty($month)) return "";
 	if($month == 6) { // if Adar check for leap year
-		if(isJewishLeapYear($year)) {
+		if(IsJewishLeapYear($year)) {
 			return $jMonths[5]; //if it is leap year return default php "Adar A"
 		} else { // non leap year
 			return $jMonths[13];
@@ -221,7 +220,7 @@ function getHebrewJewishMonth($month, $year) {
 	}
 }
 
-function getHebrewJewishDay($day) {
+function GetHebrewJewishDay($day) {
 	$jTens = array("", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ");
 	$jTenEnds = array("", "י", "ך", "ל", "ם", "ן", "ס", "ע", "ף", "ץ");
 	$tavTaz = array("ט\"ו", "ט\"ז");
@@ -250,7 +249,7 @@ function getHebrewJewishDay($day) {
 	return $sb;
 }
 
-function isJewishLeapYear($year) {
+function IsJewishLeapYear($year) {
 	if($year % 19 == 0 || $year % 19 == 3 || $year % 19 ==6 || $year % 19 == 8 || $year % 19 == 11
 			|| $year % 19 == 14 || $year % 19 == 17) { // 3rd, 6th, 8th, 11th, 14th, 17th or 19th years of 19 year cycle
 		return true;
@@ -259,7 +258,7 @@ function isJewishLeapYear($year) {
 	}
 }
 
-function isSingleDigitJeiwshYear($year) {
+function IsSingleDigitJewishYear($year) {
 	$shortYear = $year %1000; //discard thousands
 	//next check for all possible single Hebrew digit years
 	if($shortYear < 11 || ($shortYear <100 && $shortYear % 10 == 0)  || ($shortYear <= 400 && $shortYear % 100 == 0) ) {
@@ -269,7 +268,7 @@ function isSingleDigitJeiwshYear($year) {
 	}
 }
 
-function getJewishMonthName($month, $year) {
+function GetJewishMonthName($month, $year) {
 	global $JEWISH_ASHKENAZ_PRONUNCIATION;
 	$ashkenazMonths = array("Tishrei", "Cheshvan", "Kislev", "Teves", "Shevat", "Adar I", "Adar II", "Nisan", "Iyar", "Sivan", "Tamuz", "Av", "Elul", "Adar");
 	$sefardMonths = array("Tishrei", "Heshvan", "Kislev", "Tevet", "Shevat", "Adar I", "Adar II", "Nisan", "Iyar", "Sivan", "Tamuz", "Av", "Elul", "Adar");
@@ -278,7 +277,7 @@ function getJewishMonthName($month, $year) {
 		$monthNames = $sefardMonths;
 	}
 	if($month == 6) { // if Adar check for leap year
-		if(isJewishLeapYear($year)) {
+		if(IsJewishLeapYear($year)) {
 			return $monthNames[5];
 		} else {
 			return $monthNames[13];
@@ -294,11 +293,11 @@ function getJewishMonthName($month, $year) {
  * Convert a jewish gedcom date into a Gregorian date
  *
  * parses a gedcom date IE @#DHEBREW@  into an array of month day and year values
- * @param array $date		The date as coming from the parse_date() function
+ * @param array $date		The date as coming from the ParseDate() function
  * @return array
  * @TODO Actually implement parse method (done in other places but should be unified into one function
  */
-function jewishGedcomDateToGregorian($datearray){
+function JewishGedcomDateToGregorian($datearray){
 	global $monthtonum;
 	$dates = array();
 	foreach($datearray as $date) {
@@ -318,11 +317,11 @@ function jewishGedcomDateToGregorian($datearray){
  * Convert a jewish gedcom date into this year's Gregorian date
  *
  * parses a gedcom date IE @#DHEBREW@  into an array of month day and year values
- * @param array $date		The date as coming from the parse_date() function
+ * @param array $date		The date as coming from the ParseDate() function
  * @return array
  * @TODO Actually implement parse method (done in other places but should be unified into one function
  */
-function jewishGedcomDateToCurrentGregorian($datearray){
+function JewishGedcomDateToCurrentGregorian($datearray){
 	global $monthtonum, $month, $year, $hMonth, $hYear; 
 	$dates = array();
 	
@@ -334,16 +333,16 @@ function jewishGedcomDateToCurrentGregorian($datearray){
 	    if (empty($year)) 	$year          = date("Y", $time);
 	    $dtarray = array();
  	 	$dtarray[0]["day"]   = $day;
- 		$dtarray[0]["mon"]   = $monthtonum[str2lower(trim($month))];	
+ 		$dtarray[0]["mon"]   = $monthtonum[Str2Lower(trim($month))];	
  		$dtarray[0]["year"]  = $year;
  		$dtarray[0]["month"] = $month;
-    	$date   = gregorianToJewishGedcomDate($dtarray);
+    	$date   = GregorianToJewishGedcomDate($dtarray);
     	$hDay   = $date[0]["day"];
     	$hMonth = $date[0]["month"];
     	$hYear	= $date[0]["year"];
      }
      
-     if (!empty($hMonth) && !empty($month) && $monthtonum[$hMonth]>$monthtonum[str2lower($month)]) $altyr = 1;
+     if (!empty($hMonth) && !empty($month) && $monthtonum[$hMonth]>$monthtonum[Str2Lower($month)]) $altyr = 1;
      else $altyr = -1; 
      
 	foreach($datearray as $date) {
@@ -370,9 +369,9 @@ function jewishGedcomDateToCurrentGregorian($datearray){
  * @param  $datearray		The Gregorian date
  * @return array
  *
- * @TODO Improve !!
+ * @todo Improve !!
  */
-function gregorianToJewishGedcomDate($datearray){
+function GregorianToJewishGedcomDate($datearray){
 	global $monthtonum;
 	
 	$dates = array();

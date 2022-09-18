@@ -3,7 +3,7 @@
  * Search in help files 
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,174 +23,171 @@
  *
  * @package Genmod
  * @subpackage Help
- * @version $Id: searchhelp.php,v 1.4 2006/02/19 18:40:23 roland-d Exp $
+ * @version $Id: searchhelp.php,v 1.12 2008/03/02 12:14:13 sjouke Exp $
  */
 
-/**
- * Inclusion of the configuration file
-*/
-require "config.php";
-
-print_simple_header("Search help");
-
-// On first entry, initially check the boxes
-if (!isset($action)) {
-	$searchuser = "yes";
-	$searchhow = "any";
-	$searchintext = "true";
-}
-
-// If no admin, always search in user help
-if (!UserGedcomAdmin($gm_username)) $searchuser = "yes";
-
-// Initialize variables
-if (!isset($searchtext)) $searchtext = "";
-if (!isset($searchuser)) $searchuser = "no";
-if (!isset($searchconfig)) $searchconfig = "no";
-$found = 0;
-// Print the form for input
-print "<form name=\"entersearch\" action=\"$SCRIPT_NAME\" method=\"post\" >";
-print "<input name=\"action\" type=\"hidden\" value=\"search\" />";
-print "<table class=\"facts_table $TEXT_DIRECTION\">";
-print "<tr><td colspan=\"2\" class=\"topbottombar\">";
-print_help_link("hs_title_help", "qm", "hs_title");
-print $gm_lang["hs_title"]."</td></tr>";
-
-// Enter the keyword(s)
-print "<tr><td class=\"shade2 width20 wrap vmiddle\">";
-print_help_link("hs_keyword_advice", "qm", "hs_keyword");
-print $gm_lang["hs_keyword"]."</td>";
-print "<td class=\"shade1\"><input type=\"text\" name=\"searchtext\" dir=\"ltr\" value=\"".$searchtext."\" /></td></tr>";
-
-// How to search
-print "<tr ><td class=\"shade2 width20 wrap vmiddle\">";
-print_help_link("hs_searchhow_advice", "qm", "hs_searchhow");
-print $gm_lang["hs_searchhow"]."</td>";
-print "<td class=\"shade1\">";
-print "<input type=\"radio\" name=\"searchhow\" dir=\"ltr\" value=\"any\"";
-if ($searchhow == "any") print " checked=\"checked\"";
-print " />".$gm_lang["hs_searchany"]."<br />";
-print "<input type=\"radio\" name=\"searchhow\" dir=\"ltr\" value=\"all\"";
-if ($searchhow == "all") print " checked=\"checked\"";
-print " />".$gm_lang["hs_searchall"]."<br />";
-print "<input type=\"radio\" name=\"searchhow\" dir=\"ltr\" value=\"sentence\"";
-if ($searchhow == "sentence") print " checked=\"checked\"";
-print " />".$gm_lang["hs_searchsentence"]."<br />";
-print "</td></tr>";
-
-print "<tr><td ";
-if (UserIsAdmin($gm_username)) print "rowspan=\"2\" ";
-print "class=\"shade2 width20 wrap vmiddle\">";
-print_help_link("hs_searchin_advice", "qm", "hs_searchin");
-print $gm_lang["hs_searchin"]."</td>";
-// Show choice where to search only to admins
-if (UserIsAdmin($gm_username)) {
-	print "<td class=\"shade1\"><input type=\"checkbox\" name=\"searchuser\" dir=\"ltr\" value=\"yes\"";
-	if ($searchuser == "yes") print " checked=\"checked\"";
-	print " />".$gm_lang["hs_searchuser"]."<br />";
-	print "<input type=\"checkbox\" name=\"searchconfig\" dir=\"ltr\" value=\"yes\"";
-	if ($searchconfig == "yes") print " checked=\"checked\"";
-	print " />".$gm_lang["hs_searchconfig"]."</td></tr><tr>";
-}
-print "<td class=\"shade1\"><input type=\"radio\" name=\"searchintext\" dir=\"ltr\" value=\"true\"";
-if ($searchintext == "true") print " checked=\"checked\"";
-print " />".$gm_lang["hs_intruehelp"]."<br />";
-print "<input type=\"radio\" name=\"searchintext\" dir=\"ltr\" value=\"all\"";
-if ($searchintext == "all") print " checked=\"checked\"";
-print " />".$gm_lang["hs_inallhelp"]."<br />";
-print "</td></tr>";
-
-// Print the buttons
-print "<tr><td class=\"topbottombar\" colspan=\"2\">";
-print "<input type=\"submit\" name=\"entertext\" value=\"".$gm_lang["hs_search"]."\" />";
-print "<input type=\"button\" value=\"".$gm_lang["hs_close"]."\" onclick='self.close();' />";
-print "</td></tr>";
-
-// Perform the search
-if ((!empty($searchtext)) && (($searchuser == "yes") || ($searchconfig == "yes")))  {
-
-	$helpvarnames = array();
-	unset($gm_lang);
+class SearchHelp {
 	
-	// Load the factarray: Help text requires it
-	if (!isset($factarray)) {
-		require $GM_BASE_DIRECTORY . $factsfile["english"];
-		if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
+	var $name = "SearchHelp";
+	var $searchtext = "";
+	var $searchuser = "no";
+	var $searchconfig = "no";
+	var $searchhow = "";
+	// var $searchintext = "";
+	var $found = 0;
+	var $searchresults = "<hr />";
+	
+	function SearchHelp(&$genmod, &$gm_lang, &$gm_username) {
+		$this->CheckAccess($gm_username);
+		$this->GetPageValues($genmod);
+		$this->AddHeader($gm_lang);
+		$this->ShowForm($genmod, $gm_lang, $gm_username);
+		if (!empty($this->searchtext))  {
+			$this->PerformSearch($genmod);
+			$this->PrintResults($gm_lang);
+		}
+		$this->AddFooter();
 	}
 	
-	// Load the user help if chosen
-	if ($searchuser == "yes") {
-		require $GM_BASE_DIRECTORY . $helptextfile["english"];
-		if (file_exists($GM_BASE_DIRECTORY . $helptextfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $helptextfile[$LANGUAGE];
-	}
-
-	// Load the config help if chosen
-	if ($searchconfig == "yes") {
-		require $GM_BASE_DIRECTORY . $confighelpfile["english"];
-		if (file_exists($GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $confighelpfile[$LANGUAGE];
-	}
-
-	// Find all helpvars, so we know what vars to check after the lang.xx file has been reloaded
-	foreach ($gm_lang as $text => $value) {
-		if ($searchintext == "all") $helpvarnames[] = $text;
-		else if ((substr($text, -5) == "_help") || (substr($text, -4) == ".php")) $helpvarnames[] = $text;
+	function CheckAccess($gm_username) {
+		global $Users;
+		
+		// If no admin, always search in user help
+		if (!$Users->UserGedcomAdmin($gm_username)) $this->searchuser = "yes";
 	}
 	
-	// Reload lang.xx file
-	loadEnglish();
-	loadLanguage($LANGUAGE);
+	function AddHeader(&$gm_lang) {
+		print_simple_header($gm_lang["hs_title"]);
+	}
 	
-	// Split the search criteria if all or any is chosen. Otherwise, just fill the array with the sentence
-	$criteria = array();
-	if ($searchhow == "sentence") $criteria[] = $searchtext;
-	else $criteria = preg_split("/ /", $searchtext);
+	function AddFooter() {
+		?>
+		<script language="JavaScript" type="text/javascript">
+			document.entersearch.searchtext.focus();
+		</script>
+		<?php
+		print_simple_footer();
+	}
 	
-	// Search in the previously stored vars for a hit and print it
-	foreach ($helpvarnames as $key => $value) {
-		$repeat = 0;
-		$helptxt = print_text($value,0,1);
-		// Remove hyperlinks
-		$helptxt = preg_replace("/<a[^<>]+>/", "", $helptxt);
-		$helptxt = preg_replace("/<\/a>/", "", $helptxt);
-		// Remove unresolved language variables
-		$helptxt = preg_replace("/#gm[^#]+#/i", "", $helptxt);
-		// Save the original text for clean search
-		$helptxtorg = $helptxt;
-		// Scroll through the criteria
-		$cfound = 0;
-		$cnotfound = 0;
-		foreach ($criteria as $ckey => $criterium) {
-			// See if there is a case insensitive hit
-			if (strpos(str2upper($helptxtorg), str2upper($criterium))) {
-				// Set the search string for preg_replace, case insensitive
-				$srch = "/$criterium/i";
-				// The \\0 is for wrapping the existing string in the text with the span
-				$repl = "<span class=\"search_hit\">\\0</span>";
-				$helptxt = preg_replace($srch, $repl, $helptxt);
-				$cfound++;
+	function GetPageValues(&$genmod) {
+		if (isset($_REQUEST['searchtext'])) $this->searchtext = $_REQUEST['searchtext'];
+		if (isset($_REQUEST['searchuser'])) $this->searchuser = $_REQUEST['searchuser'];
+		if (isset($_REQUEST['searchconfig'])) $this->searchconfig = $_REQUEST['searchconfig'];
+		if (isset($_REQUEST['searchhow'])) $this->searchhow = $_REQUEST['searchhow'];
+		// if (isset($_REQUEST['searchintext'])) $this->searchintext = $_REQUEST['searchintext'];
+		// On first entry, initially check the boxes
+		if ($genmod['action'] !== 'search') {
+			$this->searchuser = 'yes';
+			$this->searchhow = 'any';
+			// $this->searchintext = 'true';
+		}
+	}
+	
+	function ShowForm(&$genmod, &$gm_lang) {
+		// Print the form for input
+		?>
+		<form name="entersearch" action="<?php echo $_SERVER['SCRIPT_NAME']; ?>" method="post" >
+			<input name="action" type="hidden" value="search" />
+			<input type="hidden" name="page" value="<?php echo $genmod['page'];?>" />
+			<div class="topbottombar"><?php print_help_link("hs_title_help", "qm", "hs_title"); echo $gm_lang["hs_title"]; ?></div>
+			<!-- // Enter the keyword(s) -->
+			<div id="searchhelp_text">
+				<label for="searchtext"><?php print_help_link("hs_keyword_advice", "qm", "hs_keyword"); echo $gm_lang["hs_keyword"]; ?></label>
+				<input type="text" id="searchtext" name="searchtext" dir="ltr" size="60" value="<?php echo $this->searchtext; ?>" />
+			</div>
+			<!-- // How to search -->
+			<div id="searchhelp_how">
+				<label for="searchhow"><?php print_help_link("hs_searchhow_advice", "qm", "hs_searchhow"); echo $gm_lang["hs_searchhow"]; ?></label>
+				<input type="radio" id="searchhow" name="searchhow" dir="ltr" value="any"
+				<?php
+				if ($this->searchhow == "any") echo " checked=\"checked\"";
+				echo " />".$gm_lang["hs_searchany"];
+				?>
+				<input type="radio" name="searchhow" dir="ltr" value="all"
+				<?php
+				if ($this->searchhow == "all") echo " checked=\"checked\"";
+				echo " />".$gm_lang["hs_searchall"];
+				?>
+				<input type="radio" name="searchhow" dir="ltr" value="sentence"
+				<?php
+				if ($this->searchhow == "sentence") echo " checked=\"checked\"";
+				echo " />".$gm_lang["hs_searchsentence"];
+				?>
+			</div>
+			<div class="topbottombar">
+				<input type="submit" name="entertext" value="<?php echo $gm_lang["hs_search"];?>" />
+				<input type="button" value="<?php echo $gm_lang["hs_close"]; ?>" onclick='self.close();' />
+			</div>
+		</form>
+		<?php
+		
+		/**
+		// Not possible because help texts are in the database
+		// Show choice where to search only to admins
+		if (UserIsAdmin($gm_username)) {
+			echo "<td class=\"shade1\"><input type=\"checkbox\" name=\"searchuser\" dir=\"ltr\" value=\"yes\"";
+			if ($this->searchuser == "yes") echo " checked=\"checked\"";
+			echo " />".$gm_lang["hs_searchuser"]."<br />";
+			echo "<input type=\"checkbox\" name=\"searchconfig\" dir=\"ltr\" value=\"yes\"";
+			if ($this->searchconfig == "yes") echo " checked=\"checked\"";
+			echo " />".$gm_lang["hs_searchconfig"]."</td></tr><tr>";
+		}
+		*/
+	}
+	
+	function PerformSearch(&$genmod) {
+		// Load languages
+		$helpvarnames = array();
+		$helpvarnames = LoadLanguage($genmod['language'], true, true);
+		
+		// Split the search criteria if all or any is chosen. Otherwise, just fill the array with the sentence
+		$criteria = array();
+		if ($this->searchhow == "sentence") $criteria[] = $this->searchtext;
+		else $criteria = preg_split("/ /", $this->searchtext);
+		
+		// Search in the previously stored vars for a hit and print it
+		foreach ($helpvarnames as $key => $value) {
+			$repeat = 0;
+			$helptxt = print_text($key,0,1);
+			// Remove hyperlinks
+			$helptxt = preg_replace("/<a[^<>]+>/", "", $helptxt);
+			$helptxt = preg_replace("/<\/a>/", "", $helptxt);
+			// Remove unresolved language variables
+			$helptxt = preg_replace("/#gm[^#]+#/i", "", $helptxt);
+			// Save the original text for clean search
+			$helptxtorg = $helptxt;
+			// Scroll through the criteria
+			$cfound = 0;
+			$cnotfound = 0;
+			foreach ($criteria as $ckey => $criterium) {
+				// See if there is a case insensitive hit
+				if (strpos(Str2Upper($helptxtorg), Str2Upper($criterium))) {
+					// Set the search string for preg_replace, case insensitive
+					$srch = "/$criterium/i";
+					// The \\0 is for wrapping the existing string in the text with the span
+					$repl = "<span class=\"search_hit\">\\0</span>";
+					$helptxt = preg_replace($srch, $repl, $helptxt);
+					$cfound++;
+				}
+				else $cnotfound++;
 			}
-			else $cnotfound++;
+			
+			if (	(($this->searchhow == "any") && ($cfound >= 1)) ||
+				(($this->searchhow == "all") && ($cnotfound == 0)) ||
+				($this->searchhow == "sentence") && ($cfound >= 1)) {
+				$this->searchresults .= $helptxt.'<hr />';
+				$this->found++;
+			}
 		}
-		if (
-		(($searchhow == "any") && ($cfound >= 1)) ||
-		(($searchhow == "all") && ($cnotfound == 0)) ||
-		(($searchhow == "sentence") && ($cfound >= 1))) {
-			print "<tr><td colspan=\"2\" class=\"shade2 wrap $TEXT_DIRECTION\">".$helptxt."</td></tr>";
-			$found++;
+	}
+	
+	function PrintResults(&$gm_lang) {
+		// Print total results, if a search has been performed
+		if (!empty($this->searchtext)) {
+			echo $this->searchresults;
+			echo '<div id="searchhelp_result" class="topbottombar">'.$gm_lang["hs_results"].' '.$this->found.'</div>';
 		}
 	}
 }
-
-// Print total results, if a search has been performed
-if (!empty($searchtext)) {
-	print "<tr><td colspan=\"2\" class=\"topbottombar\">".$gm_lang["hs_results"]." ".$found;
-	print "</td></tr>";
-}
-print "</table></form>";
-?>
-<script language="JavaScript" type="text/javascript">
-	document.entersearch.searchtext.focus();
-</script>
-<?php
-print_simple_footer();
+$searchhelp = new SearchHelp($genmod, $gm_lang, $gm_username);
 ?>

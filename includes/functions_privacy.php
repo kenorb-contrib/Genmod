@@ -5,7 +5,7 @@
  * See http://www.Genmod.net/privacy.php for more information on privacy in Genmod
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2002 to 2005  GM Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,14 +21,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: functions_privacy.php,v 1.5 2006/01/10 01:10:24 roland-d Exp $
+ * @version $Id: functions_privacy.php,v 1.44 2009/03/16 19:51:12 sjouke Exp $
  * @package Genmod
  * @subpackage Privacy
  */
 
 if (strstr($_SERVER["SCRIPT_NAME"],"functions_privacy.php")) {
-	print "Why do you want to do that?";
-	exit;
+	require "../intrusion.php";
 }
 
 if ($USE_RELATIONSHIP_PRIVACY) {
@@ -39,13 +38,13 @@ if ($USE_RELATIONSHIP_PRIVACY) {
 	 * by the relationship calculator.  This cache greatly speed up the relationship privacy
 	 * checking on charts as many relationships on charts are in the same relationship path.
 	 *
-	 * See the documentation for the get_relationship() function in the functions.php file.
+	 * See the documentation for the GetRelationship() function in the functions.php file.
 	 */
 	$NODE_CACHE = array();
 }
 
 //-- allow users to overide functions in privacy file
-if (!function_exists("is_dead")) {
+if (!function_exists("IsDead")) {
 	/**
 	 * check if a person is dead
 	 *
@@ -63,37 +62,56 @@ if (!function_exists("is_dead")) {
 	 * This function should only be called once per individual.  In index mode this is called during
 	 * the Gedcom import.  In MySQL mode this is called the first time the individual is accessed
 	 * and then the database table is updated.
-	 * @author John Finlay (yalnifj)
+ 	 * @author Genmod Development Team
 	 * @param string $indirec the raw gedcom record
 	 * @return bool true if dead false if alive
 	 */
-	function is_dead($indirec, $cyear="") {
-		global $CHECK_CHILD_DATES;
-		global $MAX_ALIVE_AGE;
-		global $HIDE_LIVE_PEOPLE;
-		global $PRIVACY_BY_YEAR;
-		global $gm_lang;
-		global $BUILDING_INDEX;
-	
+	function IsDead($indirec, $cyear="") {
+		global $CHECK_CHILD_DATES, $MAX_ALIVE_AGE, $HIDE_LIVE_PEOPLE;
+		global $PRIVACY_BY_YEAR, $gm_lang, $BUILDING_INDEX, $COMBIKEY;
+		global $TBLPREFIX, $GEDCOM, $GEDCOMS, $GEDCOMID;
+
 		$ct = preg_match("/0 @(.*)@ INDI/", $indirec, $match);
 		if ($ct>0) {
 			$pid = trim($match[1]);
 		}
-	
-		if (empty($pid)) return false;
-	
+		else return false;
+		
+		// NOTE: First check the DB table dates if the person is dead
+		// This causes tons of queries. We better get the info from the gedrec.
+//		$sql = "SELECT * FROM ".$TBLPREFIX."dates WHERE d_fact = 'DEAT' AND d_year IS NOT NULL AND d_gid ='".$pid."' AND d_file ='".$GEDCOMID."'";
+//		$res = NewQuery($sql);
+//		if ($res) {
+//			if ($res->NumRows()>0) {
+//				return true;
+//			}
+//		}
 		if (empty($cyear)) $cyear = date("Y");
-	
+		
 		// -- check for a death record
-		$deathrec = get_sub_record(1, "1 DEAT", $indirec);
+		$drec = GetSubRecord(1, "1 DEAT", $indirec);
+		$deathrec = $drec;
+		if (empty($deathrec)) {
+			$brec = GetSubRecord(1, "1 BURI", $indirec);
+			$deathrec = $brec;
+		}
+		if (empty($deathrec)) {
+			$crec = GetSubRecord(1, "1 CREM", $indirec);
+			$deathrec = $crec;
+		 }
 		if (!empty($deathrec)) {
+			// any record is ok to determine the status
 			if ($cyear==date("Y")) {
 				$lines = preg_split("/\n/", $deathrec);
 				if (count($lines)>1) return true;
 				if (preg_match("/1 DEAT Y/", $deathrec)>0) return true;
 			}
 			else {
-				$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $deathrec, $match);
+				// but we want a record with a date to check the year
+				$ct = 0;
+				if (!empty($drec)) $ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $drec, $match);
+				if ($ct == 0 && !empty($brec)) $ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $brec, $match);
+				if ($ct == 0 && !empty($crec)) $ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $crec, $match);
 				if ($ct>0) {
 					$dyear = $match[1];
 					if ($dyear<$cyear) return true;
@@ -103,7 +121,7 @@ if (!function_exists("is_dead")) {
 		}
 	
 		//-- if birthdate less than $MAX_ALIVE_AGE return false
-		$birthrec = get_sub_record(1, "1 BIRT", $indirec);
+		$birthrec = GetSubRecord(1, "1 BIRT", $indirec);
 		if (!empty($birthrec)) {
 			$ct = preg_match("/\d DATE.*\s(\d{3,4})\s/", $birthrec, $match);
 			if ($ct>0) {
@@ -133,10 +151,10 @@ if (!function_exists("is_dead")) {
 			//-- check the parents for dates
 			$numfams = preg_match_all("/1\s*FAMC\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
-				$parents = find_parents($fmatch[$j][1]);
+				$parents = FindParents($fmatch[$j][1]);
 				if ($parents) {
 					if (!empty($parents["HUSB"])) {
-						$prec = find_person_record($parents["HUSB"]);
+						$prec = FindPersonRecord($parents["HUSB"]);
 						$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $prec, $match, PREG_SET_ORDER);
 						for($i=0; $i<$ct; $i++) {
 							$byear = $match[$i][1];
@@ -148,7 +166,7 @@ if (!function_exists("is_dead")) {
 						}
 					}
 					if (!empty($parents["WIFE"])) {
-						$prec = find_person_record($parents["WIFE"]);
+						$prec = FindPersonRecord($parents["WIFE"]);
 						$ct = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $prec, $match, PREG_SET_ORDER);
 						for($i=0; $i<$ct; $i++) {
 							$byear = $match[$i][1];
@@ -166,10 +184,10 @@ if (!function_exists("is_dead")) {
 			$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $indirec, $fmatch, PREG_SET_ORDER);
 			for($j=0; $j<$numfams; $j++) {
 				// Get the family record
-				$famrec = find_family_record($fmatch[$j][1]);
+				$famrec = FindFamilyRecord($fmatch[$j][1]);
 	
 				//-- check for marriage date
-				$marrec = get_sub_record(1, "1 MARR", $famrec);
+				$marrec = GetSubRecord(1, "1 MARR", $famrec);
 				if ($marrec!==false) {
 					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $marrec, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
@@ -182,11 +200,11 @@ if (!function_exists("is_dead")) {
 					}
 				}
 				//-- check spouse record for dates
-				$parents = find_parents_in_record($famrec);
+				$parents = FindParentsInRecord($famrec);
 				if ($parents) {
 					if ($parents["HUSB"]!=$pid) $spid = $parents["HUSB"];
 					else $spid = $parents["WIFE"];
-					$spouserec = find_person_record($spid);
+					$spouserec = FindPersonRecord($spid);
 					// Check dates
 					$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $spouserec, $bmatch, PREG_SET_ORDER);
 					for($h=0; $h<$bt; $h++) {
@@ -202,7 +220,7 @@ if (!function_exists("is_dead")) {
 				$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
 				for($i=0; $i<$ct; $i++) {
 					// Get each child's record
-					$childrec = find_person_record($match[$i][1]);
+					$childrec = FindPersonRecord($match[$i][1]);
 					$children[] = $childrec;
 	
 					// Check each child's dates
@@ -218,18 +236,20 @@ if (!function_exists("is_dead")) {
 				}
 			}
 			//-- check grandchildren for dates
+			$gchildren = array();
 			foreach($children as $indexval => $child) {
 				// For each family in which this person is a spouse...
 				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $child, $fmatch, PREG_SET_ORDER);
 				for($j=0; $j<$numfams; $j++) {
 					// Get the family record
-					$famrec = find_family_record($fmatch[$j][1]);
+					$famrec = FindFamilyRecord($fmatch[$j][1]);
 	
 					// Get the set of children
 					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
 					for($i=0; $i<$ct; $i++) {
 						// Get each child's record
-						$childrec = find_person_record($match[$i][1]);
+						$childrec = FindPersonRecord($match[$i][1]);
+						$gchildren[] = $childrec;
 	
 						// Check each grandchild's dates
 						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $childrec, $bmatch, PREG_SET_ORDER);
@@ -244,10 +264,73 @@ if (!function_exists("is_dead")) {
 					}
 				}
 			}
+/*			//-- check greatgrandchildren for dates
+			$ggchildren = array();
+			foreach($gchildren as $indexval => $gchild) {
+				// For each family in which this person is a spouse...
+				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $gchild, $fmatch, PREG_SET_ORDER);
+				for($j=0; $j<$numfams; $j++) {
+					// Get the family record
+					$famrec = FindFamilyRecord($fmatch[$j][1]);
+	
+					// Get the set of greatgrandchildren
+					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
+					for($i=0; $i<$ct; $i++) {
+						// Get each child's record
+						$childrec = FindPersonRecord($match[$i][1]);
+						$ggchildren[] = $childrec;
+	
+						// Check each greatgrandchild's dates
+						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $childrec, $bmatch, PREG_SET_ORDER);
+						for($h=0; $h<$bt; $h++) {
+							$byear = $bmatch[$h][1];
+							// if any greatgrandchild was born more than MAX_ALIVE_AGE-50 years ago assume the grandparent has died
+							if (($cyear-$byear) > ($MAX_ALIVE_AGE-50)) {
+								//print "greatgrandchild older than $MAX_ALIVE_AGE-50 (".$bmatch[$h][0].") year is $byear\n";
+								return true;
+							}
+						}
+					}
+				}
+			}
+			//-- check greatgreatgrandchildren for dates
+			foreach($ggchildren as $indexval => $ggchild) {
+				// For each family in which this person is a spouse...
+				$numfams = preg_match_all("/1\s*FAMS\s*@(.*)@/", $ggchild, $fmatch, PREG_SET_ORDER);
+				for($j=0; $j<$numfams; $j++) {
+					// Get the family record
+					$famrec = FindFamilyRecord($fmatch[$j][1]);
+	
+					// Get the set of greatgreatgrandchildren
+					$ct = preg_match_all("/1 CHIL @(.*)@/", $famrec, $match, PREG_SET_ORDER);
+					for($i=0; $i<$ct; $i++) {
+						// Get each child's record
+						$childrec = FindPersonRecord($match[$i][1]);
+	
+						// Check each greatgreatgrandchild's dates
+						$bt = preg_match_all("/\d DATE.*\s(\d{3,4})\s/", $childrec, $bmatch, PREG_SET_ORDER);
+						for($h=0; $h<$bt; $h++) {
+							$byear = $bmatch[$h][1];
+							// if any greatgreatgrandchild was born more than MAX_ALIVE_AGE-70 years ago assume the grandparent has died
+							if (($cyear-$byear) > ($MAX_ALIVE_AGE-70)) {
+								//print "greatgreatgrandchild older than $MAX_ALIVE_AGE-70 (".$bmatch[$h][0].") year is $byear\n";
+								return true;
+							}
+						}
+					}
+				}
+			}
+*/			
+			
 		}
+//		global $ctu;
+//		if (!isset($ctu)) $ctu = 0;
+//		$ctu++;
+//		print $ctu." Undetermined: ".$pid."<br />";
 		return false;
 	}
 }
+
 
 //-- allow users to overide functions in privacy file
 if (!function_exists("displayDetailsByID")) {
@@ -257,7 +340,7 @@ if (!function_exists("displayDetailsByID")) {
 	 * This function uses the settings in the global variables above to determine if the current user
 	 * has sufficient privileges to access the GEDCOM resource.
 	 *
-	 * @author	yalnifj
+	 * @author	Genmod team
 	 * @param	string $pid the GEDCOM XRef ID for the entity to check privacy settings for
 	 * @param	string $type the GEDCOM type represented by the $pid.  This setting is used so that
 	 *			different gedcom types can be handled slightly different. (ie. a source cannot be dead)
@@ -268,136 +351,327 @@ if (!function_exists("displayDetailsByID")) {
 	 *          - "REPO" record is a repository
 	 * @return	boolean return true to show the persons details, return false to keep them private
 	 */
-	function displayDetailsByID($pid, $type = "INDI") {
-		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username;
+	function displayDetailsByID($pid, $type = "INDI", $recursive=1, $checklinks=false) {
+		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $COMBIKEY, $GEDCOMID;
 		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
-		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES;
-	
-		if (!$HIDE_LIVE_PEOPLE) return true;
+		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $Users;
+		static $pcache;
+		
+		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
+		// Return the value from the cache, if set
+		if (!isset($pcache)) $pcache = array();
+		if (isset($pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) return $pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
+		$username = $gm_username;
+		$ulevel = $Users->getUserAccessLevel($gm_username);
+
 		if (empty($pid)) return true;
+		if (empty($type)) $type = "INDI";
 	
 		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
 		else $PRIVACY_CHECKS++;
-	
-		//print "checking privacy for $pid<br />";
-	
-		$username = $gm_username;
+
+		//-- look for an Ancestral File level 1 RESN (restriction) tag. This overrules all other settings if it prevents showing data.
+		if (isset($PRIVACY_BY_RESN) && ($PRIVACY_BY_RESN==true)) {
+			if ($type == "INDI") $gedrec = FindPersonRecord($pid);
+			else if ($type == "FAM") $gedrec = FindFamilyRecord($pid);
+			else if ($type == "SOUR") $gedrec = FindSourceRecord($pid);
+			else if ($type == "REPO") $gedrec = FindRepoRecord($pid);
+			else if ($type == "OBJE") $gedrec = FindMediaRecord($pid);
+			else if ($type == "NOTE") $gedrec = FindOtherRecord($pid, "", false, "NOTE");
+			else $gedrec = FindGedcomRecord($pid);
+			if (FactViewRestricted($pid, $gedrec, 1)) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+		}
+
+		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
+//		 print "checking privacy for pid: $pid, type: $type<br />";
 		if (!empty($username)) {
-			if (isset($user_privacy[$username]["all"])) {
-				if ($user_privacy[$username]["all"] >= getUserAccessLevel($username)) return true;
-				else return false;
-			}
-			if (isset($user_privacy[$username][$pid])) {
-				if ($user_privacy[$username][$pid] >= getUserAccessLevel($username)) return true;
-				else return false;
-			}
-			if (isset($person_privacy[$pid])) {
-				if ($person_privacy[$pid]>=getUserAccessLevel($username)) return true;
-				else return false;
-			}
-			if (userGedcomAdmin($username)) return true;
-			if (userCanAccess($username)) {
-				if ($type=="INDI") {
-					$isdead = is_dead_id($pid);
-					$user = getUser($username);
-					if ($USE_RELATIONSHIP_PRIVACY || $user["relationship_privacy"]=="Y") {
-						if ($isdead) return true;
-						else {
-							if (empty($user["gedcomid"][$GEDCOM])) return false;
-							if ($user["gedcomid"][$GEDCOM]==$pid) return true;
-							$path_length = $MAX_RELATION_PATH_LENGTH;
-							if ($user["max_relation_path"]>0) $path_length = $user["max_relation_path"];
-							$relationship = get_relationship($user["gedcomid"][$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
-							if ($relationship!==false) return true;
-							else return false;
-						}
-					}
-					else {
-						if ($isdead) {
-							if ($SHOW_DEAD_PEOPLE>=getUserAccessLevel($username)) return true;
-							else return false;
-						}
-						else {
-							if ($SHOW_LIVING_NAMES>=getUserAccessLevel($username)) return true;
-							else return false;
-						}
-					}
+			// Check user privacy for all users (hide/show)
+			if (isset($user_privacy["all"][$pid])) {
+				if ($user_privacy["all"][$pid] == 1) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
 				}
 			}
+			// Check user privacy for this user (hide/show)
+			if (isset($user_privacy[$username][$pid])) {
+				if ($user_privacy[$username][$pid] == 1) return true;
+				else return false;
+			}
+			// Check person privacy (access level)
+			if (isset($person_privacy[$pid])) {
+				if ($person_privacy[$pid] >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			
+			// Check privacy by isdead status
+			if ($type == "INDI") {
+				$isdead = IsDeadId($pid);
+				$user = $Users->getUser($username);
+				// The person is still hidden at this point and cannot be shown, either dead or alive.
+				// Check the relation privacy. If within the range, people can be shown. 
+				if ($USE_RELATIONSHIP_PRIVACY) {
+					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
+					if (empty($user->gedcomid[$GEDCOM])) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+						return false;
+					}
+						
+					// If it's the user himself, we can show him
+					if ($user->gedcomid[$GEDCOM]==$pid) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+						return true;
+					}
+					
+					// Determine if the person is within range
+					$path_length = $MAX_RELATION_PATH_LENGTH;
+//					if (isset($user->max_relation_path[$GEDCOM]) && $user->max_relation_path[$GEDCOM]>0) $path_length = $user->max_relation_path[$GEDCOM];
+					// print "get relation ".$user->gedcomid[$GEDCOM]." with ".$pid;
+					$relationship = GetRelationship($user->gedcomid[$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+					// Only limit access to live people!
+					if ($relationship == false && !$isdead) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+						return false;
+					}
+					else {
+						// A relation is found. Do not return anything, as general rules will apply in this case.
+//						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+//						return true;
+					}
+				}
+				
+				// First check if the person is dead. If so, it can be shown, depending on the setting for dead people.
+				if ($isdead && $SHOW_DEAD_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				
+				// Alive people. If the user is allowed to see the person, show it.
+				if (!$isdead && $HIDE_LIVE_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				
+				// No options left to show the person. Return false.
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
 		}
-		//-- check the person privacy array for an exception
+		
+		// This is the part that handles visitors. ---------------------------------------------------------------
+		// No need to check user privacy
+		//-- check the person privacy array for an exception (access level)
+		// NOTE: This checks all record types! So no need to check later with fams, sources, etc.
 		if (isset($person_privacy[$pid])) {
-			if ($person_privacy[$pid]>=getUserAccessLevel($username)) return true;
-			else return false;
+			if ($person_privacy[$pid] >= $ulevel) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				return true;
+			}
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
 		}
-	
-		//-- look for an Ancestral File RESN (restriction) tag
-		if (isset($PRIVACY_BY_RESN) && ($PRIVACY_BY_RESN==true)) {
-			$gedrec = find_gedcom_record($pid);
-			if (preg_match("/1 RESN/", $gedrec)>0) return false;
-		}
-	
 		if ($type=="INDI") {
+//		 && $HIDE_LIVE_PEOPLE<getUserAccessLevel($username)) 
 			//-- option to keep person living if they haven't been dead very long
+			// This option assumes a person as living, if (max_alive_age = 120):
+			// - Died within the last 95 years
+			// - Married within the last 105 years
+			// - Born within the last 120 years
+			$dead = IsDeadId($pid);
 			if ($PRIVACY_BY_YEAR) {
 				$cyear = date("Y");
-				$indirec = find_person_record($pid);
+				$indirec = FindPersonRecord($pid);
 				//-- check death record
-				$deatrec = get_sub_record(1, "1 DEAT", $indirec);
+				$deatrec = GetSubRecord(1, "1 DEAT", $indirec);
 				$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $deatrec, $match);
 				if ($ct>0) {
 					$dyear = $match[1];
-					if (($cyear-$dyear) <= $MAX_ALIVE_AGE-25) return false;
+					if (($cyear-$dyear) <= $MAX_ALIVE_AGE-25) $dead = true;
 				}
-	
 				//-- check marriage records
-				$famids = find_sfamily_ids($pid);
+				$famids = FindSfamilyIds($pid);
 				foreach($famids as $indexval => $famid) {
-					$famrec = find_family_record($famid);
+					$famrec = FindFamilyRecord($famid["famid"]);
 					//-- check death record
-					$marrrec = get_sub_record(1, "1 MARR", $indirec);
+					$marrrec = GetSubRecord(1, "1 MARR", $indirec);
 					$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $marrrec, $match);
 					if ($ct>0) {
 						$myear = $match[1];
-						if (($cyear-$myear) <= $MAX_ALIVE_AGE-15) return false;
+						if (($cyear-$myear) <= $MAX_ALIVE_AGE-15) $dead = true;
 					}
 				}
 	
 				//-- check birth record
-				$birtrec = get_sub_record(1, "1 BIRT", $indirec);
+				$birtrec = GetSubRecord(1, "1 BIRT", $indirec);
 				$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $birtrec, $match);
 				if ($ct>0) {
 					$byear = $match[1];
-					if (($cyear-$byear) <= $MAX_ALIVE_AGE) return false;
+					if (($cyear-$byear) <= $MAX_ALIVE_AGE) $dead = true;
 				}
 			}
-			$disp = is_dead_id($pid);
-			if ($disp) {
-				if ($SHOW_DEAD_PEOPLE>=getUserAccessLevel($username)) return true;
-				else return false;
+			if (!$dead) {
+				// The person is alive, let's see if we can show him
+				if ($HIDE_LIVE_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
 			}
 			else {
-				if (empty($username)) return false;
-				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
-				else return false;
+				// The person is dead, let's see if we can show him
+//				print "DDbyID showlivingn: ".$SHOW_LIVING_NAMES."    useracc: ".getUserAccessLevel($username)."    ".$pid."<br />";
+//				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
+//				else return false;
+				if ($SHOW_DEAD_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
 			}
 		}
+		
+		// Now check the fams, for visitors AND for other users. Previously only INDI's are handled for users, not fams and other record types.
 	    if ($type=="FAM") {
-		    //-- check if we can display both parents
-			$parents = find_parents($pid);
-			$display = displayDetailsByID($parents["HUSB"]);
-			if ($display) {
-				$display = displayDetailsByID($parents["WIFE"]);
+		    //-- check if we can display both parents. If not, the family will be hidden.
+			$parents = FindParents($pid);
+			if (!displayDetailsByID($parents["HUSB"])) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
 			}
-			return $display;
+			if (!displayDetailsByID($parents["WIFE"])) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+			$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+			return true;
 	    }
+	    
+	    // Check the sources. First check the general setting
 	    if ($type=="SOUR") {
-		    if ($SHOW_SOURCES>=getUserAccessLevel($username)) return true;
+		    if ($SHOW_SOURCES >= $ulevel) {
+			    $disp = true;
+			    
+			    // If we can show the source, see if any links to hidden records must prevent this.
+			    // Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY && $checklinks) {
+				    // This will prevent loops if MM points to SOUR vice versa. We only go one level deep.
+				    $recursive--;
+				    if ($recursive >=0) {
+			    		$links = GetSourceLinks($pid, "", false);
+					    foreach($links as $key => $link) {
+						    $disp = $disp && DisplayDetailsByID($link, IdType($link), $recursive, true);
+						    if (!$disp) break;
+					    }
+				    }
+			    }
+			    // We can show the source, and there are no links that prevent this
+			    if ($disp) {
+   					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				// The links prevent displaying the source
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// The sources setting prevents display, so hide!
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+	    }
+	    
+	    // Check the repositories
+	    if ($type=="REPO") {
+		    // To do: see if any hidden sources exist that prevent the repository to be shown.
+		    if ($SHOW_SOURCES >= $ulevel) return true;
 			else return false;
 	    }
-	    if ($type=="REPO") {
-		    if ($SHOW_SOURCES>=getUserAccessLevel($username)) return true;
-			else return false;
+	    
+	    // Check the MM objects
+	    if ($type=="OBJE") {
+		    // Check if OBJE details are hidden by global or specific facts settings
+		    if (ShowFactDetails("OBJE", $pid)) {
+			    $disp = true;
+			    // Check links to the MM record. Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY) {
+				    $recursive--;
+				    if ($recursive >=0) {
+				    	$links = GetMediaLinks($pid);
+					    foreach($links as $key => $link) {
+						    $disp = $disp && DisplayDetailsByID($link, IdType($link), $recursive, true);
+						    if (!$disp) break;
+				    	}
+			    	}
+			    }
+			    if ($disp) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				    return true;
+			    }
+			    else {
+				    // we cannot show it because of hidden links
+	   				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// we cannot show the MM details
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+	    }
+	    // Check the Note objects
+	    if ($type=="NOTE") {
+		    // Check if NOTE details are hidden by global or specific facts settings
+		    if (ShowFactDetails("NOTE", $pid)) {
+			    $disp = true;
+			    // Check links to the note record. Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY) {
+				    $recursive--;
+				    if ($recursive >=0) {
+				    	$links = GetNoteLinks($pid, "", false);
+					    foreach($links as $key => $link) {
+						    $disp = $disp && DisplayDetailsByID($link[0], $link[1], $recursive, true);
+						    if (!$disp) break;
+				    	}
+			    	}
+			    }
+			    if ($disp) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				    return true;
+			    }
+			    else {
+				    // we cannot show it because of hidden links
+	   				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// we cannot show the Note details
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
 	    }
 	    return true;
 	}
@@ -419,29 +693,62 @@ if (!function_exists("showLivingNameByID")) {
 	 * @param		string 	$pid 	the GEDCOM XRef ID for the entity to check privacy settings for
 	 * @return	boolean 	return true to show the person's name, return false to keep it private
 	 */
-	function showLivingNameByID($pid) {
-		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username;
-	
-		if (displayDetailsByID($pid)) return true;
+	function showLivingNameByID($pid, $type="INDI") {
+		global $SHOW_LIVING_NAMES, $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $person_privacy, $user_privacy, $gm_username, $COMBIKEY, $Users, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $GEDCOM, $MAX_RELATION_PATH_LENGTH;
+		
+		// If we can show the details, we can also show the name
+		if (displayDetailsByID($pid, $type)) return true;
+		
+		// If a pid is hidden or shown due to user privacy, the name is hidden or shown also
 		$username = $gm_username;
 		if (!empty($username)) {
-			if (isset($user_privacy[$username]["all"])) {
-				if ($user_privacy[$username]["all"] >= getUserAccessLevel($username)) return true;
+			if (isset($user_privacy["all"][$pid])) {
+				if ($user_privacy["all"][$pid] == 1) return true;
 				else return false;
 			}
 			if (isset($user_privacy[$username][$pid])) {
-				if ($user_privacy[$username][$pid] >= getUserAccessLevel($username)) return true;
+				if ($user_privacy[$username][$pid] == 1) return true;
 				else return false;
 			}
 		}
 		
+		// If a pid is hidden or shown due to person privacy, the name also is
 		if (isset($person_privacy[$pid])) {
-			if ($person_privacy[$pid]>=getUserAccessLevel($username)) return true;
+			if ($person_privacy[$pid] >= $Users->getUserAccessLevel($username)) return true;
 			else return false;
 		}
+		
+		// If RESN privacy on level 1 prevents the pid to be displayed, we also cannot show the name
+		if (FactViewRestricted($pid, FindGedcomRecord($pid), 1)) return false;
+		
+		// Now split dead and alive people
+		$isdead = IsDeadId($pid);
+		// If dead, we follow DisplayDetailsByID
+		// If alive, we check if the general rule allows displaying the name. If not, return false.
+		if ($isdead) return false;
+		else if ($SHOW_LIVING_NAMES < $Users->getUserAccessLevel($username)) return false;
+		
+		// Now we check if we must further narrow what can be seen
+		// At this point we have a pid that cannot be displayed by detail and is alive,
+		// and without relationship privacy the name would be shown.
+		$user = $Users->getUser($username);
+		if ($USE_RELATIONSHIP_PRIVACY) {
 			
-		if ($SHOW_LIVING_NAMES>=getUserAccessLevel($username)) return true;
-		return false;
+			// If we don't know the user's gedcom ID, we cannot determine the relationship,
+			// so we cannot further narrow what the user sees.
+			// The same applies if we know the user, and he is viewing himself
+			if (empty($user->gedcomid[$GEDCOM]) || $user->gedcomid[$GEDCOM]==$pid) return true;
+			
+			// Determine if the person is within range
+			$path_length = $MAX_RELATION_PATH_LENGTH;
+//			if (isset($user->max_relation_path[$GEDCOM]) && $user->max_relation_path[$GEDCOM] > 0) $path_length = $user->max_relation_path[$GEDCOM];
+			$relationship = GetRelationship($user->gedcomid[$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+			// If we have a relation in range, we can display the name
+			// if not in range, we can display the name of dead people
+			if ($relationship != false) return true;
+			else return false;
+		}
+		return true;
 	}
 }
 
@@ -459,62 +766,42 @@ if (!function_exists("showFact")) {
  * @param	string $pid the GEDCOM XRef ID for the entity to check privacy settings
  * @return	boolean return true to show the fact, return false to keep it private
  */
-function showFact($fact, $pid) {
-	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
-	global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username;
-
-	//-- if $PRIV_HIDE even admin users won't see everything
-	if (isset($global_facts[$fact]))
-	{
-	  if (isset($global_facts[$fact]["show"]))
-	  {
-	    if ($global_facts[$fact]["show"] == $PRIV_HIDE) return false;
-	  }
-	}
-	$username = $gm_username;
-	//-- admin users can see everything
-	if (userGedcomAdmin($username)) return true;
+function showFact($fact, $pid, $type="") {
+	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $LINK_PRIVACY;
+	global $global_facts, $person_facts, $SHOW_SOURCES, $gm_username, $Users;
+	static $ulevel;
+	
+	if (!isset($ulevel)) $ulevel = $Users->getUserAccessLevel($gm_username);
+//	$username = $gm_username;
+//	print "Checking ".$fact." for ".$pid. "type ".$type."<br />";
 
 	//-- first check the global facts array
 	if (isset($global_facts[$fact]["show"])) {
-		switch ($global_facts[$fact]["show"]) {
-			case $PRIV_PUBLIC:
-				return true;
-				break;
-			case $PRIV_USER:
-				if (!empty($username)) return true;
-				else return false;
-				break;
-			default:
-				return false;
-				break;
-		}
+//		if ($global_facts[$fact]["show"] < $Users->getUserAccessLevel($username)) return false;
+		if ($global_facts[$fact]["show"] < $ulevel) return false;
 	}
 	//-- check the person facts array
 	if (isset($person_facts[$pid][$fact]["show"])) {
-		switch ($person_facts[$pid][$fact]["show"]) {
-			case $PRIV_PUBLIC:
-				return true;
-				break;
-			case $PRIV_USER:
-				if (!empty($username)) return true;
-				else return false;
-				break;
-			default:
-				return false;
-				break;
-		}
+//		if ($person_facts[$pid][$fact]["show"] < $Users->getUserAccessLevel($username)) return false;
+		if ($person_facts[$pid][$fact]["show"] < $ulevel) return false;
 	}
+
 	if ($fact=="SOUR") {
-		if ($SHOW_SOURCES<getUserAccessLevel($gm_username)) return false;
+//		if ($SHOW_SOURCES >= $Users->getUserAccessLevel($username)) return true;
+		if ($SHOW_SOURCES >= $ulevel) return true;
+		else return false;
+    }
+    
+//	if ($fact!="NAME") {
+//		$gedrec = FindGedcomRecord($pid);
+//		$disp = displayDetailsByID($pid, $type);
+//		return $disp;
+//	}
+//	else {
+	if ($fact == "NAME") {
+		if (!displayDetailsByID($pid, $type)) return showLivingNameById($pid);
 	}
-	if ($fact!="NAME") {
-		$gedrec = find_gedcom_record($pid);
-		$disp = displayDetailsByID($pid);
-		return $disp;
-	}
-	else if (!displayDetailsByID($pid)) return showLivingNameById($pid);
-	else return true;
+	return true;
 }
 }
 
@@ -534,49 +821,27 @@ if (!function_exists("showFactDetails")) {
  */
 function showFactDetails($fact, $pid) {
 	global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE;
-	global $global_facts, $person_facts, $gm_username;
-
-	//-- if $PRIV_HIDE even admin users won't see everything
-	if (isset($global_facts[$fact]))
-	{
-	  if (isset($global_facts[$fact]["details"]))
-	  {
-	    if ($global_facts[$fact]["details"] == $PRIV_HIDE) return false;
-	  }
-	}
+	global $global_facts, $person_facts, $gm_username, $Users;
 
 	$username = $gm_username;
-	//-- admin users can see everything
-	if (userGedcomAdmin($username)) return true;
-	//-- first check the global facts array
-	if (isset($global_facts[$fact]["details"])) {
-		switch ($global_facts[$fact]["details"]) {
-			case $PRIV_PUBLIC:
-				return true;
-				break;
-			case $PRIV_USER:
-				if (!empty($username)) return true;
-				else return false;
-				break;
-			default:
-				return false;
-				break;
+	
+	// Handle the close relatives facts just as if they were normal facts
+	$f = substr($fact, 0, 6);
+	if ($f == "_BIRT_" || $f == "_DEAT_" && $f == "_MARR_") {
+		$fact = substr($fact, 1, 4);
+	}
+	
+	//-- if $PRIV_HIDE even admin users won't see everything
+	if (isset($global_facts[$fact])) {
+		//-- first check the global facts array
+		if (isset($global_facts[$fact]["details"])) {
+			if ($global_facts[$fact]["details"] < $Users->getUserAccessLevel($username)) return false;
 		}
 	}
+		
 	//-- check the person facts array
 	if (isset($person_facts[$pid][$fact]["details"])) {
-		switch ($person_facts[$pid][$fact]["details"]) {
-			case $PRIV_PUBLIC:
-				return true;
-				break;
-			case $PRIV_USER:
-				if (!empty($username)) return true;
-				else return false;
-				break;
-			default:
-				return false;
-				break;
-		}
+			if ($person_facts[$pid][$fact]["details"] < $Users->getUserAccessLevel($username)) return false;
 	}
 	return true;
 }
@@ -591,13 +856,13 @@ function showFactDetails($fact, $pid) {
  * @return string the privatized gedcom record
  */
 function privatize_gedcom($gedrec) {
-	global $gm_lang, $GEDCOM, $gm_username;
+	global $gm_lang, $GEDCOM, $gm_username, $Users;
 	$gt = preg_match("/0 @(.+)@ (.+)/", $gedrec, $gmatch);
 	if ($gt > 0) {
 		$gid = trim($gmatch[1]);
 		$type = trim($gmatch[2]);
-		$disp = displayDetailsByID($gid, $type);
-//		print "[$gid $type $disp $sub]";
+		$disp = displayDetailsByID($gid, $type, 1, true);
+//		if ($type == "SOUR") print "<br />"."[$gm_username $gid $type $disp]";
 		//-- check if the whole record is private
 		if (!$disp) {
 			//-- check if name should be private
@@ -608,46 +873,47 @@ function privatize_gedcom($gedrec) {
 				$newrec .= "2 GIVN " . $gm_lang["private"] . "\r\n";
 			}
 			else if ($type=="SOUR") {
+//				print "hidden";
 				$newrec = "0 @".$gid."@ SOUR\r\n";
 				$newrec .= "1 TITL ".$gm_lang["private"]."\r\n";
 			}
 			else {
 				$newrec = "0 @".$gid."@ $type\r\n";
 				if ($type=="INDI") {
-					$chil = get_sub_record(1, "1 NAME", $gedrec);
+					$chil = GetSubRecord(1, "1 NAME", $gedrec);
 					if (!empty($chil)) $newrec .= trim($chil)."\r\n";
-					$chil = get_sub_record(1, "1 FAMC", $gedrec);
+					$chil = GetSubRecord(1, "1 FAMC", $gedrec);
 					$i=1;
 					while (!empty($chil)) {
 						$newrec .= trim($chil)."\r\n";
 						$i++;
-						$chil = get_sub_record(1, "1 FAMC", $gedrec, $i);
+						$chil = GetSubRecord(1, "1 FAMC", $gedrec, $i);
 					}
-					$chil = get_sub_record(1, "1 FAMS", $gedrec);
+					$chil = GetSubRecord(1, "1 FAMS", $gedrec);
 					$i=1;
 					while (!empty($chil)) {
 						$newrec .= trim($chil)."\r\n";
 						$i++;
-						$chil = get_sub_record(1, "1 FAMS", $gedrec, $i);
+						$chil = GetSubRecord(1, "1 FAMS", $gedrec, $i);
 					}
 				}
 				else if ($type=="SOUR") {
-					$chil = get_sub_record(1, "1 ABBR", $gedrec);
+					$chil = GetSubRecord(1, "1 ABBR", $gedrec);
 					if (!empty($chil)) $newrec .= trim($chil)."\r\n";
-					$chil = get_sub_record(1, "1 TITL", $gedrec);
+					$chil = GetSubRecord(1, "1 TITL", $gedrec);
 					if (!empty($chil)) $newrec .= trim($chil)."\r\n";
 				}
 				else if ($type=="FAM") {
-					$chil = get_sub_record(1, "1 HUSB", $gedrec);
+					$chil = GetSubRecord(1, "1 HUSB", $gedrec);
 					if (!empty($chil)) $newrec .= trim($chil)."\r\n";
-					$chil = get_sub_record(1, "1 WIFE", $gedrec);
+					$chil = GetSubRecord(1, "1 WIFE", $gedrec);
 					if (!empty($chil)) $newrec .= trim($chil)."\r\n";
-					$chil = get_sub_record(1, "1 CHIL", $gedrec);
+					$chil = GetSubRecord(1, "1 CHIL", $gedrec);
 					$i=1;
 					while (!empty($chil)) {
 						$newrec .= trim($chil)."\r\n";
 						$i++;
-						$chil = get_sub_record(1, "1 CHIL", $gedrec, $i);
+						$chil = GetSubRecord(1, "1 CHIL", $gedrec, $i);
 					}
 				}
 			}
@@ -658,10 +924,22 @@ function privatize_gedcom($gedrec) {
 		else {
 			$newrec = "0 @".$gid."@ $type\r\n";
 			//-- check all of the sub facts for access
-			$subs = get_all_subrecords($gedrec, "", false, false);
-			$user = getUser($gm_username);
+			$subs = GetAllSubrecords($gedrec, "", false, false, false);
+			$user = $Users->getUser($gm_username);
 			foreach($subs as $indexval => $sub) {
-				if (FactViewRestricted($gid, $sub)==false) $newrec .= $sub;
+				$ft = preg_match("/1\s(\w+)(.*)/", $sub, $match);
+				$fact = $match[1];
+				if (FactViewRestricted($gid, $sub)==false && ShowFact($fact, $gid) && ShowFactDetails($fact, $gid)) {
+					// Also remove private links from this record
+					$cl = preg_match_all("/[1-9]\s(.+)\s@(.+)@/", $sub, $match);
+					for ($i=0; $i<$cl;$i++) {
+						if (!DisplayDetailsByID($match[2][$i], $match[1][$i], 1, true)) {
+							$r = $match[0][$i]."[\r\n]*";
+							$sub = preg_replace("/$r/", "", $sub);
+						}
+					}
+					$newrec .= $sub;
+				}
 			}
 			return $newrec;
 		}
@@ -671,24 +949,6 @@ function privatize_gedcom($gedrec) {
 		return $gedrec;
 	}
 }
-
-/**
- * get current user's access level
- *
- * checks the current user and returns their privacy access level
- * @return int		their access level
- */
-function getUserAccessLevel($username="") {
-	global $PRIV_PUBLIC, $PRIV_NONE, $PRIV_USER, $GEDCOM, $gm_username;
-
-	if (empty($username)) $username = $gm_username;
-	if (empty($username)) return $PRIV_PUBLIC;
-
-	if (userGedcomAdmin($username)) return $PRIV_NONE;
-	if (userCanAccess($username)) return $PRIV_USER;
-	return $PRIV_PUBLIC;
-}
-
 /**
  * Check fact record for editing restrictions
  *
@@ -697,23 +957,25 @@ function getUserAccessLevel($username="") {
  *
  * @return int		Allowed or not allowed
  */
-function FactEditRestricted($pid, $factrec) {
-	global $GEDCOM, $gm_username;
-	$user = getUser($gm_username);
-	$myindi = "";
-	if (isset($user["gedcomid"][$GEDCOM])) trim($myindi = $user["gedcomid"][$GEDCOM]);
-	$ct = preg_match("/2 RESN (.*)/", $factrec, $match);
+function FactEditRestricted($pid, $factrec, $level=2) {
+	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $Users;
+	
+	$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 	if ($ct == 0) return false;
+	if ($level == 1 && !$PRIVACY_BY_RESN) return false;
+	$user = $Users->getUser($gm_username);
+	$myindi = "";
+	if (isset($user->gedcomid[$GEDCOM])) trim($myindi = $user->gedcomid[$GEDCOM]);
 	if ($ct > 0) {
 		$match[1] = strtolower(trim($match[1]));
 		if ($match[1] == "none") return false;
-		if ((($match[1] == "confidential") || ($match[1] == "locked")) && ((userIsAdmin($gm_username)) || (userGedcomAdmin($gm_username)))) return false;
-		if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $pid) || (userGedcomAdmin($gm_username)))) return false;
-		if (substr($pid,0,1) == "F"){
-			$famrec = find_family_record($pid);
-			$parents = find_parents_in_record($famrec);
-			if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || (userGedcomAdmin($gm_username)))) return false;
-			if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || (userGedcomAdmin($gm_username)))) return false;
+		if ((($match[1] == "confidential") || ($match[1] == "locked")) && (($Users->userIsAdmin($gm_username)) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $pid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if (IDType($pid) == "FAM"){
+			$famrec = FindFamilyRecord($pid);
+			$parents = FindParentsInRecord($famrec);
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
 		}
 	}
 	return true;
@@ -727,29 +989,371 @@ function FactEditRestricted($pid, $factrec) {
  *
  * @return int		Allowed or not allowed
  */
-function FactViewRestricted($pid, $factrec) {
-	global $GEDCOM, $gm_username;
-	$ct = preg_match("/2 RESN (.*)/", $factrec, $match);
+function FactViewRestricted($pid, $factrec, $level=2) {
+	global $GEDCOM, $gm_username, $PRIVACY_BY_RESN, $Users;
+	
+	$ct = preg_match("/$level RESN (.*)/", $factrec, $match);
 	if ($ct == 0) return false;
-	$user = getUser($gm_username);
+	if ($level == 1 && !$PRIVACY_BY_RESN) return false;
+	$user = $Users->getUser($gm_username);
 	$myindi = "";
-	if (isset($user["gedcomid"][$GEDCOM])) $myindi = trim($user["gedcomid"][$GEDCOM]);
+	if (isset($user->gedcomid[$GEDCOM])) $myindi = trim($user->gedcomid[$GEDCOM]);
 	$pid = trim($pid);
 	if ($ct > 0) {
 		$match[1] = strtolower(trim($match[1]));
 		if ($match[1] == "none") return false;
 		if ($match[1] == "locked") return false;
-		if (($match[1] == "confidential") && ((userIsAdmin($gm_username)) || (userGedcomAdmin($gm_username)))) return false;
-		if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $pid) || (userGedcomAdmin($gm_username)))) return false;
-		if (substr($pid,0,1) == "F"){
-			$famrec = find_family_record($pid);
-			$parents = find_parents_in_record($famrec);
-			if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || (userGedcomAdmin($gm_username)))) return false;
-			if (($match[1] == "privacy") && ((userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || (userGedcomAdmin($gm_username)))) return false;
+		if (($match[1] == "confidential") && (($Users->userIsAdmin($gm_username)) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $pid) || ($Users->userGedcomAdmin($gm_username)))) return false;
+		if (IDType($pid) == "FAM"){
+			$famrec = FindFamilyRecord($pid);
+			$parents = FindParentsInRecord($famrec);
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["WIFE"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
+			if (($match[1] == "privacy") && (($Users->userIsAdmin($gm_username)) || ($myindi == $parents["HUSB"]) || ($Users->userGedcomAdmin($gm_username)))) return false;
 		}
 	}
 	return true;
 }
 
+function ShowRelaFact($factrec) {
+	
+	$fact = substr($factrec, 3, 4);
+	$ct = preg_match_all("/\d ASSO @(.*)@/", $factrec, $match);
+	if ($fact == "MARR") {
+		foreach($match[1] as $key => $id) {
+			if (IDType($id) == "FAM") return ShowFact("MARR", $id);
+		}
+	}
+	else {
+		$id = $match[1][0];
+		return ShowFact($fact, $id);
+	}
+}
 
+function ShowRelaFactDetails($factrec) {
+	
+	$fact = substr($factrec, 3, 4);
+	$ct = preg_match_all("/\d ASSO @(.*)@/", $factrec, $match);
+	if ($fact == "MARR") {
+		foreach($match[1] as $key => $id) {
+			if (IDType($id) == "FAM") return ShowFactDetails("MARR", $id);
+		}
+	}
+	else {
+		$id = $match[1][0];
+		return ShowFactDetails($fact, $id);
+	}
+}
+
+//-- allow users to overide functions in privacy file
+if (!function_exists("GetIDAccessLevel")) {
+	/**
+	 * Check if details for a GEDCOM XRef ID should be shown
+	 *
+	 * This function uses the settings in the global variables above to determine if the current user
+	 * has sufficient privileges to access the GEDCOM resource.
+	 *
+	 * @author	yalnifj
+	 * @param	string $pid the GEDCOM XRef ID for the entity to check privacy settings for
+	 * @param	string $type the GEDCOM type represented by the $pid.  This setting is used so that
+	 *			different gedcom types can be handled slightly different. (ie. a source cannot be dead)
+	 *			The possible values of $type are:
+	 *			- "INDI" record is an individual
+	 *			- "FAM" record is a family
+	 *			- "SOUR" record is a source
+	 *          - "REPO" record is a repository
+	 * @return	boolean return true to show the persons details, return false to keep them private
+	 */
+	function GetIDAccessLevel($pid, $type = "INDI", $recursive=0, $checklinks=false) {
+		global $PRIV_PUBLIC, $PRIV_USER, $PRIV_NONE, $PRIV_HIDE, $USE_RELATIONSHIP_PRIVACY, $CHECK_MARRIAGE_RELATIONS, $MAX_RELATION_PATH_LENGTH, $gm_username, $COMBIKEY, $GEDCOMID;
+		global $global_facts, $person_privacy, $user_privacy, $HIDE_LIVE_PEOPLE, $GEDCOM, $SHOW_DEAD_PEOPLE, $MAX_ALIVE_AGE, $PRIVACY_BY_YEAR;
+		global $PRIVACY_CHECKS, $PRIVACY_BY_RESN, $SHOW_SOURCES, $SHOW_LIVING_NAMES, $LINK_PRIVACY, $Users;
+//		static $pcache;
+		
+		//print "Check ".$pid." type ".$type." recursive ".$recursive." checklinks ".$checklinks."<br />";
+		// Return the value from the cache, if set
+//		if (!isset($pcache)) $pcache = array();
+//		if (isset($pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid])) return $pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid];
+//		$username = $gm_username;
+//		$ulevel = $Users->getUserAccessLevel($gm_username);
+
+		if (empty($pid)) return true;
+		if (empty($type)) $type = "INDI";
+	
+		if (!isset($PRIVACY_CHECKS)) $PRIVACY_CHECKS = 1;
+		else $PRIVACY_CHECKS++;
+
+		//-- look for an Ancestral File level 1 RESN (restriction) tag. This overrules all other settings if it prevents showing data.
+		if (isset($PRIVACY_BY_RESN) && ($PRIVACY_BY_RESN==true)) {
+			if ($type == "INDI") $gedrec = FindPersonRecord($pid);
+			else if ($type == "FAM") $gedrec = FindFamilyRecord($pid);
+			else if ($type == "SOUR") $gedrec = FindSourceRecord($pid);
+			else if ($type == "REPO") $gedrec = FindRepoRecord($pid);
+			else if ($type == "OBJE") $gedrec = FindMediaRecord($pid);
+			else $gedrec = FindGedcomRecord($pid);
+			if (FactViewRestricted($pid, $gedrec, 1)) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+		}
+
+		// If a user is logged on, check for user related privacy first---------------------------------------------------------------
+//		 print "checking privacy for pid: $pid, type: $type<br />";
+		if (!empty($username)) {
+			// Check user privacy for all users (hide/show)
+			if (isset($user_privacy["all"][$pid])) {
+				if ($user_privacy["all"][$pid] == 1) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// Check user privacy for this user (hide/show)
+			if (isset($user_privacy[$username][$pid])) {
+				if ($user_privacy[$username][$pid] == 1) return true;
+				else return false;
+			}
+			// Check person privacy (access level)
+			if (isset($person_privacy[$pid])) {
+				if ($person_privacy[$pid] >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			
+			// Check privacy by isdead status
+			if ($type == "INDI") {
+				$isdead = IsDeadId($pid);
+				$user = $Users->getUser($username);
+				// The person is still hidden at this point and cannot be shown, either dead or alive.
+				// Check the relation privacy. If within the range, people can be shown. 
+				if ($USE_RELATIONSHIP_PRIVACY) {
+					// If we don't know the user's gedcom ID, we cannot determine the relationship so no reason to show
+					if (empty($user->gedcomid[$GEDCOM])) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+						return false;
+					}
+						
+					// If it's the user himself, we can show him
+					if ($user->gedcomid[$GEDCOM]==$pid) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+						return true;
+					}
+					
+					// Determine if the person is within range
+					$path_length = $MAX_RELATION_PATH_LENGTH;
+//					if (isset($user->max_relation_path[$GEDCOM]) && $user->max_relation_path[$GEDCOM]>0) $path_length = $user->max_relation_path[$GEDCOM];
+					// print "get relation ".$user->gedcomid[$GEDCOM]." with ".$pid;
+					$relationship = GetRelationship($user->gedcomid[$GEDCOM], $pid, $CHECK_MARRIAGE_RELATIONS, $path_length);
+					// Only limit access to live people!
+					if ($relationship == false && !$isdead) {
+						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+						return false;
+					}
+					else {
+						// A relation is found. Do not return anything, as general rules will apply in this case.
+//						$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+//						return true;
+					}
+				}
+				
+				// First check if the person is dead. If so, it can be shown, depending on the setting for dead people.
+				if ($isdead && $SHOW_DEAD_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				
+				// Alive people. If the user is allowed to see the person, show it.
+				if (!$isdead && $HIDE_LIVE_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				
+				// No options left to show the person. Return false.
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+		}
+		
+		// This is the part that handles visitors. ---------------------------------------------------------------
+		// No need to check user privacy
+		//-- check the person privacy array for an exception (access level)
+		// NOTE: This checks all record types! So no need to check later with fams, sources, etc.
+		if (isset($person_privacy[$pid])) {
+			if ($person_privacy[$pid] >= $ulevel) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				return true;
+			}
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+		}
+		if ($type=="INDI") {
+//		 && $HIDE_LIVE_PEOPLE<getUserAccessLevel($username)) 
+			//-- option to keep person living if they haven't been dead very long
+			// This option assumes a person as living, if (max_alive_age = 120):
+			// - Died within the last 95 years
+			// - Married within the last 105 years
+			// - Born within the last 120 years
+			$dead = IsDeadId($pid);
+			if ($PRIVACY_BY_YEAR) {
+				$cyear = date("Y");
+				$indirec = FindPersonRecord($pid);
+				//-- check death record
+				$deatrec = GetSubRecord(1, "1 DEAT", $indirec);
+				$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $deatrec, $match);
+				if ($ct>0) {
+					$dyear = $match[1];
+					if (($cyear-$dyear) <= $MAX_ALIVE_AGE-25) $dead = true;
+				}
+				//-- check marriage records
+				$famids = FindSfamilyIds($pid);
+				foreach($famids as $indexval => $famid) {
+					$famrec = FindFamilyRecord($famid["famid"]);
+					//-- check death record
+					$marrrec = GetSubRecord(1, "1 MARR", $indirec);
+					$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $marrrec, $match);
+					if ($ct>0) {
+						$myear = $match[1];
+						if (($cyear-$myear) <= $MAX_ALIVE_AGE-15) $dead = true;
+					}
+				}
+	
+				//-- check birth record
+				$birtrec = GetSubRecord(1, "1 BIRT", $indirec);
+				$ct = preg_match("/2 DATE .*(\d\d\d\d).*/", $birtrec, $match);
+				if ($ct>0) {
+					$byear = $match[1];
+					if (($cyear-$byear) <= $MAX_ALIVE_AGE) $dead = true;
+				}
+			}
+			if (!$dead) {
+				// The person is alive, let's see if we can show him
+				if ($HIDE_LIVE_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			else {
+				// The person is dead, let's see if we can show him
+//				print "DDbyID showlivingn: ".$SHOW_LIVING_NAMES."    useracc: ".getUserAccessLevel($username)."    ".$pid."<br />";
+//				if ($SHOW_LIVING_NAMES>getUserAccessLevel($username)) return true;
+//				else return false;
+				if ($SHOW_DEAD_PEOPLE >= $ulevel) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+		}
+		
+		// Now check the fams, for visitors AND for other users. Previously only INDI's are handled for users, not fams and other record types.
+	    if ($type=="FAM") {
+		    //-- check if we can display both parents. If not, the family will be hidden.
+			$parents = FindParents($pid);
+			if (!displayDetailsByID($parents["HUSB"])) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+			if (!displayDetailsByID($parents["WIFE"])) {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+			$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+			return true;
+	    }
+	    
+	    // Check the sources. First check the general setting
+	    if ($type=="SOUR") {
+		    if ($SHOW_SOURCES >= $ulevel) {
+			    $disp = true;
+			    
+			    // If we can show the source, see if any links to hidden records must prevent this.
+			    // Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY && $checklinks) {
+				    // This will prevent loops if MM points to SOUR vice versa. We only go one level deep.
+				    $recursive--;
+				    if ($recursive >=0) {
+			    		$links = GetSourceLinks($pid, "", false);
+					    foreach($links as $key => $link) {
+						    $disp = $disp && DisplayDetailsByID($link, IdType($link), $recursive, true);
+						    if (!$disp) break;
+					    }
+				    }
+			    }
+			    // We can show the source, and there are no links that prevent this
+			    if ($disp) {
+   					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+					return true;
+				}
+				// The links prevent displaying the source
+				else {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// The sources setting prevents display, so hide!
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+	    }
+	    
+	    // Check the repositories
+	    if ($type=="REPO") {
+		    // To do: see if any hidden sources exist that prevent the repository to be shown.
+		    if ($SHOW_SOURCES >= $ulevel) return true;
+			else return false;
+	    }
+	    
+	    // Check the MM objects
+	    if ($type=="OBJE") {
+		    // Check if OBJE details are hidden by global or specific facts settings
+		    if (ShowFactDetails("OBJE", $pid)) {
+			    $disp = true;
+			    // Check links to the MM record. Only hide if a linked RECORD is hidden. Don't hide if a LINK is hidden
+			    if ($LINK_PRIVACY) {
+				    $recursive--;
+				    if ($recursive >=0) {
+				    	$links = GetMediaLinks($pid);
+					    foreach($links as $key => $link) {
+						    $disp = $disp && DisplayDetailsByID($link, IdType($link), $recursive, true);
+						    if (!$disp) break;
+				    	}
+			    	}
+			    }
+			    if ($disp) {
+					$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = true;
+				    return true;
+			    }
+			    else {
+				    // we cannot show it because of hidden links
+	   				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+					return false;
+				}
+			}
+			// we cannot show the MM details
+			else {
+				$pcache[$GEDCOMID][$type][$recursive][$checklinks][$pid] = false;
+				return false;
+			}
+	    }
+	    return true;
+	}
+}
 ?>

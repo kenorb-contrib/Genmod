@@ -1,0 +1,13 @@
+<!-- @version $Id: AUS_Queensland.txt,v 1.1 2005/11/21 15:41:54 roland-d Exp $ -->
+Brisbane
+Bundaberg Coral Isles
+Central Queensland
+Fraser Coast
+Gold Coast
+Mackay
+Outback Queensland
+South East QLD Country
+Sunshine Coast
+Townsville
+Tropical North
+Whitsundays

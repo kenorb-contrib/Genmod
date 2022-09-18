@@ -1,0 +1,8 @@
+<!-- @version $Id: USA_Colorado_Moffat.txt,v 1.1 2005/10/23 22:08:17 roland-d Exp $ -->
+<!-- @see http://www.naco.org/ -->
+Craig
+Dinosaur
+Elk Springs
+Hamilton
+Maybell
+Slater

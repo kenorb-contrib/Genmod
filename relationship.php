@@ -3,7 +3,7 @@
  * Calculates the relationship between two individuals in the gedcom
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: relationship.php,v 1.3 2006/03/08 20:46:01 roland-d Exp $
+ * @version $Id: relationship.php,v 1.12 2008/11/28 06:59:48 sjouke Exp $
  */
 
 /**
@@ -31,11 +31,7 @@
 */
 require("config.php");
 
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
+$show_changes = "no";
 
 if (!isset($show_full)) $show_full=$PEDIGREE_FULL_DETAILS;
 if (!isset($path_to_find)){
@@ -75,19 +71,26 @@ $check_node = true;
 $disp = true;
 
 //-- cleanup user input
-$pid1 = clean_input($pid1);
-$pid2 = clean_input($pid2);
+$pid1 = CleanInput($pid1);
+$pid2 = CleanInput($pid2);
 
+$title = "";
+if ($SHOW_ID_NUMBERS && (($pid1 != "") || ($pid2 != ""))) {
+	if ($pid1 != "") $title .= strtoupper($pid1);
+	if ($pid2 != "") $title .= "/".strtoupper($pid2);
+	$title .= " - ";
+}
 $title_string .= $gm_lang["relationship_chart"];
+$title .= $title_string;
 // -- print html header information
-print_header($title_string);
+print_header($title);
 if (!empty($pid1)) {
 	if (preg_match("/[A-Za-z]+/", $pid1)==0) $pid1 = $GEDCOM_ID_PREFIX.$pid1;
 	//-- check if the id is valid
-	$indirec = find_person_record($pid1);
+	$indirec = FindPersonRecord($pid1);
 	if (empty($indirec)) $pid1 = "";
 	if ((!displayDetailsByID($pid1))&&(!showLivingNameByID($pid1))) $title_string .= ": ".$gm_lang["private"];
-	else $title_string .= ":<br />".get_person_name($pid1);
+	else $title_string .= ":<br />".GetPersonName($pid1);
 	if (!empty($_SESSION["pid1"]) && ($_SESSION["pid1"]!=$pid1)) {
 		unset($_SESSION["relationships"]);
 		$path_to_find=0;
@@ -96,10 +99,10 @@ if (!empty($pid1)) {
 if (!empty($pid2)) {
 	if (preg_match("/[A-Za-z]+/", $pid2)==0) $pid2 = $GEDCOM_ID_PREFIX.$pid2;
 	//-- check if the id is valid
-	$indirec = find_person_record($pid2);
+	$indirec = FindPersonRecord($pid2);
 	if (empty($indirec)) $pid2 = "";
 	if ((!displayDetailsByID($pid2))&&(!showLivingNameByID($pid2))) $title_string .= " - " . $gm_lang["private"]." ";
-	else $title_string .= " ".$gm_lang["and"]." ".get_person_name($pid2)." ";
+	else $title_string .= " ".$gm_lang["and"]." ".GetPersonName($pid2)." ";
 	if (!empty($_SESSION["pid2"]) && ($_SESSION["pid2"]!=$pid2)) {
 		unset($_SESSION["relationships"]);
 		$path_to_find=0;
@@ -116,7 +119,7 @@ function paste_id(value) {
 <?php
 print "<div style=\"position: relative; z-index: 1; width:98%;\">\n";
 print "<table class=\"list_table $TEXT_DIRECTION\" style=\"width:100%;\"><tr><td valign=\"top\">";
-print "\n\t<h2>".PrintReady($title_string)."</h2>";
+print "\n\t<h3>".PrintReady($title_string)."</h3>";
 print "</td><td>";
 // -- print the form to change the number of displayed generations
 if ($view!="preview") {
@@ -146,7 +149,7 @@ if ($view!="preview") {
 	print $gm_lang["person1"]."</td>";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"1\" class=\"pedigree_form\" type=\"text\" name=\"pid1\" id=\"pid1\" size=\"3\" value=\"$pid1\" />";
-	print_findindi_link("pid1","");
+	PrintFindIndiLink("pid1","");
         print "</td>";
 
 	// Empty space
@@ -171,7 +174,7 @@ if ($view!="preview") {
 	print $gm_lang["person2"]."</td>\n";
 	print "<td class=\"shade1 vmiddle\">";
 	print "<input tabindex=\"2\" class=\"pedigree_form\" type=\"text\" name=\"pid2\" id=\"pid2\" size=\"3\" value=\"$pid2\" />";
-        print_findindi_link("pid2","");
+        PrintFindIndiLink("pid2","");
         print "</td>";
 
 	// Empty space
@@ -218,7 +221,7 @@ if ($view!="preview") {
 		$i=0;
 		$new_path=true;
 		if (isset($_SESSION["relationships"][$path_to_find])) $node = $_SESSION["relationships"][$path_to_find];
-		else $node = get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
+		else $node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
 		if (!$node){
 			$path_to_find--;
 			$check_node=$node;
@@ -246,7 +249,7 @@ if ($view!="preview") {
 				print $gm_lang["show_path"].": </td>";
 				print "\n\t\t<td class=\"shade1\">";
 				print " <span class=\"error vmmiddle\">";
-				$check_node = get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
+				$check_node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
 				print ($check_node?"1":"&nbsp;".$gm_lang["no_results"])."</span></td>";
 				$prt = true;
 			}
@@ -299,7 +302,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 	if (!$disp) print_privacy_error($CONTACT_EMAIL);
 	else {
 		if (isset($_SESSION["relationships"][$path_to_find])) $node = $_SESSION["relationships"][$path_to_find];
-		else $node = get_relationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
+		else $node = GetRelationship($pid1, $pid2, $followspouse, 0, true, $path_to_find);
 		if ($node!==false) {
 			$_SESSION["pid1"] = $pid1;
 			$_SESSION["pid2"] = $pid2;
@@ -347,7 +350,7 @@ if ((!empty($pid1))&&(!empty($pid2))) {
 				$linex = $xoffset;
 				$liney = $yoffset;
 				$mfstyle = "NN";
-				$indirec = find_person_record($pid);
+				$indirec = FindPersonRecord($pid);
 				if (preg_match("/1 SEX F/", $indirec, $smatch)>0) $mfstyle="F";
 				if (preg_match("/1 SEX M/", $indirec, $smatch)>0) $mfstyle="";
 				$arrow_img = $GM_IMAGE_DIR."/".$GM_IMAGES["darrow"]["other"];

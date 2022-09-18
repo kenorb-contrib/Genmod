@@ -1,9 +1,14 @@
-<GMReport access="GM_PUBLIC" icon="pedigree" language="english">
+<GMReport access="PRIV_PUBLIC" icon="ancestry" language="english">
+	<!-- $Id: ahnentafel.xml,v 1.5 2009/01/03 06:47:17 sjouke Exp $ -->
 	<GMRTitle><GMRvar var="gm_lang[ahnentafel_report]" /></GMRTitle>
 	<GMRDescription>Prints an Ahnentafel report for the selected individual</GMRDescription>
 	<GMRInput name="pid" lookup="INDI" type="text"><GMRvar var="gm_lang[enter_pid]" /></GMRInput>
-	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[show_sources]" /></GMRInput>
+	<GMRInput name="maxgen" type="select" options="3,4,5,6,7,8,9,*"><GMRvar var="gm_lang[generations]" /></GMRInput>
+	<GMRInput name="sources" type="checkbox" default="1"><GMRvar var="gm_lang[SHOW_SOURCES]" /></GMRInput>
 	<GMRInput name="notes" type="checkbox" default="1"><GMRvar var="gm_lang[show_notes]" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="showFamID" type="checkbox" default="SHOW_FAM_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_FAM_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
 	<GMRStyle name="header" font="LucidaSansUnicode" size="14" style="b" />
 	<GMRStyle name="subheader" font="LucidaSansUnicode" size="12" style="b" />
 	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
@@ -12,158 +17,266 @@
 	<GMRStyle name="note" font="LucidaSansUnicode" size="9" style="" />
 	<GMRStyle name="footnote" font="LucidaSansUnicode" size="8" style="" />
 	<GMRStyle name="footnotenum" font="LucidaSansUnicode" size="6" style="" />
-	<GMRDoc pageSize="A4" orientation="P" margin="24">
+	<GMRDoc pageSize="$pageSize" orientation="P" margin="24">
 		<GMRHeader>
 		</GMRHeader>
 		<GMRBody>
 			<GMRSetVar name="num" value="1" />
 			<GMRSetVar name="generation" value="0" />
-			<GMRCell width="0" height="30" align="center" style="header">Ahnentafel Report for <GMRGetPersonName id="$pid" /></GMRCell>
-			<GMRRelatives id="$pid" group="direct-ancestors" sortby="none">
-				<GMRif condition="@SEX=='M'">
-					<GMRSetVar name="pronoun" value="He" />
-				</GMRif>
+			<GMRSetVar name="empty_name" value="f" />
+			<GMRSetVar name="empty_start_value" value="0" />
+			<GMRCell width="0" height="30" align="center" style="header"><GMRvar var="gm_lang[ahnentafel_header]" /><GMRGetPersonName id="$pid" hideID="true" /></GMRCell>
+			<GMRRelatives id="$pid" group="direct-ancestors" sortby="none" maxgen="$maxgen" showempty="true">
+				<GMRSetVar name="gender" value="m" />
+				<GMRSetVar name="pronoun" value="$gm_lang[ahnentafel_pronoun_m]" />
 				<GMRif condition="@SEX=='F'">
-					<GMRSetVar name="pronoun" value="She" />
+					<GMRSetVar name="pronoun" value="$gm_lang[ahnentafel_pronoun_f]" />
+					<GMRSetVar name="gender" value="f" />
 				</GMRif>
+				<GMRSetVar name="printPronoun" value=" " />
 				<GMRif condition="$generation!=@generation">
-					<GMRCell width="0" height="30" align="center" style="subheader">Generation <GMRGeneration /></GMRCell>
-					<GMRSetVar name="generation" value="@generation" />
-				</GMRif>
-				<GMRTextBox width="25" height="20" border="0">
-					<GMRText style="text"><GMRvar var="num" />.</GMRText>
-				</GMRTextBox>
-				<GMRTextBox width="0" height="12" border="0" newline="1">
-					<GMRText style="name"><GMRGetPersonName id="" /> </GMRText>
-					<GMRGedcom id="BIRT">
-						<GMRText style="text">was born</GMRText>
-						<GMRif condition="$sources==1">
-							<GMRRepeatTag tag="BIRT:SOUR">
-								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
-								</GMRFootnote>
-							</GMRRepeatTag>
-						</GMRif>
-						<GMRif condition="@DATE!=''">
-							<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''">. </GMRif></GMRText>
-						</GMRif>
-						<GMRif condition="@PLAC!=''">
-							<GMRText style="text"> in <GMRGedcomValue tag="PLAC" level="2" />. </GMRText>
-						</GMRif>
-						<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-							<GMRText style="text"> but the details are unknown. </GMRText>
-						</GMRif>
-					</GMRGedcom>
-					<GMRGedcom id="CHR">
-						<GMRText style="text"><GMRvar var="pronoun" /> was christened</GMRText>
-						<GMRif condition="$sources==1">
-							<GMRRepeatTag tag="CHR:SOUR">
-								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
-								</GMRFootnote>
-							</GMRRepeatTag>
-						</GMRif>
-						<GMRif condition="@DATE!=''">
-							<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''">. </GMRif></GMRText>
-						</GMRif>
-						<GMRif condition="@PLAC!=''">
-							<GMRText style="text"> in <GMRGedcomValue tag="PLAC" level="2" />. </GMRText>
-						</GMRif>
-						<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-							<GMRText style="text"> but the details are unknown. </GMRText>
-						</GMRif>
-					</GMRGedcom>
-					<GMRGedcom id="DEAT">
-						<GMRText style="text"><GMRvar var="pronoun" /> died</GMRText>
-						<GMRif condition="$sources==1">
-							<GMRRepeatTag tag="DEAT:SOUR">
-								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
-								</GMRFootnote>
-							</GMRRepeatTag>
-						</GMRif>
-						<GMRif condition="@DATE!=''">
-							<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''">. </GMRif></GMRText>
-						</GMRif>
-						<GMRif condition="@PLAC!=''">
-							<GMRText style="text"> in <GMRGedcomValue tag="PLAC" level="2" />. </GMRText>
-						</GMRif>
-						<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-							<GMRText style="text"> but the details are unknown. </GMRText>
-						</GMRif>
-					</GMRGedcom>
-					<GMRGedcom id="BURI">
-						<GMRText style="text"><GMRvar var="pronoun" /> was buried</GMRText>
-						<GMRif condition="$sources==1">
-							<GMRRepeatTag tag="BURI:SOUR">
-								<GMRFootnote>
-									<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
-								</GMRFootnote>
-							</GMRRepeatTag>
-						</GMRif>
-						<GMRif condition="@DATE!=''">
-							<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''">. </GMRif></GMRText>
-						</GMRif>
-						<GMRif condition="@PLAC!=''">
-							<GMRText style="text"> in <GMRGedcomValue tag="PLAC" level="2" />. </GMRText>
-						</GMRif>
-						<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
-							<GMRText style="text"> but the details are unknown. </GMRText>
-						</GMRif>
-					</GMRGedcom>
-					<GMRSetVar name="cpid" value="@ID" />
-					<GMRif condition="$cpid!=$spid">
-						<GMRGedcom id="@FAMS">							
-							<GMRif condition="$cpid==@HUSB">
-								<GMRSetVar name="spid" value="@WIFE" />
-							</GMRif>
-							<GMRif condition="$cpid==@WIFE">
-								<GMRSetVar name="spid" value="@HUSB" />
-							</GMRif>
-							<GMRGedcom id="MARR">
-								<GMRif condition="$spid!='' and @DATE!='' and @PLAC!=''">
-									<GMRText style="text"><GMRvar var="pronoun" /> was married </GMRText>
-									<GMRif condition="$sources==1">
-										<GMRRepeatTag tag="MARR:SOUR">
-											<GMRFootnote>
-												<GMRGedcom id="@SOUR"><GMRGedcomValue tag="TITL" /><br /></GMRGedcom><GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
-											</GMRFootnote>
-										</GMRRepeatTag>
-									</GMRif>
-									<GMRif condition="@DATE!=''">
-										<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''"> </GMRif></GMRText>
-									</GMRif>
-									<GMRif condition="@PLAC!=''">
-										<GMRText style="text"> in <GMRGedcomValue tag="PLAC" level="2" /> </GMRText>
-									</GMRif>
-									<GMRif condition="$spid!=''">
-										<GMRText style="text">to <GMRGetPersonName id="$spid" />.</GMRText>
-									</GMRif>
-									<GMRif condition="((@desc=='Y') or (@DATE=='' and @PLAC=='')) and ($spid=='')">
-										<GMRText style="text"> but the details are unknown. </GMRText>
-									</GMRif>
-								</GMRif>
-							</GMRGedcom>
-						</GMRGedcom>
-					</GMRif>
-				</GMRTextBox>
-				<GMRif condition="$notes==1">
-					<GMRRepeatTag tag="NOTE">
-						<GMRTextBox width="25" height="20" border="0">
+					<GMRif condition="$empty_name=='t'" >
+						<GMRTextBox width="50" height="20" border="0">
+							<GMRSetVar name="empty_end_value" value="$num-1" />
+							<GMRText style="text"><GMRvar var="empty_start_value" />-<GMRvar var="empty_end_value" />.</GMRText>
+						</GMRTextBox>
+						<GMRTextBox width="475" height="12" border="0" newline="1">
 							<GMRText style="text"><br /></GMRText>
 						</GMRTextBox>
-						<GMRTextBox width="0" height="12" border="0" newline="1">
-							<GMRText style="note"><br /><GMRGedcomValue tag="@fact" /></GMRText>
+						<GMRTextBox width="25" height="20" border="0" newline="1">
+							<GMRText style="text"><br /></GMRText>
 						</GMRTextBox>
-					</GMRRepeatTag>
+						<GMRSetVar name="empty_start_value" value="$num" />
+					</GMRif>
+					<GMRCell width="0" height="30" align="center" style="subheader"><GMRvar var="gm_lang[ahnentafel_generation]" /><GMRGeneration /></GMRCell>
+					<GMRSetVar name="generation" value="@generation" />
 				</GMRif>
-				<GMRTextBox width="25" height="20" border="0" newline="1">
-					<GMRText style="text"><br /></GMRText>
-				</GMRTextBox>
+				<GMRSetVar name="indiname" value="@NAME" />
+				<GMRif condition="$indiname==''">
+					<GMRif condition="$empty_name=='f'">
+						<GMRSetVar name="empty_name" value="t" />
+						<GMRSetVar name="empty_start_value" value="$num" />
+					</GMRif>
+				</GMRif>
+				<GMRif condition="$indiname!=''">
+					<GMRif condition="$empty_name=='t'" >
+						<GMRTextBox width="50" height="20" border="0">
+							<GMRSetVar name="empty_end_value" value="$num-1" />
+							<GMRText style="text"><GMRvar var="empty_start_value" />-<GMRvar var="empty_end_value" />.</GMRText>
+						</GMRTextBox>
+						<GMRTextBox width="475" height="12" border="0" newline="1">
+							<GMRText style="text"><br /></GMRText>
+						</GMRTextBox>
+						<GMRTextBox width="25" height="20" border="0" newline="1">
+							<GMRText style="text"><br /></GMRText>
+						</GMRTextBox>
+						<GMRSetVar name="empty_name" value="f" />
+					</GMRif>
+					<GMRTextBox width="25" height="20" border="0">
+						<GMRText style="text"><GMRvar var="num" />.</GMRText>
+					</GMRTextBox>
+					<GMRTextBox width="0" height="12" border="0" newline="1">
+						<GMRText style="name"><GMRGetPersonName id="" /> </GMRText>
+						<GMRGedcom id="BIRT">
+							<GMRText style="text"><GMRvar var="printPronoun" />
+								<GMRif condition="$gender=='m'">
+									<GMRvar var="gm_lang[ahnentafel_born_m]" />
+								</GMRif>
+								<GMRif condition="$gender=='f'">
+									<GMRvar var="gm_lang[ahnentafel_born_f]" />
+								</GMRif>
+							</GMRText>
+							<GMRif condition="$sources==1">
+								<GMRRepeatTag tag="BIRT:SOUR">
+									<GMRFootnote>
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
+									</GMRFootnote>
+								</GMRRepeatTag>
+							</GMRif>
+							<GMRif condition="@DATE!=''">
+								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="@PLAC!=''">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+							</GMRif>
+							<GMRText style="text">.  </GMRText>
+							<GMRSetVar name="printPronoun" value="$pronoun" />
+						</GMRGedcom>
+						<GMRGedcom id="CHR">
+							<GMRText style="text"><GMRvar var="printPronoun" />
+								<GMRif condition="$gender=='m'">
+									<GMRvar var="gm_lang[ahnentafel_christened_m]" />
+								</GMRif>
+								<GMRif condition="$gender=='f'">
+									<GMRvar var="gm_lang[ahnentafel_christened_f]" />
+								</GMRif>
+							</GMRText>
+							<GMRif condition="$sources==1">
+								<GMRRepeatTag tag="CHR:SOUR">
+									<GMRFootnote>
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
+									</GMRFootnote>
+								</GMRRepeatTag>
+							</GMRif>
+							<GMRif condition="@DATE!=''">
+								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="@PLAC!=''">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+							</GMRif>
+							<GMRText style="text">.  </GMRText>
+							<GMRSetVar name="printPronoun" value="$pronoun" />
+						</GMRGedcom>
+						<GMRSetVar name="cpid" value="@ID" />
+						<GMRif condition="$cpid!=$spid">
+							<GMRGedcom id="@FAMS">
+								<GMRif condition="$cpid==@HUSB">
+									<GMRSetVar name="spid" value="@WIFE" />
+								</GMRif>
+								<GMRif condition="$cpid==@WIFE">
+									<GMRSetVar name="spid" value="@HUSB" />
+								</GMRif>
+								<GMRSetVar name="mid" value="@ID" />
+								<GMRGedcom id="MARR">
+									<GMRif condition="$spid!='' and @DATE!='' and @PLAC!=''">
+										<GMRText style="text"><!-- br / --><GMRvar var="printPronoun" />
+											<GMRif condition="$gender=='m'">
+												<GMRvar var="gm_lang[ahnentafel_married_m]" />
+											</GMRif>
+											<GMRif condition="$gender=='f'">
+												<GMRvar var="gm_lang[ahnentafel_married_f]" />
+											</GMRif>
+										</GMRText>
+										<GMRif condition="$showFamID">
+											<GMRText style="text"> (<GMRvar var="mid" />)</GMRText>
+										</GMRif>
+										<GMRif condition="$sources==1">
+											<GMRRepeatTag tag="MARR:SOUR">
+												<GMRFootnote>
+													<GMRGedcom id="@SOUR">
+														<GMRGedcomValue tag="TITL" />
+													</GMRGedcom>
+														<GMRif condition="@PAGE!=''">: </GMRif>
+													<GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
+												</GMRFootnote>
+											</GMRRepeatTag>
+										</GMRif>
+										<GMRif condition="$spid!=''">
+											<GMRText style="text"> <GMRGetPersonName id="$spid" /></GMRText>
+										</GMRif>
+										<GMRif condition="@DATE!=''">
+											<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /><GMRif condition="@PLAC==''"> </GMRif></GMRText>
+										</GMRif>
+										<GMRif condition="@PLAC!=''">
+											<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+										</GMRif>
+										<GMRif condition="((@desc=='Y') or (@DATE=='' and @PLAC=='')) and ($spid=='')">
+											<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+										</GMRif>
+										<GMRText style="text">.  </GMRText>
+										<GMRSetVar name="printPronoun" value="$pronoun" />
+									</GMRif>
+								</GMRGedcom>
+							</GMRGedcom>
+						</GMRif>
+						<GMRGedcom id="DEAT">
+							<GMRText style="text"><!-- br / --><GMRvar var="printPronoun" />
+								<GMRif condition="$gender=='m'">
+									<GMRvar var="gm_lang[ahnentafel_died_m]" />
+								</GMRif>
+								<GMRif condition="$gender=='f'">
+									<GMRvar var="gm_lang[ahnentafel_died_f]" />
+								</GMRif>
+							</GMRText>
+							<GMRif condition="$sources==1">
+								<GMRRepeatTag tag="DEAT:SOUR">
+									<GMRFootnote>
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
+									</GMRFootnote>
+								</GMRRepeatTag>
+							</GMRif>
+							<GMRif condition="@DATE!=''">
+								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="@PLAC!=''">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+							</GMRif>
+							<GMRText style="text">.  </GMRText>
+							<GMRSetVar name="printPronoun" value="$pronoun" />
+						</GMRGedcom>
+						<GMRGedcom id="BURI">
+							<GMRText style="text"><GMRvar var="printPronoun" />
+								<GMRif condition="$gender=='m'">
+									<GMRvar var="gm_lang[ahnentafel_buried_m]" />
+								</GMRif>
+								<GMRif condition="$gender=='f'">
+									<GMRvar var="gm_lang[ahnentafel_buried_f]" />
+								</GMRif>
+							</GMRText>
+							<GMRif condition="$sources==1">
+								<GMRRepeatTag tag="BURI:SOUR">
+									<GMRFootnote>
+										<GMRGedcom id="@SOUR">
+											<GMRGedcomValue tag="TITL" />
+										</GMRGedcom>
+										<GMRif condition="@PAGE!=''">: </GMRif>
+										<GMRGedcomValue tag="PAGE" level="3"/> <GMRGedcomValue tag="DATA:TEXT" level="3"/>
+									</GMRFootnote>
+								</GMRRepeatTag>
+							</GMRif>
+							<GMRif condition="@DATE!=''">
+								<GMRText style="text"> <GMRGedcomValue tag="DATE" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="@PLAC!=''">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_place]" /><GMRGedcomValue tag="PLAC" level="2" /></GMRText>
+							</GMRif>
+							<GMRif condition="(@desc=='Y') or (@DATE=='' and @PLAC=='')">
+								<GMRText style="text"><GMRvar var="gm_lang[ahnentafel_no_details]" /></GMRText>
+							</GMRif>
+							<GMRText style="text">.  </GMRText>
+							<GMRSetVar name="printPronoun" value="$pronoun" />
+						</GMRGedcom>
+					</GMRTextBox>
+					<GMRif condition="$notes==1">
+						<GMRRepeatTag tag="NOTE">
+							<GMRTextBox width="25" height="20" border="0">
+								<GMRText style="text"><br /></GMRText>
+							</GMRTextBox>
+							<GMRTextBox width="0" height="12" border="0" newline="1">
+								<GMRText style="note"><br /><GMRGedcomValue tag="@fact" /></GMRText>
+							</GMRTextBox>
+						</GMRRepeatTag>
+					</GMRif>
+					<GMRTextBox width="25" height="20" border="0" newline="1">
+						<GMRText style="text"><br /></GMRText>
+					</GMRTextBox>
+				</GMRif>
 				<GMRSetVar name="num" value="$num+1" />
 			</GMRRelatives>
 			<!-- if the sources were on, print the source citations as footnotes -->
 			<GMRif condition="$sources==1">
+				<GMRNewPage></GMRNewPage>
 				<GMRTextBox border="0" width="$width" height="20">
 					<GMRText style="subheader"><br /><GMRvar var="gm_lang[sources]" /><br /><br /></GMRText>
 					<GMRFootnoteTexts />

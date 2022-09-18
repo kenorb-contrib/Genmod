@@ -5,7 +5,7 @@
  * This is the page that does the work of linking items.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage MediaDB
- * @version $Id: inverselink.php,v 1.4 2006/02/19 18:40:23 roland-d Exp $ 
+ * @version $Id: inverselink.php,v 1.9 2008/01/06 10:58:44 roland-d Exp $ 
  */
 /**
  * Inclusion of the configuration file
@@ -38,7 +38,6 @@ require("includes/functions_edit.php");
 /**
  * Inclusion of the language files
 */
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
  
 //-- page parameters and checking
 $paramok = true;
@@ -111,13 +110,15 @@ if ($action == "choose" && $paramok) {
 	
 	print "<tr><td class=\"shade2\">";
 	if ($linkto == "person") {
+		$rectype = "INDI";
 		print $gm_lang["enter_pid"]."</td>";
 		print "<td class=\"shade1\">";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"linktoid\" id=\"linktoid\" size=\"3\" value=\"$linktoid\" />";
-		print_findindi_link("linktoid","");
+		PrintFindIndiLink("linktoid","");
 	}
 	
 	if ($linkto == "family") {
+		$rectype = "FAM";
 		print $gm_lang["enter_famid"]."</td>";
 		print "<td class=\"shade1\">";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"linktoid\" id=\"linktoid\" size=\"3\" value=\"$linktoid\" />";
@@ -125,6 +126,7 @@ if ($action == "choose" && $paramok) {
 	}
 	
 	if ($linkto == "source") {
+		$rectype = "SOUR";
 		print $gm_lang["source"]."</td>";
 		print "<td  class=\"shade1\">";
 		print "<input class=\"pedigree_form\" type=\"text\" name=\"linktoid\" id=\"linktoid\" size=\"3\" value=\"$linktoid\" />";
@@ -140,14 +142,14 @@ if ($action == "choose" && $paramok) {
 }  
 elseif ($action == "update" && $paramok) {
 	// find indi
-	$indirec = find_gedcom_record($linktoid);
+	$indirec = FindGedcomRecord($linktoid);
 	
 	if ($indirec) {
 		$mediarec = "1 OBJE @".$mediaid."@\r\n";
 		$newrec = trim($indirec."\r\n".$mediarec);
 		
 		// update the database
-		if (update_db_link($mediaid, $linktoid, $mediarec, $ged, -1)) {
+		if (update_db_link($mediaid, $linktoid, $mediarec, $ged, -1, $rectype)) {
 			WriteToLog("Database link update is OK", "I", "G", $GEDCOM);
 			// TODO: Add variable
 			print "DB update OK";
@@ -157,7 +159,7 @@ elseif ($action == "update" && $paramok) {
 			WriteToLog("There was an error updating the database link", "E", "G", $GEDCOM);
 			print "DB upate KO";
 		}
-		replace_gedrec($linktoid, $newrec);
+		ReplaceGedrec($linktoid, $newrec);
 		
 	} 
 	else print "<br /><center>".$gm_lang["invalid_id"]."</center>";	

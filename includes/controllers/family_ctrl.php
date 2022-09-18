@@ -5,7 +5,7 @@
  * You must supply a $famid value with the identifier for the family.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2002 to 2005  GM Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * $Id: family_ctrl.php,v 1.5 2005/12/18 11:11:11 roland-d Exp $
+ * $Id: family_ctrl.php,v 1.42 2009/03/29 13:20:10 sjouke Exp $
  * @package Genmod
  * @subpackage Controllers
  */
@@ -31,28 +31,28 @@ require_once 'includes/controllers/basecontrol.php';
 require_once 'includes/functions_charts.php';
 require_once 'includes/family_class.php';
 require_once 'includes/menu.php';
-require_once $GM_BASE_DIRECTORY.$factsfile['english'];
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]))
-{
-	require_once $GM_BASE_DIRECTORY.$factsfile[$LANGUAGE];
-}
 
 class FamilyRoot extends BaseController
 {
+	var $classname = "FamilyRoot";
 	var $user = null;
 	var $uname = '';
 	var $showLivingHusb = true;
 	var $showLivingWife = true;
 	var $parents = '';
 	var $display = false;
-	var $accept_success = false;
-	var $show_changes = 'no';
+	var $show_changes = false;
+	var $canedit = false;
 	var $famrec = '';
 	var $link_relation = 0;
 	var $title = '';
 	var $famid = '';
 	var $family = null;
 	var $difffam = null;
+	var $famnew = false;
+	var $famdeleted = false;
+	var $display_other_menu = false;
+	var $exists = true;
 	
 	/**
 	 * constructor
@@ -74,70 +74,79 @@ class FamilyRoot extends BaseController
 			$gm_lang,
 			$CONTACT_EMAIL,
 			$show_famlink,
-			$gm_changes
+			$show_changes,
+			$ENABLE_CLIPPINGS_CART,
+			$Users,
+			$SHOW_ID_NUMBERS
 		;
 		$bwidth = $Dbwidth;
 		$pbwidth = $bwidth + 12;
 		$pbheight = $bheight + 14;
 
-		if (!isset($_REQUEST['action']))
-		{
-			$_REQUEST['action'] = '';
-		}
-		if (!isset($_REQUEST['show_changes']))
-		{
-			$_REQUEST['show_changes'] = 'yes';
-		}
-		$this->show_changes = $_REQUEST['show_changes'];
-		if (!isset($_REQUEST['view']))
-		{
-			$_REQUEST['view'] = '';
-		}
+		if (!isset($_REQUEST['action'])) $_REQUEST['action'] = '';
+		if (!isset($_REQUEST['show_changes'])) $_REQUEST['show_changes'] = 'yes';
+		
+		if ($_REQUEST['show_changes'] == 'yes' && $Users->UserCanEdit($Users->GetUserName())) $this->show_changes = true;
+		else $this->show_changes = false;
+
+		if (!isset($_REQUEST['view'])) $_REQUEST['view'] = '';
 		$show_famlink = true;
-		if ($_REQUEST['view'] == 'preview')
-		{
-			$show_famlink = false;
+		if ($_REQUEST['view'] == 'preview') $show_famlink = false;
+		if (!isset($_REQUEST['famid'])) $_REQUEST['famid'] = '';
+		$_REQUEST['famid'] = CleanInput($_REQUEST['famid']);
+		
+		$this->famid = $_REQUEST['famid'];
+		$this->famrec = FindFamilyRecord($this->famid);
+		$this->uname = $Users->GetUserName();
+		if ($Users->UserCanEdit($this->uname)) $this->canedit = true;
+		
+		//-- if the user can edit and there are changes then get the new changes
+		if (!empty($this->famid) && GetChangeData(true, $this->famid, true, "", "")) {
+			$rec = GetChangeData(false, $this->famid, true, "gedlines", "");
+			$newrec = $rec[$GEDCOM][$this->famid];
+			if (empty($newrec) && !empty($this->famrec)) $this->famdeleted = true;
+			if (!empty($newrec) && empty($this->famrec)) $this->famnew = true;
+			if ($this->show_changes) $this->famrec = $newrec;
 		}
 
-		if (!isset($_REQUEST['famid']))
-		{
-			$_REQUEST['famid'] = '';
+		if (empty($this->famrec) && !$this->famdeleted) {
+			$this->exists = false;
+			print_header($gm_lang['family_info']);
+			print $gm_lang["family_not_found"];
+			print_footer();
+			exit;
 		}
-		$_REQUEST['famid'] = clean_input($_REQUEST['famid']);
-		$this->famid = $_REQUEST['famid'];
-		$this->famrec = find_family_record($this->famid);
+		
+		// Recheck editing permissions based on 1 RESN. This will only affect the editing menu
+		if (FactEditRestricted($this->famid, $this->famrec, 1)) {
+			$this->canedit = false;
+		}
+		$this->parents = FindParentsInRecord($this->famrec);
+		
 		//-- if no record was found create a default empty one
-		if (empty($this->famrec)) $this->famrec = "0 @".$this->famid."@ FAM\r\n";
+		$famrec = trim($this->famrec);
+		if (empty($famrec)) $this->famrec = "0 @".$this->famid."@ FAM\r\n";
 		$this->display = displayDetailsByID($this->famid, 'FAM');
 		$this->family = new Family($this->famrec);
 		
-		$this->uname = getUserName();
-		//-- if the user can edit and there are changes then get the new changes
-		if ($this->show_changes=="yes" && userCanEdit($this->uname) && isset($gm_changes[$this->famid."_".$GEDCOM])) {
-			$newrec = find_gedcom_record($this->famid);
-			$this->difffam = new Family($newrec);
-			$this->famrec = $newrec;
-		}
-		$this->parents = array('HUSB'=>$this->family->getHusbId(), 'WIFE'=>$this->family->getWifeId());
-
+		
 		//-- check if we can display both parents
-		if ($this->display == false)
-		{
+		if ($this->display == false) {
 			$this->showLivingHusb = showLivingNameByID($this->parents['HUSB']);
 			$this->showLivingWife = showLivingNameByID($this->parents['WIFE']);
 		}
-		
-		if (!empty($this->uname))
-		{
-			$this->user = getUser($this->uname);
+
+		// Check if we can display the Other menu
+		if ($Users->userCanViewGedlines() || ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) || ($this->display && !empty($this->uname))) $this->display_other_menu = true;
+				
+		if (!empty($this->uname)) {
+			$this->user = $Users->getUser($this->uname);
 
 			//-- add favorites action
-			if (($_REQUEST['action'] == 'addfav') && (!empty($_REQUEST['gid'])))
-			{
+			if (($_REQUEST['action'] == 'addfav') && (!empty($_REQUEST['gid']))) {
 				$_REQUEST['gid'] = strtoupper($_REQUEST['gid']);
-				$indirec = find_gedcom_record($_REQUEST['gid']);
-				if ($indirec)
-				{
+				$indirec = FindGedcomRecord($_REQUEST['gid']);
+				if ($indirec) {
 					$favorite = array(
 						'username' => $this->uname,
 						'gid' => $_REQUEST['gid'],
@@ -152,72 +161,65 @@ class FamilyRoot extends BaseController
 			}
 		}
 
-		if (userCanAccept($this->uname))
-		{
-			if ($_REQUEST['action'] == 'accept')
-			{
-				if (accept_changes($_REQUEST['famid'].'_'.$GEDCOM))
-				{
-					$this->show_changes = 'no';
-					$this->accept_success = true;
-					unset($famlist[$_REQUEST['famid']]);
-					$this->parents = find_parents($_REQUEST['famid']);
-				}
-			}
-			
-			if ($_REQUEST['action'] == 'undo')
-			{
-				$this->family->undoChange();
-				unset($famlist[$_REQUEST['famid']]);
-				$this->parents = find_parents($_REQUEST['famid']);
-			}
-		}
-
 		//-- make sure we have the true id from the record
 		$ct = preg_match("/0 @(.*)@/", $this->famrec, $match);
-		if ($ct > 0)
-		{
+		if ($ct > 0) {
 			$this->famid = trim($match[1]);
 		}
 
-		if ($this->showLivingHusb == false && $this->showLivingWife == false)
-		{
-			print_header("{$gm_lang['private']} {$gm_lang['family_info']}");
+		if ($this->showLivingHusb == false && $this->showLivingWife == false) {
+			print_header("{$gm_lang['private']} ({$this->famid}) {$gm_lang['family_info']}");
 			print_privacy_error($CONTACT_EMAIL);
 			print_footer();
 			exit;
 		}
-
+		
 		$none = true;
-		if ($this->showLivingHusb == true)
-		{
-			if (get_person_name($this->parents['HUSB']) !== 'Individual ')
-			{
-				$this->title .= get_person_name($this->parents['HUSB']);
+		if ($this->showLivingHusb == true) {
+			$gedrec = "";
+			if ($this->show_changes && !empty($this->parents['HUSB']) && GetChangeData(true, $this->parents['HUSB'], true)) {
+				$rec = GetChangeData(false, $this->parents['HUSB'], true, "gedlines");
+				$gedrec = $rec[$GEDCOM][$this->parents['HUSB']];
+			}
+			if (GetPersonName($this->parents['HUSB'], $gedrec) !== 'Individual ') {
+				$this->title .= GetPersonName($this->parents['HUSB'], $gedrec);
 				$none = false;
 			}
-			if ($this->showLivingWife && (get_person_name($this->parents['WIFE']) !== 'Individual '))
-			{
-				if ($none == false)
-				{
-					$this->title .= ' + ';
-				}
-				$this->title .= get_person_name($this->parents['WIFE']);
-				$none = false;
-			}
-			$this->title = "{$this->title} {$gm_lang['family_info']}";
-		}
-		if ($none == true)
-		{
-			$this->title = $gm_lang['family_info'];
-		}
-
-		if (empty($this->parents['HUSB']) || empty($this->parents['WIFE']))
-		{
-			$this->link_relation = 0;
 		}
 		else
 		{
+			$this->title .= $gm_lang['private'];
+			$none = false;
+		}
+		if ($this->showLivingWife) {
+			$gedrec = "";
+			if ($this->show_changes && !empty($this->parents['WIFE']) && GetChangeData(true, $this->parents['WIFE'], true)) {
+				$rec = GetChangeData(false, $this->parents['WIFE'], true, "gedlines");
+				$gedrec = $rec[$GEDCOM][$this->parents['WIFE']];
+			}
+			if (GetPersonName($this->parents['WIFE'], $gedrec) !== 'Individual ') {
+				if ($none == false) {
+					$this->title .= ' + ';
+				}
+				$this->title .= GetPersonName($this->parents['WIFE'], $gedrec);
+				$none = false;
+			}
+		}
+		else
+		{
+			if ($none == false) {
+				$this->title .= ' + ';
+			}
+			$this->title .= $gm_lang['private'];
+			$none = false;
+		}
+		if ($SHOW_ID_NUMBERS) $this->title .= " - ".$this->famid;
+		$this->title .= " - ".$gm_lang['family_info'];
+
+		if (empty($this->parents['HUSB']) || empty($this->parents['WIFE'])) {
+			$this->link_relation = 0;
+		}
+		else {
 			$this->link_relation = 1;
 		}
 	}
@@ -246,7 +248,7 @@ class FamilyRoot extends BaseController
 
 	function getChildren()
 	{
-		return find_children_in_record($this->famrec);
+		return FindChildrenInRecord($this->famrec);
 	}
 
 	function getChildrenUrlTimeline($start=0)
@@ -270,32 +272,27 @@ class FamilyRoot extends BaseController
 	 * @return Menu
 	 */
 	function &getChartsMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// charts menu
-		$menu = new Menu($gm_lang['charts'], 'timeline.php?pids[0]='.$this->parents['HUSB'].'&amp;pids[1]='.$this->parents['WIFE']);
-		if (!empty($GM_IMAGES["timeline"]["small"]))
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['timeline']['small']}");
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
+		$menu = new Menu($gm_lang['charts']);
+		$menu->addLink('timeline.php?pids[0]='.$this->parents['HUSB'].'&pids[1]='.$this->parents['WIFE']);
+		
 		// charts / parents_timeline
-		$submenu = new Menu($gm_lang['parents_timeline'], 'timeline.php?pids[0]='.$this->parents['HUSB'].'&amp;pids[1]='.$this->parents['WIFE']);
-		if (!empty($GM_IMAGES["timeline"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['timeline']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+		$submenu = new Menu($gm_lang['parents_timeline']);
+		$submenu->addLink('timeline.php?pids[0]='.$this->parents['HUSB'].'&pids[1]='.$this->parents['WIFE']);
 		$menu->addSubmenu($submenu);
+		
 		// charts / children_timeline
-		$submenu = new Menu($gm_lang['children_timeline'], 'timeline.php?'.$this->getChildrenUrlTimeline());
-		if (!empty($GM_IMAGES["timeline"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['timeline']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+		$submenu = new Menu($gm_lang['children_timeline']);
+		$submenu->addLink('timeline.php?'.$this->getChildrenUrlTimeline());
 		$menu->addSubmenu($submenu);
+		
 		// charts / family_timeline
-		$submenu = new Menu($gm_lang['family_timeline'], 'timeline.php?pids[0]='.$this->getHusband().'&amp;pids[1]='.$this->getWife().'&amp;'.$this->getChildrenUrlTimeline(2));
-		if (!empty($GM_IMAGES["timeline"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['timeline']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+		$submenu = new Menu($gm_lang['family_timeline']);
+		$submenu->addLink('timeline.php?pids[0]='.$this->getHusband().'&pids[1]='.$this->getWife().'&'.$this->getChildrenUrlTimeline(2));
 		$menu->addSubmenu($submenu);
 		
 		return $menu;
@@ -306,20 +303,16 @@ class FamilyRoot extends BaseController
 	 * @return Menu
 	 */
 	function &getReportsMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
-		$menu = new Menu($gm_lang['reports'], 'reportengine.php?action=setup&amp;report=reports/familygroup.xml&amp;famid='.$this->getFamilyID());
-		if (!empty($GM_IMAGES["reports"]["small"]))
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['reports']['small']}");
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
+		$menu = new Menu($gm_lang['reports']);
+		$menu->addLink('reportengine.php?action=setup&report=reports/familygroup.xml&famid='.$this->getFamilyID());
 
 		// reports / family_group_report
-		$submenu = new Menu($gm_lang['family_group_report'], 'reportengine.php?action=setup&amp;report=reports/familygroup.xml&amp;famid='.$this->getFamilyID());
-		if (!empty($GM_IMAGES["reports"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['reports']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+		$submenu = new Menu($gm_lang['family_group_report']);
+		$submenu->addLink('reportengine.php?action=setup&report=reports/familygroup.xml&famid='.$this->getFamilyID());
 		$menu->addSubmenu($submenu);
 		
 		return $menu;
@@ -329,100 +322,66 @@ class FamilyRoot extends BaseController
 	 * get the family page edit menu
 	 */
 	function &getEditMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang, $gm_changes;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang, $Users, $show_changes;
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
 		// edit_fam menu
 		$menu = new Menu($gm_lang['edit_fam']);
-		$menu->addOnclick("return edit_raw('".$this->getFamilyID()."', 'edit_raw');");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
+		if (!$this->famdeleted && $this->canedit) {
 
-		// edit_fam / delete_family
-		$submenu = new Menu($gm_lang['delete_family']);
-		$submenu->addOnclick("if (confirm('".$gm_lang["delete_family_confirm"]."')) return delete_family('".$this->getFamilyID()."', 'delete_family'); else return false;");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		// edit_fam / edit_raw
-		$submenu = new Menu($gm_lang['edit_raw']);
-		$submenu->addOnclick("return edit_raw('".$this->getFamilyID()."', 'edit_raw');");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-		$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		// edit_fam / members
-		$submenu = new Menu($gm_lang['change_family_members']);
-		$submenu->addOnclick("return change_family_members('".$this->getFamilyID()."', 'change_family_members');");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		// edit_fam / add child
-		$submenu = new Menu($gm_lang['add_child_to_family']);
-		$submenu->addOnclick("return addnewchild('".$this->getFamilyID()."', 'add_child_to_family');");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-			$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		// edit_fam / reorder_children
-		$submenu = new Menu($gm_lang['reorder_children']);
-		$submenu->addOnclick("return reorder_children('".$this->getFamilyID()."', 'reorder_children');");
-		if (!empty($GM_IMAGES["edit_fam"]["small"]))
-		$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-		$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-		$menu->addSubmenu($submenu);
-
-		if (isset($gm_changes[$this->getFamilyID().'_'.$GEDCOM])) {
-			// edit_fam / seperator
-			$submenu = new Menu();
-			$submenu->isSeperator();
+			// edit_fam / members
+			$submenu = new Menu($gm_lang['change_family_members']);
+			$submenu->addLink("change_family_members('".$this->getFamilyID()."', 'change_family_members');");
 			$menu->addSubmenu($submenu);
 
-			// edit_fam / show/hide changes
-			if ($_REQUEST['show_changes'] == 'no') {
-				$submenu = new Menu($gm_lang['show_changes'], 'family.php?famid='.$this->getFamilyID().'&amp;show_changes=yes');
-				if (!empty($GM_IMAGES["edit_fam"]["small"]))
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+			// edit_fam / add child
+			$submenu = new Menu($gm_lang['add_child_to_family']);
+			$submenu->addLink("addnewchild('".$this->getFamilyID()."', 'add_child_to_family');");
+			$menu->addSubmenu($submenu);
+
+			// edit_fam / reorder_children. Only show if #kids > 1
+			if ($this->family->getNumberOfChildren() > 1) {
+				$submenu = new Menu($gm_lang['reorder_children']);
+				$submenu->addLink("reorder_children('".$this->getFamilyID()."', 'reorder_children');");
 				$menu->addSubmenu($submenu);
 			}
-			else {
-				$submenu = new Menu($gm_lang['hide_changes'], 'family.php?famid='.$this->getFamilyID().'&amp;show_changes=no');
-				if (!empty($GM_IMAGES["edit_fam"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+			
+			// edit_fam / reorder_media. Only show if #media > 1
+			if ($this->family->getNumberOfMedia() > 1) {
+				$submenu = new Menu($gm_lang['reorder_media']);
+				$submenu->addLink("reorder_media('".$this->getFamilyID()."', 'reorder_media');");
+				$menu->addSubmenu($submenu);
+			}
+			
+			// edit_fam / delete_family. Don't show if unapproved fam.
+			if (!$this->famnew && !$this->famdeleted) {
+				$submenu = new Menu($gm_lang['delete_family']);
+				$submenu->addLink("if (confirm('".$gm_lang["delete_family_confirm"]."')) delete_family('".$this->getFamilyID()."', 'delete_family');");
 				$menu->addSubmenu($submenu);
 			}
 
-			if (userCanAccept(getUserName()))
-			{
-				// edit_fam / accept_all
-				/*$submenu = new Menu($gm_lang['accept_all']);
-				$submenu->addOnclick("window.open('edit_changes.php','','width=600,height=600,resizable=1,scrollbars=1'); return false;");
-				if (!empty($GM_IMAGES["edit_fam"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
-				$menu->addSubmenu($submenu);
-				*/
-				$submenu = new Menu($gm_lang["accept_all"], "family.php?famid=".$this->famid."&amp;action=accept");
-				if (!empty($GM_IMAGES["edit_fam"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
-				$menu->addSubmenu($submenu);
-				$submenu = new Menu($gm_lang["undo_all"], "family.php?famid=".$this->famid."&amp;action=undo");
-				if (!empty($GM_IMAGES["edit_fam"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['edit_fam']['small']}");
-				$submenu->addClass("submenuitem$ff", "submenuitem_hover$ff");
+			// edit_fam / edit_raw
+			if ($Users->userCanEditGedlines()) {
+				$submenu = new Menu($gm_lang['edit_raw']);
+				$submenu->addLink("edit_raw('".$this->getFamilyID()."', 'edit_raw');");
 				$menu->addSubmenu($submenu);
 			}
+		}
+		// TODO: also show this option when media changed
+		if (GetChangeData(true, $this->getFamilyID(), true) || HasChangedMedia($this->famrec)) {
+			// edit_fam / seperator
+			if (!$this->family->famdeleted) {
+				$submenu = new Menu();
+				$submenu->isSeperator();
+				$menu->addSubmenu($submenu);
+			}
+
+			// edit_fam / show/hide changes
+				if ($show_changes == "no") $submenu = new Menu($gm_lang['show_changes']);
+				else $submenu = new Menu($gm_lang['hide_changes']);
+				$submenu->addLink('showchanges();');
+				$menu->addSubmenu($submenu);
 		}
 		return $menu;
 	}
@@ -432,64 +391,32 @@ class FamilyRoot extends BaseController
 	 * @return Menu
 	 */
 	function &getOtherMenu() {
-		global $TEXT_DIRECTION, $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $gm_lang;
-		global $SHOW_GEDCOM_RECORD, $ENABLE_CLIPPINGS_CART;
+		global $TEXT_DIRECTION, $GEDCOM, $gm_lang;
+		global $ENABLE_CLIPPINGS_CART, $Users;
 		
 		if ($TEXT_DIRECTION=="rtl") $ff="_rtl";
 		else $ff="";
 		
-			// other menu
+		// other menu
 		$menu = new Menu($gm_lang['other']);
-		$menu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}", "submenu{$ff}");
-		if ($SHOW_GEDCOM_RECORD)
-		{
-			$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-			if ($_REQUEST['show_changes'] == 'yes'  && userCanEdit(getUserName()))
-			{
-				$menu->addLink("javascript:show_gedcom_record('new');");
-			}
-			else
-			{
-				$menu->addLink("javascript:show_gedcom_record();");
-			}
-		}
-		else
-		{
-			if (!empty($GM_IMAGES["clippings"]["small"]))
-				$menu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['clippings']['small']}");
-			$menu->addLink('clippings.php?action=add&amp;id='.$this->getFamilyID().'&amp;type=fam');
-		}
-		if ($SHOW_GEDCOM_RECORD)
-		{
+		if ($Users->userCanViewGedlines()) {
 				// other / view_gedcom
+				if ($this->show_changes) $execute = "show_gedcom_record('new');";
+				else $execute = "show_gedcom_record();";
 				$submenu = new Menu($gm_lang['view_gedcom']);
-				if ($_REQUEST['show_changes'] == 'yes'  && userCanEdit(getUserName()))
-				{
-					$submenu->addLink("javascript:show_gedcom_record('new');");
-				}
-				else
-				{
-					$submenu->addLink("javascript:show_gedcom_record();");
-				}
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				$submenu->addLink($execute);
 				$menu->addSubmenu($submenu);
 		}
-		if ($ENABLE_CLIPPINGS_CART >= getUserAccessLevel())
-		{
+		if ($ENABLE_CLIPPINGS_CART >= $Users->getUserAccessLevel()) {
 				// other / add_to_cart
-				$submenu = new Menu($gm_lang['add_to_cart'], 'clippings.php?action=add&amp;id='.$this->getFamilyID().'&amp;type=fam');
-				if (!empty($GM_IMAGES["clippings"]["small"]))
-					$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['clippings']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				$submenu = new Menu($gm_lang['add_to_cart']);
+				$submenu->addLink('clippings.php?action=add&id='.$this->getFamilyID().'&type=fam');
 				$menu->addSubmenu($submenu);
 		}
-		if ($this->display && !empty($this->uname))
-		{
+		if ($this->display && !empty($this->uname)) {
 				// other / add_to_my_favorites
-				$submenu = new Menu($gm_lang['add_to_my_favorites'], 'family.php?action=addfav&amp;famid='.$this->getFamilyID().'&amp;gid='.$this->getFamilyID());
-				$submenu->addIcon("{$GM_IMAGE_DIR}/{$GM_IMAGES['gedcom']['small']}");
-				$submenu->addClass("submenuitem{$ff}", "submenuitem_hover{$ff}");
+				$submenu = new Menu($gm_lang['add_to_my_favorites']);
+				$submenu->addLink('family.php?action=addfav&famid='.$this->getFamilyID().'&gid='.$this->getFamilyID());
 				$menu->addSubmenu($submenu);
 		}
 		return $menu;

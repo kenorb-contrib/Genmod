@@ -1,0 +1,68 @@
+<GMReport access="PRIV_PUBLIC" icon="place">
+	<!-- $Id: deathlist.xml,v 1.3 2009/01/03 06:47:17 sjouke Exp $ -->
+	<GMRTitle><GMRvar var="gm_lang[death_report]" /></GMRTitle>
+	<GMRDescription>Prints a list of individuals matching specific name and/or death criteria</GMRDescription>
+	<GMRInput name="name" lookup="NAME" type="text"><GMRvar var="gm_lang[name]" /></GMRInput>
+	<GMRInput name="deathplace" lookup="PLAC" type="text"><GMRvar var="gm_lang[deathplace]" /></GMRInput>
+	<GMRInput name="deathdate1" lookup="DATE" type="text"><GMRvar var="gm_lang[deathdate1]" /></GMRInput>
+	<GMRInput name="deathdate2" lookup="DATE" type="text"><GMRvar var="gm_lang[deathdate2]" /></GMRInput>
+	<GMRInput name="sortby" type="select" options="NAME,DEAT"><GMRvar var="gm_lang[sort_by]" /></GMRInput>
+	<GMRInput name="showIndID" type="checkbox" default="SHOW_ID_NUMBERS"><GMRvar var="gm_lang[SHOW_ID_NUMBERS]" /></GMRInput>
+	<GMRInput name="pageSize" type="select" options="AVAIL_PAGE_SIZES" default="DEFAULT_PAGE_SIZE"><GMRvar var="gm_lang[page_size]" /></GMRInput>
+	<GMRStyle name="header" font="LucidaSansUnicode" size="16" style="b" />
+	<GMRStyle name="pagenum" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="text" font="LucidaSansUnicode" size="8" style="" />
+	<GMRStyle name="label" font="LucidaSansUnicode" size="8" style="" />
+	<GMRDoc pageSize="$pageSize" orientation="L" margin="24">
+		<GMRHeader>
+			<GMRCell width="0" height="20" align="center" style="header"><GMRvar var="gm_lang[death_report]" /></GMRCell>
+			<!-- GMRCell width="0" height="10" align="right" style="pagenum"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /> - <GMRNow /></GMRCell -->
+			<GMRTextBox width="50%" height="10" border="0">
+				<GMRText style="pagenum"><GMRNow /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="0" height="10" border="0" newline="1">
+				<GMRText style="pagenum" align="right"><GMRvar var="gm_lang[page]" /> <GMRPageNum /> <GMRvar var="gm_lang[of]" /> <GMRTotalPages /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="200" height="12" border="1">
+				<GMRText style="label"><GMRvar var="gm_lang[name]" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="100" height="12" border="1">
+				<GMRText style="label"><GMRvar var="gm_lang[date]" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="225" height="12" border="1">
+				<GMRText style="label"><GMRvar var="factarray[PLAC]" /></GMRText>
+			</GMRTextBox>
+			<GMRTextBox width="225" height="12" border="1" newline="1">
+				<GMRText style="label"><GMRvar var="factarray[SOUR]" /></GMRText>
+			</GMRTextBox>
+		</GMRHeader>
+		<GMRBody>
+			<GMRList list="individual" filter1="DEAT:PLAC CONTAINS $deathplace" filter2="DEAT:DATE GTE $deathdate1" filter3="DEAT:DATE LTE $deathdate2" filter4="NAME CONTAINS $name" sortby="$sortby">
+				<GMRTextBox width="200" height="12" border="0">
+					<GMRText style="text"><GMRGetPersonName id="" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="100" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="DEAT:DATE" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="220" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="DEAT:PLAC" /></GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="5" height="12" border="0">
+					<GMRText style="text"> </GMRText>
+				</GMRTextBox>
+				<GMRTextBox width="220" height="12" border="0">
+					<GMRText style="text"><GMRGedcomValue tag="DEAT:@SOUR" /></GMRText>
+					<GMRGedcom id="DEAT:@SOUR">
+						<GMRText style="text"><GMRGedcomValue tag="TITL" /></GMRText>
+					</GMRGedcom>
+				</GMRTextBox>
+				<GMRTextBox width="5" height="12" border="0" newline="1">
+					<GMRText style="text"> </GMRText>
+				</GMRTextBox>
+			</GMRList>
+			<GMRCell width="0" height="24" border="0" align="right" style="label">
+				<GMRvar var="gm_lang[total_indis]" />: <GMRListTotal />
+			</GMRCell>
+		</GMRBody>
+	</GMRDoc>
+</GMReport>

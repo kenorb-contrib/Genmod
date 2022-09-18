@@ -5,7 +5,7 @@
  * Processes GM XML Reports and generates a report
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Reports
- * @version $Id: reportengine.php,v 1.4 2006/02/19 18:40:23 roland-d Exp $
+ * @version $Id: reportengine.php,v 1.13 2008/12/12 06:51:36 sjouke Exp $
  */
 
 /**
@@ -35,12 +35,6 @@ require("config.php");
  * Inclusion of the chart functions
 */
 require("includes/functions_charts.php");
-
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
 
 @set_time_limit($TIME_LIMIT*2);
 function get_tag_values($tag) {
@@ -63,17 +57,17 @@ if (!isset($type)) $type = array();
 
 $newvars = array();
 foreach($vars as $name=>$var) {
-	$var = clean_input($var);
+	$var = CleanInput($var);
 	$newvars[$name]["id"] = $var;
 	if (!empty($type[$name]) && (($type[$name]=="INDI")||($type[$name]=="FAM")||($type[$name]=="SOUR"))) {
-		$gedcom = find_gedcom_record($var);
+		$gedcom = FindGedcomRecord($var);
 		if (empty($gedcom)) $action="setup";
 		if ($type[$name]=="FAM") {
 			if (preg_match("/0 @.*@ INDI/", $gedcom)>0) {
-				$fams = find_sfamily_ids($var);
+				$fams = FindSfamilyIds($var);
 				if (!empty($fams[0])) {
-					$gedcom = find_family_record($fams[0]);
-					if (!empty($gedcom)) $vars[$name] = $fams[0];
+					$gedcom = FindFamilyRecord($fams[0]["famid"]);
+					if (!empty($gedcom)) $vars[$name] = $fams[0]["famid"];
 					else $action="setup";
 				}
 			}
@@ -89,16 +83,16 @@ foreach($varnames as $indexval => $name) {
 	}
 }
 
-$reports = get_report_list();
+$reports = GetReportList();
 if (!empty($report)) {
 	$r = basename($report);
 	if (!isset($reports[$r]["access"])) $action = "choose";
-	else if ($reports[$r]["access"]<getUserAccessLevel($gm_username)) $action = "choose";
+	else if ($reports[$r]["access"] < $Users->getUserAccessLevel($gm_username)) $action = "choose";
 }
 
 //-- choose a report to run
 if ($action=="choose") {
-	$reports = get_report_list(true);
+	$reports = GetReportList(true);
 	print_header($gm_lang["choose_report"]);
 
 	print "<br /><br />\n";
@@ -182,7 +176,7 @@ function paste_id(value) {
 		$firstrun = 0;
 		if (!isset($report_array["inputs"])) $report_array["inputs"] = array();
 		foreach($report_array["inputs"] as $indexval => $input) {
-			if ((($input["name"] == "sources") && ($SHOW_SOURCES>=getUserAccessLevel($gm_username))) || ($input["name"] != "sources")) {
+			if ((($input["name"] == "sources") && ($SHOW_SOURCES >= $Users->getUserAccessLevel($gm_username))) || ($input["name"] != "sources")) {
 				if (($input["name"] != "photos") || ($MULTI_MEDIA)) {
 					print "<tr><td class=\"shade2 wrap\">\n";
 					print "<input type=\"hidden\" name=\"varnames[]\" value=\"".$input["name"]."\" />\n";
@@ -191,14 +185,14 @@ function paste_id(value) {
 					if (!isset($input["default"])) $input["default"] = "";
 					if (isset($input["lookup"])) {
 						if ($input["lookup"]=="INDI") {
-							if (!empty($pid)) $input["default"] = clean_input($pid);
-							else $input["default"] = check_rootid($input["default"]);
+							if (!empty($pid)) $input["default"] = CleanInput($pid);
+							else $input["default"] = CheckRootId($input["default"]);
 						}
 						if ($input["lookup"]=="FAM") {
-							if (!empty($famid)) $input["default"] = clean_input($famid);
+							if (!empty($famid)) $input["default"] = CleanInput($famid);
 						}
 						if ($input["lookup"]=="SOUR") {
-							if (!empty($sid)) $input["default"] = clean_input($sid);
+							if (!empty($sid)) $input["default"] = CleanInput($sid);
 						}
 					}
 					if ($input["type"]=="text") {
@@ -224,8 +218,14 @@ function paste_id(value) {
 						print "<select name=\"vars[".$input["name"]."]\" id=\"".$input["name"]." var\">\n";
 						$options = preg_split("/[, ]+/", $input["options"]);
 						foreach($options as $indexval => $option) {
-							print "\t<option value=\"$option\">";
+							print "\t<option value=\"$option\"";
+//LERMAN - add ability to have a selected item
+							if (isset($input["default"]) && ($input["default"] == $option)) {
+								print " SELECTED=selected";
+							}
+							print ">";
 							if (isset($gm_lang[$option])) print $gm_lang[$option];
+							else if (isset($gm_lang["p_".$option])) print $gm_lang["p_".$option];
 							else if (isset($factarray[$option])) print $factarray[$option];
 							else print $option;
 							print "</option>\n";
@@ -235,8 +235,8 @@ function paste_id(value) {
 					if (isset($input["lookup"])) {
 						print "<input type=\"hidden\" name=\"type[".$input["name"]."]\" value=\"".$input["lookup"]."\" />";
 						if ($input["lookup"]=="FAM") print_findfamily_link("famid");
-						if ($input["lookup"]=="INDI") print_findindi_link("pid","");
-						if ($input["lookup"]=="PLAC") print_findplace_link("birthplace");
+						if ($input["lookup"]=="INDI") PrintFindIndiLink("pid","");
+						if ($input["lookup"]=="PLAC") print_findplace_link($input["name"]);
 						if ($input["lookup"]=="DATE") {
 							$text = $gm_lang["select_date"];
 							if (isset($GM_IMAGES["calendar"]["button"])) $Link = "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["calendar"]["button"]."\" name=\"a_".$input["name"]."\" id=\"a_".$input["name"]."\" alt=\"".$text."\" title=\"".$text."\" border=\"0\" align=\"middle\" />";
@@ -254,6 +254,20 @@ function paste_id(value) {
 				}
 			}
 		}
+
+/*		?>
+		<tr><td class="shade2 wrap"></td>
+		<td class="shade1">
+		<table><tr>
+		<td><center><input type="radio" name="output" value="PDF" checked="checked" /><img src="images/media/pdf.gif" alt="PDF" title="PDF" /></center></td>
+		<td><center><input type="radio" name="output" value="HTML" <?php if ($output=="HTML") echo " checked=\"checked\"";?> /><img src="images/media/html.gif" alt="HTML" title="HTML" /></center></td>
+		<?php if (file_exists("includes/reportlatex.php")) { ?>
+			<td><center><input type="radio" name="output" value="TEX" <?php if ($output=="TEX") echo " checked=\"checked\"";?> /><img src="images/media/tex.gif" alt="LaTEX" title="LaTEX" /></center></td>
+		<?php } ?>
+		</tr></table>
+		</td></tr>
+		<?php */
+
 		print "<tr><td class=\"topbottombar\" colspan=\"2\"><input type=\"submit\" value=\"".$gm_lang["download_report"]."\" onclick=\"document.setupreport.elements['download'].value='1';\"/></td></tr>\n";
 		print "</table>\n";
 		print "</form>\n";
@@ -264,8 +278,18 @@ function paste_id(value) {
 //-- run the report
 else if ($action=="run") {
 	//-- load the report generator
-	if ($output=="HTML") require("includes/reporthtml.php");
-	else if ($output=="PDF") require("includes/reportpdf.php");
+	switch ($output) {
+	case "HTML":
+		require("includes/reporthtml.php");
+		break;
+	case "TEXT":
+		require 'includes/class_reportlatex.php';
+		break;
+	case "PDF":
+	default:
+		require("includes/reportpdf.php");
+		break;
+	}
 
 	//-- start the sax parser
 	$xml_parser = xml_parser_create();

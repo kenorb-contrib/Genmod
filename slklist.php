@@ -3,7 +3,7 @@
  * Displays a list of 'earthfathers' == patriarch.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: slklist.php,v 1.1 2005/10/23 21:36:54 roland-d Exp $
+ * @version $Id: slklist.php,v 1.6 2008/01/06 11:01:51 roland-d Exp $
  */
 
 /*=================================================
@@ -133,10 +133,10 @@ $years= array();
 	{
 		$ref= $keys[$i];
 		$value= $values[$i];
-//--		$person= find_person_record($key);
+//--		$person= FindPersonRecord($key);
 //--		$naam="";
 //--		if (getnameitem($namen)!==false)
-		$person= find_person_record($ref);
+		$person= FindPersonRecord($ref);
 		$naam="";
 		if (getnameitem($value)!==false)
 		{	$naam= $match1[1];
@@ -193,7 +193,7 @@ global $nrgen, $levelgen;
 	$tabbladname["$key"]= $tabblad;
 	$kk=0;
 
-	$person= find_person_record($key);
+	$person= FindPersonRecord($key);
 	$fams="";
 	$ctf= preg_match_all("/1\s*FAMS\s*@(.*)@/",$person,$match,PREG_SET_ORDER);
 //--	If first call check if this dynasty is a single person or has a lot of children with the same name
@@ -206,11 +206,11 @@ global $nrgen, $levelgen;
 //--	loop for every relation
 	{
 		$fams= $match[$ii][1]; $ii++;
-		$famlines= find_family_record($fams);
+		$famlines= FindFamilyRecord($fams);
 //--if ($key == "I646") {print ("zoek2 I646:".$ctf.":".$key.":".$fams.":".$famlines.":"."<br />");}
 //-- print ("fams,famlines:".$fams.":".$famlines."<br />");
 //--	check if there is a husband. If so stop
-		$parents= find_parents($fams);
+		$parents= FindParents($fams);
 		$stop=1;
 		if ($parents["WIFE"] == $key)
 		{
@@ -235,7 +235,7 @@ global $nrgen, $levelgen;
 		while ($jj < $ctc)
 		{	$chil= $match1[$jj][1]; $jj++;
 			$kk= $kk+1;
-			$fullname= get_sortable_name($chil);
+			$fullname= GetSortableName($chil);
 			$nrgenstr1= $nrgenstr . $kk . ".";
 //-- print ("volgnr en kind:".$kk.":".$chil."---".$nrgenstr1."---".$fullname."<br />");
 			$maxgen1= fill_in($kk,$chil,$fullname,$level+1,$nrgenstr1,$xfather,$xmother,$tabblad);
@@ -292,7 +292,7 @@ $nrgenstr="--";
 //--	print ("start fillin arry:".$nr.":".$key.":".$value.":".$level.":".$nrgenstr.":".$romeins[$level]."<br />");
 	$kk=0;
 
-	$person= find_person_record($key);
+	$person= FindPersonRecord($key);
 	$fams="";
 	$ctf= preg_match_all("/1\s*FAMS\s*@(.*)@/",$person,$match,PREG_SET_ORDER);
 //--	If first call check if this dynasty is a single person or has a lot of children with the same name
@@ -303,11 +303,11 @@ $nrgenstr="--";
 //--	loop for every relation
 	{
 		$fams= $match[$ii][1]; $ii++;
-		$famlines= find_family_record($fams);
+		$famlines= FindFamilyRecord($fams);
 //--if ($key == "I646") {print ("zoek3 I646:".$ctf.":".$key.":".$fams.":".$famlines.":"."<br />");}
 //--	print ("fams,famlines:".$fams.":".$famlines."<br />");
 //--	check if there is a husband. If so stop
-		$parents= find_parents($fams);
+		$parents= FindParents($fams);
 		$stop=1;
 		if ($parents["WIFE"] == $key)
 		{
@@ -405,7 +405,7 @@ print ("gevonden:".$maxmulti.":".$key.":".$name.":".$tabbladnr["$key"]."<br />")
 		}
 		elseif ($tabbladnr["$key"] < 1)
 	{
-//--		$person= find_person_record($key);
+//--		$person= FindPersonRecord($key);
 //--		$fams="";
 //--		$ctf= preg_match_all("/1\s*FAMS\s*@(.*)@/",$person,$match,PREG_SET_ORDER);
 //--	If first call check if this dynasty is a single person or has a lot of children with the same name
@@ -418,7 +418,7 @@ print ("gevonden:".$maxmulti.":".$key.":".$name.":".$tabbladnr["$key"]."<br />")
 //--		{
 //--			$fams= $match[$ii][1]; $ii++;
 //--			$famlines= find_family_record($fams);
-//--			$parents= find_parents($fams);
+//--			$parents= FindParents($fams);
 //--			$stop=2;
 //--			if ($parents["WIFE"] == $key)
 //--			{
@@ -715,7 +715,7 @@ function stringinfo($indirec,$lookfor)
 {
 //-- print "start stringinfo<br />";
 global $match1,$match2,$usedinitials;
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
+	$birthrec = GetSubRecord(1, $lookfor, $indirec);
 	$match1[1]="";
 	$match2[1]="";
 	if ($birthrec!==false)
@@ -740,7 +740,7 @@ function stringevent($indirec,$lookfor)
 {
 //-- print "start stringevent<br />";
 global $match1,$match2,$usedinitials;
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
+	$birthrec = GetSubRecord(1, $lookfor, $indirec);
 	$match1[1]="";
 	$match2[1]="";
 	if ($birthrec!==false)
@@ -772,7 +772,7 @@ function formfile($indirec,$lookfor)
 //-- print "start dateplace<br />";
 global $match1,$match2,$usedinitials;
 
-	$objerec = get_sub_record(1, $lookfor, $indirec);
+	$objerec = GetSubRecord(1, $lookfor, $indirec);
 	$match1[1]="";
 	$match2[1]="";
 	if ($objerec!==false)
@@ -796,7 +796,7 @@ function dateplace($indirec,$lookfor)
 //-- print "start dateplace<br />";
 global $match1,$match2,$usedinitials;
 
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
+	$birthrec = GetSubRecord(1, $lookfor, $indirec);
 	$match1[1]="";
 	$match2[1]="";
 	if ($birthrec!==false)
@@ -820,7 +820,7 @@ function datenote($indirec,$lookfor)
 //--print "start datenote<br />";
 global $match1,$match2,$usedinitials;
 
-	$birthrec = get_sub_record(1, $lookfor, $indirec);
+	$birthrec = GetSubRecord(1, $lookfor, $indirec);
 	$match1[1]="";
 	$match2[1]="";
 	if ($birthrec!==false)
@@ -1198,16 +1198,16 @@ if ($absmo == "")
 //--	print ("refrecord:".$i.":".$mykey.":".$refrecord["$mykey"].":".$myfather.":".$absfa.":".$mymother.":".$absmo."<br />");
 }
 		$myparent= $myfather; if ($myparent == ""){$myparent= $mymother;}
-		if ($mytype == 1) {$namen= get_sortable_name($mykey);} else {$namen= get_sortable_name($myparent);}
-		$person= find_person_record($mykey);
+		if ($mytype == 1) {$namen= GetSortableName($mykey);} else {$namen= GetSortableName($myparent);}
+		$person= FindPersonRecord($mykey);
 //--	printf ("%2s,%5s,%30s,%6s,%6s,%6s,%6s,%20s<br />",$mytype,$mylevel,$mygennum,$mykey,$myfam,$myfather,$mymother,$namen);
 
 
 //-- find all the fact information
 	if ($mytype == 1)
-	{	$indirec = find_person_record($mykey);}
+	{	$indirec = FindPersonRecord($mykey);}
 	else
-	{	$indirec= find_family_record($myfam);}
+	{	$indirec= FindFamilyRecord($myfam);}
 
 //-- in case you want prints for debugging
 	$indilines = split("\n", $indirec);

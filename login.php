@@ -5,7 +5,7 @@
  * Provides links for administrators to get to other administrative areas of the site
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  *
  * @package Genmod
  * @subpackage Display
- * @version $Id: login.php,v 1.11 2006/04/30 18:44:15 roland-d Exp $
+ * @version $Id: login.php,v 1.21 2009/03/25 16:53:52 sjouke Exp $
  */ 
 
 /**
@@ -49,22 +49,23 @@ if ($action=="login") {
 	else $password="";
 	if (isset($_POST['remember'])) $remember = $_POST['remember'];
 	else $remember = "no";
-	$auth = authenticateUser($username, $password);
+	$auth = $Users->AuthenticateUser($username, $password);
 	if ($auth) {
 		if (!empty($_POST["usertime"])) {
 			$_SESSION["usertime"]=@strtotime($_POST["usertime"]);
 		}
 		else $_SESSION["usertime"]=time();
 		$_SESSION["timediff"]=time()-$_SESSION["usertime"];
-		$MyUserName = getUserName();
-		$MyUser = $users[$MyUserName];
-		if (isset($MyUser["language"])) {
-		  if (isset($_SESSION['CLANGUAGE']))$_SESSION['CLANGUAGE'] = $MyUser["language"];
-		  else if (isset($HTTP_SESSION_VARS['CLANGUAGE'])) $HTTP_SESSION_VARS['CLANGUAGE'] = $MyUser["language"];
+		$MyUserName = $Users->GetUserName();
+		$MyUser = $Users->GetUser($MyUserName);
+		if (isset($MyUser->language)) {
+		  if (isset($_SESSION['CLANGUAGE']))$_SESSION['CLANGUAGE'] = $MyUser->language;
+		  else if (isset($HTTP_SESSION_VARS['CLANGUAGE'])) $HTTP_SESSION_VARS['CLANGUAGE'] = $MyUser->language;
 		}
 		session_write_close();
 		$url = preg_replace("/logout=1/", "", $url);
-		if (!stristr($url, $SERVER_URL)) $url = $SERVER_URL . $url;
+		if (stristr($SERVER_URL, $url) === false) $url = $SERVER_URL . $url;
+		else $url = $SERVER_URL;
 		if ($remember=="yes") setcookie("gm_rem", $username, time()+60*60*24*7);
 		else setcookie("gm_rem", "", time()-60*60*24*7);
 		header("Location: $url");
@@ -106,7 +107,7 @@ if ($_SESSION["cookie_login"]) {
 if ($REQUIRE_AUTHENTICATION) {
 	print "<table class=\"center width60 ".$TEXT_DIRECTION."\"><tr><td class=\"wrap\">";
 	if (empty($help_message) || !isset($help_message)) {
-		if (!empty($GEDCOM)) ReadGedcomConfig($GEDCOM);
+		if (!empty($GEDCOM)) SwitchGedcom($GEDCOM);
 		switch ($WELCOME_TEXT_AUTH_MODE){
 			case "1":
 				$help_message = "welcome_text_auth_mode_1";
@@ -143,7 +144,7 @@ else {
 	<form name="loginform" method="post" action="<?php print $LOGIN_URL; ?>" onsubmit="t = new Date(); document.loginform.usertime.value=t.getFullYear()+'-'+(t.getMonth()+1)+'-'+t.getDate()+' '+t.getHours()+':'+t.getMinutes()+':'+t.getSeconds(); return true;">
 		<?php $i = 0;?>
 		<input type="hidden" name="action" value="login" />
-		<input type="hidden" name="url" value="<?php print $url; ?>" />
+		<input type="hidden" name="url" value="<?php print htmlspecialchars($url); ?>" />
 		<input type="hidden" name="ged" value="<?php if (isset($ged)) print $ged; else print $GEDCOM; ?>" />
 		<input type="hidden" name="pid" value="<?php if (isset($pid)) print $pid; ?>" />
 		<input type="hidden" name="type" value="<?php print $type; ?>" />
@@ -179,14 +180,13 @@ else {
 		        }
 		    ?>
 		      <input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print $gm_lang["login"]; ?>" />&nbsp;
-		      <input type="submit" tabindex="<?php $i++; print $i?>" value="<?php print $gm_lang["admin"]; ?>" onclick="document.loginform.url.value='admin.php';" />
 		    </td>
 		  </tr>
 		</table>
 </form><br /><br />
 <?php
 $sessname = session_name();
-if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".$gm_lang["cookie_help"]."</span><br /><br />";
+if (!isset($_COOKIE[$sessname]) && !isset($_COOKIE["gm_rem"])) print "<span class=\"error\">".$gm_lang["cookie_message"]."</span><br /><br />";
 if ($USE_REGISTRATION_MODULE) {?>
 	<table class="center facts_table width40">
 	<tr><td class="topbottombar" colspan="2"><?php print $gm_lang["account_information"];?></td></tr>

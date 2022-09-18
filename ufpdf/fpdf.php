@@ -68,6 +68,7 @@ var $TextColor;          //commands for text color
 var $ColorFlag;          //indicates whether fill and text colors are different
 var $ws;                 //word spacing
 var $AutoPageBreak;      //automatic page breaking
+var $autoLineWrap;		 //automatic line wrapping 
 var $PageBreakTrigger;   //threshold used to trigger page breaks
 var $InFooter;           //flag set when processing footer
 var $ZoomMode;           //zoom display mode
@@ -112,6 +113,7 @@ function FPDF($orientation='P',$unit='mm',$format='A4')
 	$this->TextColor='0 g';
 	$this->ColorFlag=false;
 	$this->ws=0;
+	$this->autoLineWrap = true;
 	//Standard fonts
 	$this->CoreFonts=array('courier'=>'Courier','courierB'=>'Courier-Bold','courierI'=>'Courier-Oblique','courierBI'=>'Courier-BoldOblique',
 		'helvetica'=>'Helvetica','helveticaB'=>'Helvetica-Bold','helveticaI'=>'Helvetica-Oblique','helveticaBI'=>'Helvetica-BoldOblique',
@@ -133,9 +135,9 @@ function FPDF($orientation='P',$unit='mm',$format='A4')
 	{
 		$format=strtolower($format);
 		if($format=='a3')
-			$format=array(841.89,1190.55);
+			$format=array(844.72,1190.55);
 		elseif($format=='a4')
-			$format=array(595.28,841.89);
+			$format=array(595.28,844.72);
 		elseif($format=='a5')
 			$format=array(420.94,595.28);
 		elseif($format=='letter')
@@ -226,6 +228,10 @@ function SetAutoPageBreak($auto,$margin=0)
 	$this->AutoPageBreak=$auto;
 	$this->bMargin=$margin;
 	$this->PageBreakTrigger=$this->h-$margin;
+}
+
+function SetAutoLineWrap($auto) {
+	$this->autoLineWrap = $auto;
 }
 
 function SetDisplayMode($zoom,$layout='continuous')
@@ -435,7 +441,7 @@ function GetStringWidth($s)
 {
 	//Get width of a string in the current font
 	$s=(string)$s;
-	$cw=$this->CurrentFont['cw'];
+	$cw=&$this->CurrentFont['cw'];
 	$w=0;
 	$l=strlen($s);
 	for($i=0;$i<$l;$i++) {
@@ -580,7 +586,7 @@ function SetFont($family,$style='',$size=0)
 	$this->FontStyle=$style;
 	$this->FontSizePt=$size;
 	$this->FontSize=$size/$this->k;
-	$this->CurrentFont=$this->fonts[$fontkey];
+	$this->CurrentFont=&$this->fonts[$fontkey];
 	if($this->page>0)
 		$this->_out(sprintf('BT /F%d %.2f Tf ET',$this->CurrentFont['i'],$this->FontSizePt));
 }
@@ -719,7 +725,7 @@ function Cell($w,$h=0,$txt='',$border=0,$ln=0,$align='',$fill=0,$link='')
 function MultiCell($w,$h,$txt,$border=0,$align='J',$fill=0)
 {
 	//Output text with automatic or explicit line breaks
-	$cw=$this->CurrentFont['cw'];
+	$cw=&$this->CurrentFont['cw'];
 	if($w==0)
 		$w=$this->w-$this->rMargin-$this->x;
 	$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
@@ -833,7 +839,7 @@ function MultiCell($w,$h,$txt,$border=0,$align='J',$fill=0)
 function Write($h,$txt,$link='')
 {
 	//Output text in flowing mode
-	$cw=$this->CurrentFont['cw'];
+	$cw=&$this->CurrentFont['cw'];
 	$w=$this->w-$this->rMargin-$this->x;
 	$wmax=($w-2*$this->cMargin)*1000/$this->FontSize;
 	$s=str_replace("\r",'',$txt);
@@ -868,7 +874,7 @@ function Write($h,$txt,$link='')
 			$sep=$i;
 		if (isset($cw[$c])) $l+=$cw[$c];
 		else if (isset($cw[ord($c)])) $l+=$cw[ord($c)];
-		if($l>$wmax)
+		if($l>$wmax  && $this->autoLineWrap)
 		{
 			//Automatic line break
 			if($sep==-1)
@@ -1260,7 +1266,7 @@ function _putfonts()
 			$this->_out('endobj');
 			//Widths
 			$this->_newobj();
-			$cw=$font['cw'];
+			$cw=&$font['cw'];
 			$s='[';
 			for($i=32;$i<=255;$i++) {
 				if (isset($cw[chr($i)])) $s.=$cw[chr($i)].' ';

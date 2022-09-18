@@ -3,7 +3,7 @@
  * Standard theme
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,15 +21,17 @@
  *
  * @package Genmod
  * @subpackage Themes
- * @version $Id: theme.php,v 1.6 2006/04/30 18:44:15 roland-d Exp $
+ * @version $Id: theme.php,v 1.15 2009/03/18 19:43:48 sjouke Exp $
  */
 
 $theme_name = "Standard";		//-- the name of this theme
 
 $stylesheet = $THEME_DIR."style.css";	//-- CSS level 2 stylesheet to use
 $rtl_stylesheet = $THEME_DIR."style_rtl.css";           //-- CSS level 2 stylesheet to use
+$mail_stylesheet = $THEME_DIR."style_mail.css";           //-- CSS level 2 stylesheet to use
 $print_stylesheet = $THEME_DIR."print.css";	//-- CSS level 2 print stylesheet to use
 $toplinks = $THEME_DIR."toplinks.html";	//-- File to display the icons and links to different sections
+$menubar = $THEME_DIR."menubar.php";	//-- File to display the top menu
 $headerfile = $THEME_DIR."header.html";	//-- Header information for the site
 $footerfile = $THEME_DIR."footer.html";	//-- Footer information for the site
 $print_footerfile = $THEME_DIR."print_footer.html";	//-- Print Preview Footer information for the site
@@ -46,16 +48,18 @@ $GM_IMAGES["indis"]["large"] = "indis.gif";
 $GM_IMAGES["media"]["large"] = "media.gif";
 $GM_IMAGES["notes"]["large"] = "notes.gif";
 $GM_IMAGES["pedigree"]["large"] = "pedigree.gif";
+$GM_IMAGES["charts"]["large"] = "charts.gif";
 $GM_IMAGES["sfamily"]["large"] = "sfamily.gif";
-$GM_IMAGES["reports"]["large"] = "reports.gif";
+$GM_IMAGES["reports"]["large"] = "reports(II).gif";
 $GM_IMAGES["source"]["large"] = "source.gif";
 $GM_IMAGES["repository"]["large"] = "repository.gif";
-$GM_IMAGES["list"]["large"] = "list.gif";
+$GM_IMAGES["list"]["large"] = "lists.gif";
 $GM_IMAGES["chart"]["large"] = "chart.gif";
 
 //- Theme main icons
 $GM_IMAGES["calendar"]["large"] = "calendar.gif";
-$GM_IMAGES["clippings"]["large"] = "clippings.gif";
+// $GM_IMAGES["clippings"]["large"] = "clippings.gif";
+$GM_IMAGES["clippings"]["large"] = "reports.gif";
 $GM_IMAGES["search"]["large"] = "search.gif";
 
 //- GM small icons
@@ -91,12 +95,15 @@ $GM_IMAGES["chart"]["small"] = "small/chart.gif";
 //- GM buttons for data entry pages
 $GM_IMAGES["addrepository"]["button"] = "buttons/addrepository.gif";
 $GM_IMAGES["addsource"]["button"] = "buttons/addsource.gif";
+$GM_IMAGES["addnote"]["button"] = "buttons/addnote.gif";
 $GM_IMAGES["autocomplete"]["button"] = "buttons/autocomplete.gif";
 $GM_IMAGES["calendar"]["button"] = "buttons/calendar.gif";
 $GM_IMAGES["family"]["button"] = "buttons/family.gif";
 $GM_IMAGES["indi"]["button"] = "buttons/indi.gif";
 $GM_IMAGES["keyboard"]["button"] = "buttons/keyboard.gif";
 $GM_IMAGES["media"]["button"] = "buttons/media.gif";
+$GM_IMAGES["addmedia"]["button"] = "buttons/addmedia.gif";
+$GM_IMAGES["note"]["button"] = "buttons/note.gif";
 $GM_IMAGES["place"]["button"] = "buttons/place.gif";
 $GM_IMAGES["repository"]["button"] = "buttons/repository.gif";
 $GM_IMAGES["source"]["button"] = "buttons/source.gif";
@@ -141,6 +148,9 @@ $GM_IMAGES["udarrow"]["other"] = "udarrow.gif";
 $GM_IMAGES["ldarrow"]["other"] = "ldarrow.gif";
 $GM_IMAGES["ddarrow"]["other"] = "ddarrow.gif";
 $GM_IMAGES["remove"]["other"]	= "remove.gif";
+$GM_IMAGES["link"]["other"]		= "link.gif";
+$GM_IMAGES["delete"]["other"]	= "delete.gif";
+$GM_IMAGES["download"]["other"]	= "download.gif";
 
 //- digits
 $GM_IMAGES["0"]["digit"] = "0.jpg";

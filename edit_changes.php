@@ -3,7 +3,7 @@
  * Interface to review/accept/reject changes made by editing online.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  *
  * @package Genmod
  * @subpackage Edit
- * @version $Id: edit_changes.php,v 1.15 2006/04/09 15:53:27 roland-d Exp $
+ * @version $Id: edit_changes.php,v 1.54 2009/03/16 19:51:12 sjouke Exp $
  */
 
 /**
@@ -34,14 +34,9 @@ require "config.php";
 */
 require "includes/functions_edit.php";
 
-/**
- * Inclusion of the language files
-*/
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
-
-if (!userCanAccept($gm_username)) {
-	header("Location: login.php?url=edit_changes.php");
+if (!$Users->userCanAccept($gm_username)) {
+	if (empty($LOGIN_URL)) header("Location: login.php?url=edit_changes.php");
+	else header("Location: ".$LOGIN_URL."?url=edit_changes.php");
 	exit;
 }
 
@@ -65,7 +60,7 @@ print_simple_header($gm_lang["review_changes"]);
 //-->
 </script>
 <?php
-print "<div class=\"center\">\n";
+print "<div id=\"content_popup\" class=\"center\">\n";
 print "<span class=\"subheaders\">";
 print_help_link("accept_gedcom", "qm", "review_changes");
 print $gm_lang["review_changes"];
@@ -73,7 +68,7 @@ print "</span><br /><br />\n";
 
 // NOTE: User wants to reject the change
 if ($action=="reject") {
-	if (reject_change($cid, $gedfile)) {
+	if (RejectChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
 		print $gm_lang["reject_successful"];
 		print "</b><br /><br />";
@@ -81,7 +76,7 @@ if ($action=="reject") {
 }
 // NOTE: User rejects all changes
 if ($action=="rejectall") {
-	if (reject_change("", $gedfile, true)) {
+	if (RejectChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
 		print $gm_lang["reject_successful"];
 		print "</b><br /><br />";
@@ -89,7 +84,7 @@ if ($action=="rejectall") {
 }
 // NOTE: User has accepted the change
 if ($action=="accept") {
-	if (accept_change($cid, $gedfile)) {
+	if (AcceptChange($cid, $gedfile)) {
 		print "<br /><br /><b>";
 		print $gm_lang["accept_successful"];
 		print "</b><br /><br />";
@@ -97,163 +92,365 @@ if ($action=="accept") {
 }
 // NOTE: User accepted all changes
 if ($action=="acceptall") {
-	if (accept_change("", $gedfile, true)) {
+	if (AcceptChange("", $gedfile, true)) {
 		print "<br /><br /><b>";
 		print $gm_lang["accept_successful"];
 		print "</b><br /><br />";
 	}
 }
 
-if (change_present()==0) {
+if (GetChangeData(true, "", true)==0) {
 	print "<br /><br /><b>";
 	print $gm_lang["no_changes"];
 	print "</b>";
 }
 else {
-	$showchanges = array();
-	$sql = "select ch_cid as cid from ".$TBLPREFIX."changes where ch_gedfile = '".$GEDCOMS[$GEDCOM]["id"]."' order by ch_cid ASC";
-	$res = dbquery($sql);
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
-		$sqlcid = "select * from ".$TBLPREFIX."changes where ch_cid = '".$row["cid"]."' AND ch_gedfile = '".$GEDCOMS[$GEDCOM]["id"]."' ";
-		$rescid = dbquery($sqlcid);
+	
+	// Trace on/off
+	$trace = false;
+	
+	// Array to store all changes groupwise
+	$changegroup = array();
+	
+	// List of ID's in previous changes
+	$foundids = array();
+	
+	// List of previous level 0 ID changes
+	$found0ids = array();
+	
+	// List of names that have changes, for printing purposes only
+	$changegids = array();
+	
+	// First read all changes
+	$sql = "SELECT DISTINCT ch_cid AS cid FROM ".$TBLPREFIX."changes WHERE ch_gedfile = '".$GEDCOMID."' ORDER BY ch_cid ASC, ch_fact ASC, ch_time DESC";
+	$res = NewQuery($sql);
+	while($row = $res->FetchAssoc()){
+		$sqlcid = "SELECT * FROM ".$TBLPREFIX."changes WHERE ch_cid = '".$row["cid"]."' AND ch_gedfile = '".$GEDCOMID."' ORDER BY ch_id ASC";
+		$rescid = NewQuery($sqlcid);
 		$change_row = 0;
-		while($rowcid = $rescid->fetchRow(DB_FETCHMODE_ASSOC)){
-			$showchanges[$rowcid["ch_cid"]][$change_row]["gid"] = $rowcid["ch_gid"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["gedfile"] = $rowcid["ch_gedfile"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["type"] = $rowcid["ch_type"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["user"] = $rowcid["ch_user"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["time"] = $rowcid["ch_time"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["old"] = $rowcid["ch_old"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["new"] = $rowcid["ch_new"];
-			$showchanges[$rowcid["ch_cid"]][$change_row]["locked"] = $rowcid["ch_delete"];
+		while($rowcid = $rescid->FetchAssoc()){
+			if ($trace) print "ch_id: ".$rowcid["ch_id"];
+			// First we handle the level 0 changes.
+			// ADD ID
+			// If the ID is new, it is not dependent
+			if (preg_match("/0 @.*@ /", $rowcid["ch_new"]) > 0 && empty($rowcid["ch_old"])) {
+				if ($trace) print "Found add ".$rowcid["ch_gid"]." ";
+				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
+				// But we check if it's really new: there must be no DB record AND no previous changes on this ID
+				// If not, there is a problem and we can only reject.
+				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if (empty($oldrec) && !in_array($rowcid["ch_gid"], $foundids)) {
+					$rowcid["canaccept"] = true;
+					$rowcid["canreject"] = true;
+				}
+				else {
+					$rowcid["canaccept"] = false;
+					$rowcid["canreject"] = true;
+				}
+				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+			}
+			// DELETE ID
+			// If it's a delete, we check if the DB gedcom rec is the same. If so, there are no dependencies
+			// If not, we have previous changes, OR we have a problem.
+			else if (preg_match("/0 @.*@ /", $rowcid["ch_old"]) > 0 && empty($rowcid["ch_new"])) {
+				if ($trace) print "Found a deletion ".$rowcid["ch_gid"]." ";
+				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
+				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if ($oldrec != $rowcid["ch_old"]) {
+					// Not the same, check if we really have previous changes on this ID
+					if (in_array($rowcid["ch_gid"], $foundids)) {
+						// Yes, found one
+						$rowcid["canaccept"] = false;
+						$rowcid["canreject"] = false;
+					}
+					else {
+						// No, we have a problem and must reject
+						$rowcid["canaccept"] = false;
+						$rowcid["canreject"] = true;
+					}
+				}
+				else {
+					// ok, it's the first and correct change
+					$rowcid["canaccept"] = true;
+					$rowcid["canreject"] = true;
+				}
+				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+			}
+			// EDIT ID
+			// Here the record is edited. If based on the DB, we can accept it because there are no dependencies
+			// If not, we either have previous changes OR a problem. Same code as DELETE
+			else if (preg_match("/0 @.*@ /", $rowcid["ch_old"]) > 0 && preg_match("/0 @.*@ /", $rowcid["ch_new"]) > 0) {
+				if ($trace) print "Found edit ".$rowcid["ch_gid"]." ";
+				$found0ids[$rowcid["ch_gid"]] = $row["cid"];
+				$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+				if ($oldrec != $rowcid["ch_old"]) {
+					// Not the same, check if we really have previous changes on this ID
+					if (in_array($rowcid["ch_gid"], $foundids)) {
+						// Yes, found one
+						$rowcid["canaccept"] = false;
+						$rowcid["canreject"] = false;
+					}
+					else {
+						// No, we have a problem and must reject
+						$rowcid["canaccept"] = false;
+						$rowcid["canreject"] = true;
+					}
+				}
+				else {
+					// ok, it's the first and correct change
+					$rowcid["canaccept"] = true;
+					$rowcid["canreject"] = true;
+				}
+				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+			}
+			else {
+				// FACTS
+				// Now we check the fact level changes
+				// If no previous changes on this ID, we check if the old value is in the DB
+				if (!in_array($rowcid["ch_gid"], $foundids)) {
+					if ($trace) print "Fact, no previous changes".$rowcid["ch_gid"];
+					$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+					// Don't check when the old value is empty, Just see if the ID exists.
+					if (empty($rowcid["ch_old"])) {
+						if (!empty($oldrec)) {
+							$rowcid["canaccept"] = true;
+							$rowcid["canreject"] = true;
+						}
+						else {
+							// We want to add something to a non existent ID!!!!!! Reject!
+							$rowcid["canaccept"] = false;
+							$rowcid["canreject"] = true;
+						}
+					}
+					else {
+						// here we handle fact changes and deletes.
+						$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $oldrec);
+						if (!empty($oldsub)) {
+							// It's in the DB, so a valid change
+							$rowcid["canaccept"] = true;
+							$rowcid["canreject"] = true;
+						}
+						else {
+							// We have a problem, reject only!
+							$rowcid["canaccept"] = false;
+							$rowcid["canreject"] = true;
+						}
+					}
+				if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				}
+				else {
+					if ($trace) print "Fact, previous changes".$rowcid["ch_gid"];
+					// There are previous changes.
+					// If the previous changes are level 0, we cannot be sure about what happens to this fact, so do nothing
+					// One exeption: if the previous change is in the same group, it will be accepted together, so we can accept it.
+					if ($trace) print "Check for ".$rowcid["ch_gid"]." in ";
+					if ($trace) print_r($found0ids);
+					if ($trace) print"<br />";
+					if (array_key_exists($rowcid["ch_gid"], $found0ids)) {
+						if ($trace) print "check same group";
+						if ($found0ids[$rowcid["ch_gid"]] == $row["cid"]) {
+							// Same change group
+							$rowcid["canaccept"] = true;
+							$rowcid["canreject"] = true;
+						}
+						else {
+							// Different change group
+							$rowcid["canaccept"] = false;
+							$rowcid["canreject"] = false;
+						}
+					}
+					else {
+						// ok, no previous level 0 changes, but there are previous fact level changes.
+						// We will loop through the previous changes and see if we can find the old value somewhere.
+						// We will only do this if there was an old value, because add's have no fact level dependencies
+						$foundearlier = false;
+						if (!empty($rowcid["ch_old"])) {
+							foreach ($changegroup as $groupid => $changes) {
+								foreach ($changes as $nr => $change) {
+									// Make sure we talk about the same gid here
+									if ($change["gid"] == $rowcid["ch_gid"]) {
+										if (trim($change["new"]) == trim($rowcid["ch_old"])) {
+											$foundearlier = true;
+											break 2;
+										}
+									}
+								}
+							}
+							if ($foundearlier) {
+								// It's a change on a change, do nothing!
+								$rowcid["canaccept"] = false;
+								$rowcid["canreject"] = false;
+							}
+							else {
+								// It must be a change on the DB. Check that!
+								$oldrec = FindGedcomRecord($rowcid["ch_gid"], "", true);
+								$oldsub = GetSubRecord(1, trim($rowcid["ch_old"]), $oldrec);
+								if (!empty($oldsub)) {
+									// It's in the DB, so a valid change
+									$rowcid["canaccept"] = true;
+									$rowcid["canreject"] = true;
+								}
+								else {
+									// We have a problem, reject only!
+									$rowcid["canaccept"] = false;
+									$rowcid["canreject"] = true;
+								}
+							}
+						}
+						// it's an add fact, not depending on level 0 changes, so we don't loop and can do all
+						else {
+							$rowcid["canaccept"] = true;
+							$rowcid["canreject"] = true;
+						}
+					}
+					if ($trace) print "a: ".$rowcid["canaccept"]." r: ".$rowcid["canreject"]."<br />";
+				}
+			}
+					
+			$changegroup[$rowcid["ch_cid"]][$change_row]["gid"] = $rowcid["ch_gid"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["gedfile"] = $rowcid["ch_gedfile"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["type"] = $rowcid["ch_type"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["user"] = $rowcid["ch_user"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["time"] = $rowcid["ch_time"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["old"] = $rowcid["ch_old"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["new"] = $rowcid["ch_new"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["locked"] = $rowcid["ch_delete"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["fact"] = $rowcid["ch_fact"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["canaccept"] = $rowcid["canaccept"];
+			$changegroup[$rowcid["ch_cid"]][$change_row]["canreject"] = $rowcid["canreject"];
+			$foundids[] = $rowcid["ch_gid"];
 			$change_row++;
 		}
 	}
-	print "<table class=\"list_value center\">";
-	$changegids = array();
-	foreach ($showchanges as $cid => $showchange) {
-		print "<tr class=\"topbottombar $TEXT_DIRECTION\"><td colspan=\"2\">".$gm_lang["change_type"].": ".$gm_lang[$showchanges[$cid][0]["type"]]."</td><td>";
-		if (!$showchanges[$cid][0]["locked"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$cid&amp;gedfile=".$showchanges[$cid][0]["gedfile"]."\">".$gm_lang["accept"]."</a> | <a href=\"edit_changes.php?action=reject&amp;cid=$cid&amp;gedfile=".$showchanges[$cid][0]["gedfile"]."\">".$gm_lang["reject"]."</a>";
-		print "</td>";
-		print "</td></tr>";
-		print "<tr class=\"shade2\"><td>".$gm_lang["name"]."</td><td>".$gm_lang["username"]."</td><td>".$gm_lang["date"]."</td></tr><tr>";
-		if ($showchanges[$cid][0]["locked"]) print "<tr class=\"locked\"><td colspan=\"4\">".strtoupper($gm_lang["locked"])."</td></tr>";
-		foreach ($showchange as $key => $change) {
-			print "<tr class=\"shade1\"><td>";
-			$gedrec = find_gedcom_record($change["gid"]);
-			$type = id_type($change["gid"]);
-			switch ($type) {
-				case "INDI":
-					if (empty($gedrec)) $names = get_indi_names(retrieve_changed_fact($change["gid"], "INDI"));
-					else $names = get_indi_names($gedrec);
-					$printname = "<b>".PrintReady(check_NN($names[0][0]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-					print $printname;
-					$changegids["individuals"][$change["gid"]] = $printname;
-					break;
-				case "FAM":
-					$printname = "<b>".PrintReady(get_family_descriptor($change["gid"]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-					print $printname;
-					$changegids["families"][$change["gid"]] = $printname;
-					break;
-				case "SOUR":
-					$name = get_gedcom_value("ABBR", 1, $gedrec);
-					if (empty($name)) $name = get_gedcom_value("TITL", 1, $gedrec);
-					$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-					print $printname;
-					$changegids["source"][$change["gid"]] = $printname;
-					break;
-				case "REPO":
-					$name = get_gedcom_value("NAME", 1, $gedrec);
-					if (empty($name)) $name = get_gedcom_value("NAME", 1, retrieve_changed_fact($change["gid"], "REPO"));
-					$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-					print $printname;
-					$changegids["repo"][$change["gid"]] = $printname;
-					break;
-				case "OBJE":
-					$printname = "<b>".$gm_lang["media"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
-					print $printname;
-					$changegids["media"][$change["gid"]] = $printname;
-					break;
+
+	// We have all the changes and found out the change dependencies.
+	// Now we set the group dependencies:
+	// if all changes in a group can be accepted, the group can be accepted.
+	// if all changes in the group can be rejected, the group can be rejected.
+	foreach ($changegroup as $groupid => $changes) {
+		$rejectgroup = true;
+		$acceptgroup = true;
+		foreach ($changes as $nr => $change) {
+			if ($change["canaccept"] == false && $acceptgroup == true) $acceptgroup = false;
+			if ($change["canreject"] == false && $rejectgroup == true) $rejectgroup = false;
+		}
+		$changegroup[$groupid]["canaccept"] = $acceptgroup;
+		$changegroup[$groupid]["canreject"] = $rejectgroup;
+	}
+	// We have all downwards dependencies now. 
+	// However, if a change is the last change for a specific pid, it can be rejected.
+	// For this to be true, all pids in the change group must not have been found later.
+	// We sort the array in reverse groupid order, then walk through.
+	krsort($changegroup);
+	$laterids = array();
+	foreach ($changegroup as $groupid => $changes) {
+		$foundlater = false;
+		// We check if the pids are found in later changes. We cannot update the laterids array now, because there can be 2 changes to the same pid 
+		// in one group, which would cause that the group cannot be rejected.
+		// We skip groups that can already be rejected.
+		if (!$changegroup[$groupid]["canreject"]) {
+			foreach ($changes as $nr => $change) {
+				// A changegroup also contains accept and reject attributes. We must skip these, and only get the changes which are arrays.
+				if (is_array($change)) {
+					if (array_key_exists($change["gid"], $laterids)) $foundlater = true;
+				}
 			}
-			print "</td>";
-			print "<td>";
-			$cuser = getUser($change["user"]);
-			if ($cuser) print PrintReady($cuser["firstname"]." ".$cuser["lastname"]);
-			print "</td>";
-			print "<td>".get_changed_date(date("j M Y",$change["time"]))." ".date($TIME_FORMAT, $change["time"])."</td></tr>";
+			if (!$foundlater) $changegroup[$groupid]["canreject"] = true;
+			// now we add the pids of this group to the found array
+			foreach ($changes as $nr => $change) {
+				if (is_array($change)) $laterids[$change["gid"]] = true;
+			}
+		}
+	}
+	// Sort the array back to its original order
+	ksort($changegroup);
+
+	// Now, at last, we can start printing!
+	print "<table class=\"shade1\">";
+	foreach ($changegroup as $groupid => $changes) {
+		print "<tr class=\"topbottombar shade2 $TEXT_DIRECTION\"><td colspan=\"2\">".$gm_lang["change_type"].": ";
+		if (isset($gm_lang[$changegroup[$groupid][0]["type"]])) print $gm_lang[$changegroup[$groupid][0]["type"]];
+		else print $changegroup[$groupid][0]["type"];
+		if (isset($factarray[$changegroup[$groupid][0]["fact"]])) print ": ".$factarray[$changegroup[$groupid][0]["fact"]];
+		print "</td><td>";
+		if ($changegroup[$groupid]["canaccept"]) print "<a href=\"edit_changes.php?action=accept&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["gedfile"]."\">".$gm_lang["accept"]."</a>";
+		if ($changegroup[$groupid]["canaccept"] && $changegroup[$groupid]["canreject"]) print " | ";
+		if ($changegroup[$groupid]["canreject"]) print "<a href=\"edit_changes.php?action=reject&amp;cid=$groupid&amp;gedfile=".$changegroup[$groupid][0]["gedfile"]."\">".$gm_lang["reject"]."</a>";
+		print "</td></tr>";
+		print "<tr><td>".$gm_lang["name"]."</td><td>".$gm_lang["username"]."</td><td>".$gm_lang["date"]."</td></tr><tr>";
+		foreach ($changes as $key => $change) {
+			// $change also contains the canaccept and canreject values. Only process if it's an array
+			if (is_array($change)) {
+				print "<tr class=\"shade1\"><td>";
+				$gedrec = FindGedcomRecord($change["gid"], "", true);
+				if (empty($gedrec)) {
+					if (GetChangeData(true, $change["gid"], true)) {
+						$rec = GetChangeData(false, $change["gid"], true, "gedlines");
+						$gedrec = $rec[$GEDCOM][$change["gid"]];
+					}
+				}
+				$type = IdType($change["gid"]);
+				switch ($type) {
+					case "INDI":
+						if (empty($gedrec)) $gedrec = RetrieveChangedFact($change["gid"], "INDI", "");
+						if (empty($gedrec)) $gedrec = RetrieveChangedFact($change["gid"], "FAMC", "");
+						$names = GetIndiNames($gedrec);
+						$printname = "<b>".PrintReady(CheckNN($names[0][0]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
+						print $printname;
+						$changegids["individuals"][$change["gid"]] = $printname;
+						break;
+					case "FAM":
+						$printname = "<b>".PrintReady(GetFamilyDescriptor($change["gid"], "", $gedrec, true))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						print $printname;
+						$changegids["families"][$change["gid"]] = $printname;
+						break;
+					case "SOUR":
+						$name = GetGedcomValue("ABBR", 1, $gedrec);
+						if (empty($name)) $name = GetGedcomValue("TITL", 1, $gedrec);
+						if (empty($name)) $name = GetGedcomValue("ABBR", 1, RetrieveChangedFact($change["gid"], "SOUR", $gedrec));
+						if (empty($name)) $name = GetGedcomValue("TITL", 1, RetrieveChangedFact($change["gid"], "SOUR", $gedrec));
+						$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
+						print $printname;
+						$changegids["source"][$change["gid"]] = $printname;
+						break;
+					case "REPO":
+						$name = GetGedcomValue("NAME", 1, $gedrec);
+						if (empty($name)) $name = GetGedcomValue("NAME", 1, RetrieveChangedFact($change["gid"], "REPO", $gedrec));
+						$printname = "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
+						print $printname;
+						$changegids["repo"][$change["gid"]] = $printname;
+						break;
+					case "OBJE":
+						$printname = "<b>".$gm_lang["media"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						print $printname;
+						$changegids["media"][$change["gid"]] = $printname;
+						break;
+					case "SUBM":
+						$printname = "<b>".$gm_lang["submitter_record"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						print $printname;
+						$changegids["subm"][$change["gid"]] = $printname;
+						break;
+					case "NOTE":
+						$printname = "<b>".$gm_lang["note"]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";;
+						print $printname;
+						$changegids["note"][$change["gid"]] = $printname;
+						break;
+				}
+				if ($trace) print "a".$changegroup[$groupid]["canaccept"]."r".$changegroup[$groupid]["canreject"];
+				print "</td>";
+				print "<td>";
+				$cuser = $Users->getUser($change["user"]);
+				if (!$cuser->is_empty) print PrintReady($cuser->firstname." ".$cuser->lastname);
+				print "</td>";
+				// NOTE: Use European time format if none is specified.
+				if (empty($TIME_FORMAT)) $TIME_FORMAT = "H:m:s";
+				print "<td>".GetChangedDate(date("j M Y",$change["time"]))." ".date($TIME_FORMAT, $change["time"])."</td></tr>";
 			
+			}
 		}
 	}
 	print "</table>";
-	/**
-	print "<br /><br /><table class=\"list_table\">";
-	print "<tr><td class=\"list_value $TEXT_DIRECTION\">";
-	$changedgedcoms = array();
-	foreach($gm_changes as $cid=>$changes) {
-		for($i=0; $i<count($changes); $i++) {
-			$change = $changes[$i];
-			if ($i==0) {
-				$changedgedcoms[$change["gedcom"]] = true;
-				if ($GEDCOM != $change["gedcom"]) {
-					$GEDCOM = $change["gedcom"];
-				}
-				// find_record_in_file obsolete
-				// get the id from the DB
-				$gedrec = find_gedcom_record($change["gid"]);
-				if (empty($gedrec)) $gedrec = $change["undo"];
-				$ct = preg_match("/0 @(.*)@(.*)/", $gedrec, $match);
-				if ($ct>0) $type = trim($match[2]);
-				else $type = "INDI";
-				if ($type=="INDI") {
-					$names = get_indi_names($gedrec);
-					print "<b>".PrintReady(check_NN($names[0][0]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-				}
-				else if ($type=="FAM") print "<b>".PrintReady(get_family_descriptor($change["gid"]))."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-				else if ($type=="SOUR") {
-					$name = get_gedcom_value("ABBR", 1, $gedrec);
-					if (empty($name)) $name = get_gedcom_value("TITL", 1, $gedrec); 
-					print "<b>".PrintReady($name)."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-				}
-				else print "<b>".$factarray[$type]."</b> &lrm;(".$change["gid"].")&lrm;<br />\n";
-				if ($type=="INDI") print "<a href=\"#\" onclick=\"return show_diff('individual.php?pid=".$change["gid"]."&amp;ged=".$change["gedcom"]."&amp;show_changes=yes');\">".$gm_lang["view_change_diff"]."</a> | \n";
-				if ($type=="FAM") print "<a href=\"#\" onclick=\"return show_diff('family.php?famid=".$change["gid"]."&amp;ged=".$change["gedcom"]."&amp;show_changes=yes');\">".$gm_lang["view_change_diff"]."</a> | \n";
-				if ($type=="SOUR") print "<a href=\"#\" onclick=\"return show_diff('source.php?sid=".$change["gid"]."&amp;ged=".$change["gedcom"]."&amp;show_changes=yes');\">".$gm_lang["view_change_diff"]."</a> | \n";
-				print "<a href=\"javascript:show_gedcom_record('".$change["gid"]."');\">".$gm_lang["view_gedcom"]."</a> | ";
-				print "<a href=\"#\" onclick=\"return edit_raw('".$change["gid"]."');\">".$gm_lang["edit_raw"]."</a><br />";
-				print "<div class=\"indent\">\n";
-				print $gm_lang["changes_occurred"]."<br />\n";
-				print "<table class=\"list_table\">\n";
-				print "<tr><td class=\"list_label\">".$gm_lang["undo"]."</td>";
-				print "<td class=\"list_label\">".$gm_lang["accept"]."</td>";
-				print "<td class=\"list_label\">".$gm_lang["type"]."</td><td class=\"list_label\">".$gm_lang["username"]."</td><td class=\"list_label\">".$gm_lang["date"]."</td><td class=\"list_label\">GEDCOM</td></tr>\n";
-			}
-			if ($i==count($changes)-1) {
-				print "<td class=\"list_value $TEXT_DIRECTION\"><a href=\"edit_changes.php?action=undo&amp;cid=$cid&amp;index=$i\">".$gm_lang["undo"]."</a></td>";
-				print "<td class=\"list_value $TEXT_DIRECTION\"><a href=\"edit_changes.php?action=accept&amp;cid=$cid\">".$gm_lang["accept"]."</a></td>\n";
-			}
-			else {
-				print "<td class=\"list_value $TEXT_DIRECTION\"><br /></td>";
-				print "<td class=\"list_value $TEXT_DIRECTION\"><br /></td>";
-			}
-			print "<td class=\"list_value $TEXT_DIRECTION\"><b>".$gm_lang[$change["type"]]."</b></td>\n";
-			print "<td class=\"list_value $TEXT_DIRECTION\"><a href=\"#\" onclick=\"return reply('".$change["user"]."','".$gm_lang["review_changes"]."')\" alt=\"".$gm_lang["message"]."\">";
-			$cuser = getUser($change["user"]);
-			if ($cuser) {
-				print PrintReady($cuser["firstname"]." ".$cuser["lastname"]);
-			}
- 			print PrintReady("&nbsp;(".$change["user"].")")."</a></td>\n";
- 			print "<td class=\"list_value $TEXT_DIRECTION\">".get_changed_date(date("j M Y",$change["time"]))." ".date($TIME_FORMAT, $change["time"])."</td>\n";
-			print "<td class=\"list_value $TEXT_DIRECTION\">".$change["gedcom"]."</td>\n";
-			print "</tr>\n";
-			if ($i==count($changes)-1) {
-				print "</table>\n";
-				print "</div><br />";
-			}
-		}
-	}
-	print "</td></tr></table>";
-	*/
-	print "<br /><br /><table class=\"list_table\">\r\n";
+	print "<br /><br /><table class=\"list_table center\">\r\n";
 	print "<tr><td class=\"topbottombar\" colspan=\"2\">";
 	print_help_link("view_gedcom_help", "qm", "view_gedcom");
 	print $gm_lang["view_gedcom"]."</td></tr>";
@@ -265,16 +462,15 @@ else {
 	}
 	print "</table>";
 	//-- accept and reject all
-	print "<br /><br /><table class=\"list_table\"><tr><td class=\"list_label\">".$gm_lang["accept_all"]."</td>";
-	print "<td class=\"list_label\">".$gm_lang["reject_all"]."</td></tr>";
-	print "<tr><td class=\"list_value\">";
-	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".$GEDCOMS[$GEDCOM]["id"]."\">".$gm_lang["accept_all"]."</a>\n";
+	print "<br /><br /><table class=\"list_table center\">";
+	print "<tr><td class=\"shade2\">";
+	print "<a href=\"edit_changes.php?action=acceptall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".$gm_lang["accept_all_confirm"]."');\">".$gm_lang["accept_all"]."</a>\n";
 	print "</td>";
-	print "<td class=\"list_value\">";
-	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".$GEDCOMS[$GEDCOM]["id"]."\" onclick=\"return confirm('".$gm_lang["reject_all_confirm"]."');\">".$gm_lang["reject_all"]."</a>\n";
+	print "<td class=\"shade2\">";
+	print "<a href=\"edit_changes.php?action=rejectall&amp;gedfile=".$GEDCOMID."\" onclick=\"return confirm('".$gm_lang["reject_all_confirm"]."');\">".$gm_lang["reject_all"]."</a>\n";
 	print "</td></tr></table>";
 }
 print "<br /><br />\n</center></div>\n";
-print "<center><a href=\"#\" onclick=\"if (window.opener.showchanges) window.opener.showchanges(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
+print "<center><a href=\"#\" onclick=\"window.opener.reload(); window.close();\">".$gm_lang["close_window"]."</a><br /></center>\n";
 print_simple_footer();
 ?>

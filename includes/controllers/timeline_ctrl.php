@@ -3,7 +3,7 @@
  * Controller for the timeline chart
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2002 to 2005	GM Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,17 @@
  *
  * @package Genmod
  * @subpackage Charts
- * @version $Id: timeline_ctrl.php,v 1.3 2006/01/10 18:31:39 roland-d Exp $
+ * @version $Id: timeline_ctrl.php,v 1.12 2008/01/06 10:57:55 roland-d Exp $
  */
 require("config.php");
 require("includes/functions_charts.php");
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY . $factsfile[$LANGUAGE])) require $GM_BASE_DIRECTORY . $factsfile[$LANGUAGE];
 require_once 'includes/controllers/basecontrol.php';
 require_once 'includes/person_class.php';
 /**
  * Main controller class for the timeline page.
  */
 class TimelineControllerRoot extends BaseController {
+	var $classname = "TimelineControllerRoot";
 	var $bheight = 30;
 	var $placements = array();
 	var $familyfacts = array();
@@ -46,6 +45,7 @@ class TimelineControllerRoot extends BaseController {
 	var $people = array();
 	var $pidlinks = "";
 	var $scale = 2;
+	var $show_changes = false;
 	// GEDCOM elements that will be found but should not be displayed
 	var $nonfacts = "FAMS,FAMC,MAY,BLOB,OBJE,SEX,NAME,SOUR,NOTE,BAPL,ENDL,SLGC,SLGS,_TODO,CHAN,HUSB,WIFE,CHIL";
 	
@@ -63,8 +63,8 @@ class TimelineControllerRoot extends BaseController {
 		$this->baseyear = date("Y");
 		// NOTE: New pid
 		if (isset($_REQUEST['newpid'])) {
-			$newpid = clean_input($_REQUEST['newpid']);
-			$indirec = find_person_record($newpid);
+			$newpid = CleanInput($_REQUEST['newpid']);
+			$indirec = FindPersonRecord($newpid);
 			if (empty($indirec)) {
 				if (stristr($newpid, "I")===false) $newpid = "I".$newpid;
 			}
@@ -73,7 +73,7 @@ class TimelineControllerRoot extends BaseController {
 		if (!isset($_REQUEST['pids'])){
 			$this->pids=array();
 			if (!empty($newpid)) $this->pids[] = $newpid;
-			else $this->pids[] = check_rootid("");
+			else $this->pids[] = CheckRootId("");
 		}
 		else {
 			$this->pids = $_REQUEST['pids'];
@@ -89,9 +89,9 @@ class TimelineControllerRoot extends BaseController {
 		//-- cleanup user input
 		foreach($this->pids as $key=>$value) {
 			if ($value!=$remove) {
-				$value = clean_input($value);
+				$value = CleanInput($value);
 				$this->pids[$key] = $value;
-				$indirec = find_person_record($value);
+				$indirec = FindPersonRecord($value);
 				$this->people[] = new Person($indirec);
 			}
 		}
@@ -103,7 +103,7 @@ class TimelineControllerRoot extends BaseController {
 				$this->pidlinks .= "pids[]=".$indi->getXref()."&amp;";
 				$bdate = $indi->bdate;
 				if (!empty($bdate) && (stristr($bdate, "hebrew")===false)) {
-					$date = parse_date($bdate);
+					$date = ParseDate($bdate);
 					if (!empty($date[0]["year"])) {
 						$this->birthyears[$indi->getXref()] = $date[0]["year"];
 						if (!empty($date[0]["mon"])) $this->birthmonths[$indi->getXref()] = $date[0]["mon"];
@@ -113,7 +113,7 @@ class TimelineControllerRoot extends BaseController {
 					}
 				}
 				// find all the fact information
-				$facts = get_all_subrecords($indi->getGedcomRecord(), $this->nonfacts, true, false);
+				$facts = GetAllSubrecords($indi->getGedcomRecord(), $this->nonfacts, true, false);
 				foreach($facts as $indexval => $factrec) {
 					//-- get the fact type
 					$ct = preg_match("/1 (\w+)(.*)/", $factrec, $match);
@@ -124,12 +124,12 @@ class TimelineControllerRoot extends BaseController {
 						$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
 						if ($ct>0) {
 							$datestr = trim($match[1]);
-							$date = parse_date($datestr);
+							$date = ParseDate($datestr);
 							//-- do not print hebrew dates
 							if ((stristr($date[0]["ext"], "hebrew")===false)&&($date[0]["year"]!=0)) {
 								if ($date[0]["year"]<$this->baseyear) $this->baseyear=$date[0]["year"];
 								if ($date[0]["year"]>$this->topyear) $this->topyear=$date[0]["year"];
-								if (!is_dead_id($indi->getXref())) {
+								if (!IsDeadId($indi->getXref())) {
 									if ($this->topyear < date("Y")) $this->topyear = date("Y");
 								}
 								$tfact = array();
@@ -203,7 +203,7 @@ class TimelineControllerRoot extends BaseController {
 					$familyfacts[$famid.$fact] = $factitem["p"];
 				}
 				$datestr = trim($match[1]);
-				$date = parse_date($datestr);
+				$date = ParseDate($datestr);
 				$year = $date[0]["year"];
 	
 				$month = $date[0]["mon"];
@@ -239,12 +239,12 @@ class TimelineControllerRoot extends BaseController {
 					print "<img src=\"".$GM_IMAGE_DIR."/".$GM_IMAGES["hline"]["other"]."\" name=\"boxline$factcount\" id=\"boxline$factcount\" height=\"3\" align=\"left\" hspace=\"0\" width=\"10\" vspace=\"0\" alt=\"\" />\n";
 					$col = $factitem["p"] % 6;
 					print "</td><td valign=\"top\" class=\"person".$col."\">\n";
-					if (count($this->pids) > 6)print get_person_name($factitem["pid"])." - ";
+					if (count($this->pids) > 6)print GetPersonName($factitem["pid"])." - ";
 					if (isset($factarray[$fact])) print $factarray[$fact];
 					else if (isset($gm_lang[$fact])) print $gm_lang[$fact];
 					else print $fact;
 					print "--";
-					print "<span class=\"date\">".get_changed_date($datestr)."</span> ";
+					print "<span class=\"date\">".GetChangedDate($datestr)."</span> ";
 					if (!empty($desc)) print $desc." ";
 					if ($SHOW_PEDIGREE_PLACES>0) {
 						$pct = preg_match("/2 PLAC (.*)/", $factrec, $match);
@@ -259,7 +259,7 @@ class TimelineControllerRoot extends BaseController {
 							}
 						}
 					}
-					$age = get_age(find_person_record($factitem["pid"]), $datestr);
+					$age = GetAge(FindPersonRecord($factitem["pid"]), $datestr);
 					if (!empty($age)) print $age;
 					//-- print spouse name for marriage events
 					$ct = preg_match("/1 _GMS @(.*)@/", $factrec, $match);
@@ -272,7 +272,7 @@ class TimelineControllerRoot extends BaseController {
 							if ($p==count($this->pids)) $p = $factitem["p"];
 							$col = $p % 6;
 							print " <span class=\"person$col\"> <a href=\"individual.php?pid=$spouse&amp;ged=$GEDCOM\">";
-							if (displayDetailsByID($spouse)||showLivingNameByID($spouse)) print get_person_name($spouse);
+							if (displayDetailsByID($spouse)||showLivingNameByID($spouse)) print GetPersonName($spouse);
 							else print $gm_lang["private"];
 							print "</a> </span>";
 						}
@@ -324,4 +324,3 @@ else
 $controller = new TimelineController();
 $controller->init();
 ?>
-

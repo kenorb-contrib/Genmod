@@ -3,7 +3,7 @@
  * Family List
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * The Family list shows all families from a chosen gedcom file. The list is
  * setup in two sections. The alphabet bar and the details.
@@ -38,7 +38,7 @@
  *
  * @package Genmod
  * @subpackage Lists
- * @version $Id: famlist.php,v 1.3 2006/04/30 18:44:14 roland-d Exp $
+ * @version $Id: famlist.php,v 1.20 2009/03/25 16:53:52 sjouke Exp $
  */
 
 /**
@@ -46,14 +46,26 @@
 */
 require("config.php");
 
+$COMBIKEY = true;
+
 print_header($gm_lang["family_list"]);
 print "<div class =\"center\">";
-print "\n\t<h2>";
+print "\n\t<h3>";
 print_help_link("name_list_help", "qm", "name_list");
-print $gm_lang["family_list"]."</h2>";
+print $gm_lang["family_list"]."</h3>";
 
 if (empty($surname_sublist)) $surname_sublist = "yes";
 if (empty($show_all)) $show_all = "no";
+if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
+// Added if any of the gedcoms require authentication and the user is not logged on, we cannot do allgeds.
+if (!isset($allgeds) || $allgeds != "yes" || !$ALLOW_CHANGE_GEDCOM) $allgeds = "no";
+if ($allgeds == "yes" && empty($gm_username)) {
+	foreach($GEDCOMS as $key => $ged) {
+		SwitchGedcom($key);
+		if ($REQUIRE_AUTHENTICATION) $allgeds = "no";
+	}
+	SwitchGedcom();
+}
 
 // Remove slashes
 if (isset($alpha)) $alpha = stripslashes($alpha);
@@ -83,7 +95,7 @@ $tfamlist = array();
  * @var array $famalpha
  */
 
-$famalpha = get_fam_alpha();
+$famalpha = GetFamAlpha($allgeds);
 
 uasort($famalpha, "stringsort");
 
@@ -96,17 +108,15 @@ if (count($famalpha) > 0) {
 	foreach($famalpha as $letter=>$list) {
 		if (empty($alpha)) {
 			if (!empty($surname)) {
-				if ($USE_RTL_FUNCTIONS && isRTLText($surname)) $alpha = substr(preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/^[a-z. ]*/"), array(",",",",""), $surname),0,2);
-				else $alpha = substr(preg_replace(array("/ [jJsS][rR]\.?,/", "/ I+,/", "/^[a-z. ]*/"), array(",",",",""), $surname),0,1);
+				if ($USE_RTL_FUNCTIONS && isRTLText($surname)) $alpha = substr(StripPrefix($surname),0,2);
+				else $alpha = substr(StripPrefix($surname),0,1);
 			}
 		}
 		if ($letter != "@") {
-			if (!isset($startalpha) && !isset($alpha)) {
-				$startalpha = $letter;
-				$alpha = $letter;
-			}
-			print "<a href=\"famlist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist."\">";
-			if (($alpha==$letter)&&($show_all=="no")) print "<span class=\"warning\">".$letter."</span>";
+			print "<a href=\"famlist.php?alpha=".urlencode($letter)."&amp;surname_sublist=".$surname_sublist;
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">";
+			if (isset($alpha) && ($alpha==$letter)&&($show_all=="no")) print "<span class=\"warning\">".$letter."</span>";
 			else print $letter;
 			print "</a> | \n";
 		}
@@ -119,31 +129,63 @@ if (count($famalpha) > 0) {
 		}
 	}
 	if ($pass == TRUE) {
-		if (isset($alpha) && $alpha == "@") print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=".$surname_sublist."&amp;surname=@N.N.\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
-		else print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.\">".PrintReady($gm_lang["NN"])."</a>";
-		print " | \n";
+		if (isset($alpha) && $alpha == "@") {
+			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=".$surname_sublist."&amp;surname=@N.N.";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\"><span class=\"warning\">".PrintReady($gm_lang["NN"])."</span></a>";
+		}
+		else {
+			print "<a href=\"famlist.php?alpha=@&amp;surname_sublist=yes&amp;surname=@N.N.";
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">".PrintReady($gm_lang["NN"])."</a>";
+		}
 		/**
 		 * @ignore
 		*/
 		$pass = FALSE;
 	}
-	if ($show_all=="yes") print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=$surname_sublist\"><span class=\"warning\">".$gm_lang["all"]."</span>\n";
-	else print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=$surname_sublist\">".$gm_lang["all"]."</a>\n";
+	if ($LISTS_ALL) {
+		print " | \n";
+		if ($show_all=="yes") {
+			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\"><span class=\"warning\">".$gm_lang["all"]."</span></a>\n";
+		}
+		else {
+			print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=".$surname_sublist;
+			if ($allgeds == "yes") print "&amp;allgeds=yes";
+			print "\">".$gm_lang["all"]."</a>\n";
+		}
+	}
 	if (isset($startalpha)) $alpha = $startalpha;
 }
 print "<br /><br />";
+if (!isset($alpha)) $alpha="";
 if (($surname_sublist=="yes")&&($show_all=="yes")) {
-	get_fam_list();
-	if (!isset($alpha)) $alpha="";
+	GetFamList($allgeds);
 	$surnames = array();
 	$fam_hide = array();
+	$indi_total = array();
+	$thisged = $GEDCOM;
+	$thisgedid = $GEDCOMID;
+	$oldged = $GEDCOM;
+	$oldgedid = $GEDCOMID;
 	foreach($famlist as $gid=>$fam) {
-		if (displayDetailsById($gid, "FAM")||showLivingNameById($gid, "FAM")) {
+		$thisgid = splitkey($gid, "id");
+		$thisgedid = splitkey($gid, "gedid");
+		$thisged = splitkey($gid, "ged");
+		if ($thisged != $GEDCOM) {
+			$GEDCOM = $thisged;
+			$GEDCOMID = $thisgedid;
+			$Privacy->ReadPrivacy($GEDCOMID);
+		}
+		$indi_total[$thisgid."[".$fam["gedfile"]."]"] = 1;
+		if (showLivingNameById($thisgid, "FAM")) {
 			$names = preg_split("/\+/", $fam["name"]);
 			$foundnames = array();
 			for($i=0; $i<count($names); $i++) {
 				$name = trim($names[$i]);
-				$sname = extract_surname($name);
+				$sname = ExtractSurname($name);
 				if (isset($foundnames[$sname])) {
 					if (isset($surnames[$sname]["match"])) $surnames[$sname]["match"]--;
 				}
@@ -152,79 +194,100 @@ if (($surname_sublist=="yes")&&($show_all=="yes")) {
 		}
 		else $fam_hide[$gid."[".$fam["gedfile"]."]"] = 1;
 	}
+	if ($GEDCOM != $oldged) {
+		$GEDCOM = $oldged;
+		$GEDCOMID = $oldgedid;
+		$Privacy->ReadPrivacy($GEDCOMID);
+	}
 	$i = 0;
-	uasort($surnames, "itemsort");
+	uasort($surnames, "ItemSort");
 	// NOTE: Print header
 	print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
+	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
 }
 else if (($surname_sublist=="yes")&&(empty($surname))&&($show_all=="no")) {
 	if (!isset($alpha)) $alpha="";
-	$tfamlist = get_alpha_fams($alpha);
-	$surnames = array();
-	$fam_hide = array();
-	foreach($tfamlist as $gid=>$fam) {
-		if ((displayDetailsByID($gid, "FAM"))||(showLivingNameById($gid, "FAM"))) {
-			$i=0;
-			foreach($fam["surnames"] as $indexval => $name) {
-				surname_count(trim($name));
-				$i++;
+	if (!empty($alpha)) {
+		$tfamlist = GetAlphaFams($alpha, $allgeds);
+		$surnames = array();
+		$fam_hide = array();
+		$indi_total = array();
+		$thisged = $GEDCOM;
+		$thisgedid = $GEDCOMID;
+		$oldged = $GEDCOM;
+		$oldgedid = $GEDCOMID;
+		foreach($tfamlist as $gid=>$fam) {
+			$thisgid = splitkey($gid, "id");
+			$thisged = splitkey($gid, "ged");
+			$thisgedid = splitkey($gid, "gedid");
+			if ($thisged != $GEDCOM) {
+				$GEDCOM = $thisged;
+				$GEDCOMID = $thisgedid;
+				$Privacy->ReadPrivacy($GEDCOMID);
 			}
+			$indi_total[$thisgid."[".$fam["gedfile"]."]"] = 1;
+			if (showLivingNameById($thisgid, "FAM")) {
+				$i=0;
+				foreach($fam["surnames"] as $indexval => $name) {
+					SurnameCount(trim($name), $alpha);
+					$i++;
+				}
+			}
+			else $fam_hide[$gid."[".$thisgedid."]"] = 1;
 		}
-		else $fam_hide[$gid."[".$fam["gedfile"]."]"] = 1;
+		if ($GEDCOM != $oldged) {
+			$GEDCOM = $oldged;
+			$GEDCOMID = $oldgedid;
+			$Privacy->ReadPrivacy($GEDCOMID);
+		}
+		uasort($surnames, "ItemSort");
+		print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
+		PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"], $allgeds);
 	}
-	uasort($surnames, "itemsort");
-	print "<div class=\"topbar\">".$gm_lang["surnames"]."</div>\n";
-	PrintSurnameList($surnames, $_SERVER["SCRIPT_NAME"]);
 }
 else {
 	$firstname_alpha = false;
 	// NOTE: If the surname is set then only get the names in that surname list
 	if ((!empty($surname))&&($surname_sublist=="yes")) {
 		$surname = trim($surname);
-		$tfamlist = get_surname_fams($surname);
+		$tfamlist = GetSurnameFams($surname, $allgeds);
 	}
 	// NOTE: Get all individuals for the sublist
-	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) $tfamlist = get_alpha_fams($alpha);
+	if (($surname_sublist=="no")&&(!empty($alpha))&&($show_all=="no")) {
+		$tfamlist = GetAlphaFams($alpha, $allgeds);
+	}
 	
 	// NOTE: Simplify processing for ALL indilist
 	// NOTE: Skip surname is yes and ALL is chosen
 	if (($surname_sublist=="no")&&($show_all=="yes")) {
-		$tfamlist = get_fam_list();
+		$tfamlist = GetFamList($allgeds);
 		print "<div class=\"topbar\">".$gm_lang["families"]."</div>\n";
-		PrintFamilyList($tfamlist);
+		PrintFamilyList($tfamlist, true, false, $allgeds);
 	}
 	else {
 		// NOTE: If user wishes to skip surname do not print the surname
 		print "<div class=\"topbar\">";
 		if ($surname_sublist == "no") print $gm_lang["surnames"];
-		else	print PrintReady(str_replace("#surname#", check_NN($surname), $gm_lang["fams_with_surname"]));
+		else	print PrintReady(str_replace("#surname#", CheckNN($surname), $gm_lang["fams_with_surname"]));
 		print "</div>\n";
-		PrintFamilyList($tfamlist);
+		PrintFamilyList($tfamlist, true, false, $allgeds);
 	}
 }
-print "</tr></table>";
 
 print "<br />";
 if ($alpha != "@") {
-	if ($surname_sublist=="yes") print_help_link("skip_sublist_help", "qm", "skip_surnames");
-	else print_help_link("skip_sublist_help", "qm", "show_surnames");
+	print_help_link("skip_sublist_help", "qm", "skip_surnames");
+	if ($surname_sublist=="yes") {
+		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=no&amp;show_all=".$show_all;
+		if ($allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".$gm_lang["skip_surnames"]."</a>";
+	}
+	else {
+		print "<br /><a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=yes&amp;show_all=".$show_all;
+		if ($allgeds == "yes") print "&amp;allgeds=yes";
+		print "\">".$gm_lang["show_surnames"]."</a>";
+	}
 }
-if ($show_all=="yes" && $alpha != "@"){
-	if ($surname_sublist=="yes") print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=no\">".$gm_lang["skip_surnames"]."</a>";
- 	else print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=yes\">".$gm_lang["show_surnames"]."</a>";
-}
-else if (empty($alpha)) {
-	if ($surname_sublist=="yes") print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=no\">".$gm_lang["skip_surnames"]."</a>";
-	else print "<a href=\"famlist.php?show_all=yes&amp;surname_sublist=yes\">".$gm_lang["show_surnames"]."</a>\n";
-}
-else if ($alpha != "@" && is_array(isset($surname))) {
-	print "<a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=yes\">".$gm_lang["show_surnames"]."</a>";
-}
-else if ($alpha != "@") {
-	if ($surname_sublist=="yes") print "<a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=no\">".$gm_lang["skip_surnames"]."</a>";
-	else print "<a href=\"famlist.php?alpha=$alpha&amp;surname_sublist=yes\">".$gm_lang["show_surnames"]."</a>";
-}
-print "</div>\n";
+print "</div>";
 print_footer();
 ?>

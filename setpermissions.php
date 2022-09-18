@@ -3,7 +3,7 @@
  * Use this file to try and use PHP to set permissions on the neccessary files.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @package Genmod
- * @version $Id: setpermissions.php,v 1.2 2005/10/27 08:41:30 roland-d Exp $
+ * @version $Id: setpermissions.php,v 1.3 2008/01/06 11:01:43 roland-d Exp $
  */
 
 if (chmod("config.php", 0777)) print "Successfully set permissions for config.php.<br />";

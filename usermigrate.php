@@ -4,7 +4,7 @@
  * authenticate.php and xxxxxx.dat files (MySQL mode).
  * 
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  * @author Genmod Development Team
  * @package Genmod
  * @subpackage Admin
- * @version $Id: usermigrate.php,v 1.3 2006/04/09 15:53:27 roland-d Exp $
+ * @version $Id: usermigrate.php,v 1.9 2008/01/06 11:03:47 roland-d Exp $
  */
 
 /**
@@ -31,16 +31,11 @@
 */
 require "config.php";
 
-/**
- * Inclusion of the language files
-*/
-require $GM_BASE_DIRECTORY.$confighelpfile["english"];
-if (file_exists($GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE])) require $GM_BASE_DIRECTORY.$confighelpfile[$LANGUAGE];
-
 //-- make sure that they have admin status before they can use this page
 //-- otherwise have them login again
-if (!userIsAdmin(getUserName())) {
-	header("Location: login.php?url=usermigrate.php");
+if (!userIsAdmin(GetUserName())) {
+	if (empty($LOGIN_URL)) header("Location: login.php?url=usermigrate.php");
+	else header("Location: ".$LOGIN_URL."?url=usermigrate.php");
 	exit;
 }
 
@@ -231,9 +226,9 @@ function um_export() {
 	$authtext = "<?php\n\n\$users = array();\n\n";
 	$users = GetUsers();
 	foreach($users as $key=>$user) {
-		$user["firstname"] = $DBCONN->escapeSimple($user["firstname"]);
-		$user["lastname"] = $DBCONN->escapeSimple($user["lastname"]);
-		$user["comment"] = $DBCONN->escapeSimple($user["comment"]);
+		$user["firstname"] = $DBCONN->EscapeQuery($user["firstname"]);
+		$user["lastname"] = $DBCONN->EscapeQuery($user["lastname"]);
+		$user["comment"] = $DBCONN->EscapeQuery($user["comment"]);
 		$authtext .= "\$user = array();\n";
 		foreach($user as $ukey=>$value) {
 			if (!is_array($value)) {
@@ -269,8 +264,8 @@ function um_export() {
 	$messages = array();
 	$mesid = 1;
 	$sql = "SELECT * FROM ".$TBLPREFIX."messages ORDER BY m_id DESC";
-	$res = dbquery($sql);
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	$res = NewQuery($sql);
+	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
 		$message = array();
 		$message["id"] = $mesid;
@@ -305,9 +300,9 @@ function um_export() {
 	if (($proceed == "export") || ($proceed == "exportovr")) print $gm_lang["um_creating"]." \"favorites.dat\"<br /><br />";
 	$favorites = array();
 	$sql = "SELECT * FROM ".$TBLPREFIX."favorites";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	$favid = 1;
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
 		$favorite = array();
 		$favorite["id"] = $favid;
@@ -344,8 +339,8 @@ function um_export() {
 	if (($proceed == "export") || ($proceed == "exportovr")) print $gm_lang["um_creating"]." \"news.dat\"<br /><br />";
 	$allnews = array();
 	$sql = "SELECT * FROM ".$TBLPREFIX."news ORDER BY n_date DESC";
-	$res = dbquery($sql);
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	$res = NewQuery($sql);
+	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
 		$news = array();
 		$news["id"] = $row["n_id"];
@@ -380,8 +375,8 @@ function um_export() {
 	$blocks["main"] = array();
 	$blocks["right"] = array();
 	$sql = "SELECT * FROM ".$TBLPREFIX."blocks ORDER BY b_location, b_order";
-	$res = dbquery($sql);
-	while($row = $res->fetchRow(DB_FETCHMODE_ASSOC)){
+	$res = NewQuery($sql);
+	while($row = $res->FetchAssoc()){
 		$row = db_cleanup($row);
 		$blocks = array();
 		$blocks["username"] = $row["b_username"];
@@ -460,7 +455,7 @@ if ($proceed == "import") {
 	require $INDEX_DIRECTORY."authenticate.php";
 	$countold = count($users);
 	$sql = "DELETE FROM ".$TBLPREFIX."users";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	if (!$res) {
 		print "<span class=\"error\">Unable to update <i>Users</i> table.</span><br />\n";
 		exit;
@@ -470,7 +465,7 @@ if ($proceed == "import") {
 		else $user["visibleonline"] = true;
 		if ($user["editaccount"] == "1") $user["editaccount"] = false;
 		else $user["editaccount"] = true;
-		addUser($user, "imported");
+		AddUser($user, "imported");
 	}
 	$countnew = count(getUsers());
 	if ($countold == $countnew) {
@@ -484,7 +479,7 @@ if ($proceed == "import") {
 	// Get messages and import them
 	print $gm_lang["um_imp_messages"]."<br />";
 	$sql = "DELETE FROM ".$TBLPREFIX."messages";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	if (!$res) {
 		print "<span class=\"error\">Unable to update <i>Messages</i> table.</span><br />\n";
 		exit;
@@ -499,8 +494,8 @@ if ($proceed == "import") {
 		fclose($fp);
 		$messages = unserialize($mstring);
 		foreach($messages as $newid => $message) {
-			$sql = "INSERT INTO ".$TBLPREFIX."messages VALUES ($newid, '".$DBCONN->escapeSimple($message["from"])."','".$DBCONN->escapeSimple($message["to"])."','".$DBCONN->escapeSimple($message["subject"])."','".$DBCONN->escapeSimple($message["body"])."','".$DBCONN->escapeSimple($message["created"])."')";
-			$res = dbquery($sql);
+			$sql = "INSERT INTO ".$TBLPREFIX."messages VALUES ($newid, '".$DBCONN->EscapeQuery($message["from"])."','".$DBCONN->EscapeQuery($message["to"])."','".$DBCONN->EscapeQuery($message["subject"])."','".$DBCONN->EscapeQuery($message["body"])."','".$DBCONN->EscapeQuery($message["created"])."')";
+			$res = NewQuery($sql);
 			if (!$res) {
 				print "<span class=\"error\">Unable to update <i>Messages</i> table.</span><br />\n";
 				exit;
@@ -512,7 +507,7 @@ if ($proceed == "import") {
 	// Get favorites and import them
 	print $gm_lang["um_imp_favorites"]."<br />";
 	$sql = "DELETE FROM ".$TBLPREFIX."favorites";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	if (!$res) {
 		print "<span class=\"error\">Unable to update <i>Favorites</i> table.</span><br />\n";
 		exit;
@@ -540,7 +535,7 @@ if ($proceed == "import") {
 	// Get news and import it
 	print $gm_lang["um_imp_news"]."<br />";
 	$sql = "DELETE FROM ".$TBLPREFIX."news";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	if (!$res) {
 		print "<span class=\"error\">Unable to update <i>News</i> table.</span><br />\n";
 		exit;
@@ -567,7 +562,7 @@ if ($proceed == "import") {
 	// Get blocks and import them
 	print $gm_lang["um_imp_blocks"]."<br />";
 	$sql = "DELETE FROM ".$TBLPREFIX."blocks";
-	$res = dbquery($sql);
+	$res = NewQuery($sql);
 	if (!$res) {
 		print "<span class=\"error\">Unable to update <i>Blocks</i> table.</span><br />\n";
 		exit;
@@ -583,8 +578,8 @@ if ($proceed == "import") {
 		$allblocks = unserialize($mstring);
 		foreach($allblocks as $bid => $blocks) {
 			$username = $blocks["username"];
-			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ($bid, '".$DBCONN->escapeSimple($blocks["username"])."', '".$blocks["location"]."', '".$blocks["order"]."', '".$DBCONN->escapeSimple($blocks["name"])."', '".$DBCONN->escapeSimple(serialize($blocks["config"]))."')";
-			$res = dbquery($sql);
+			$sql = "INSERT INTO ".$TBLPREFIX."blocks VALUES ($bid, '".$DBCONN->EscapeQuery($blocks["username"])."', '".$blocks["location"]."', '".$blocks["order"]."', '".$DBCONN->EscapeQuery($blocks["name"])."', '".$DBCONN->EscapeQuery(serialize($blocks["config"]))."')";
+			$res = NewQuery($sql);
 			if (!$res) {
 				print "<span class=\"error\">Unable to update <i>Blocks</i> table.</span><br />\n";
 				exit;

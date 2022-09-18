@@ -3,7 +3,7 @@
  * Various functions used to generate the Genmod RSS feed.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +19,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * @version $Id: functions_rss.php,v 1.5 2006/04/09 15:53:28 roland-d Exp $
+ * @version $Id: functions_rss.php,v 1.22 2009/03/08 18:37:35 sjouke Exp $
  * @package Genmod
  * @subpackage RSS
  */
 
-if (strstr($_SERVER["SCRIPT_NAME"],"functions")) {
-        print "Now, why would you want to do that.        You're not hacking are you?";
-        exit;
+if (strstr($_SERVER["SCRIPT_NAME"],"functions_rss")) {
+	require "../intrusion.php";
 }
 
 require("config.php");
-require($GM_BASE_DIRECTORY.$factsfile["english"]);
-if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
+//require($GM_BASE_DIRECTORY.$factsfile["english"]);
+//if (file_exists($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE])) require($GM_BASE_DIRECTORY.$factsfile[$LANGUAGE]);
 
 if (isset($_SESSION["timediff"])) $time = time()-$_SESSION["timediff"];
 else $time = time();
@@ -66,13 +65,17 @@ function iso8601_date($time) {
  */
 function getUpcomingEvents() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS, $monthstart;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $LAST_QUERY, $GM_BLOCKS;
 	global $INDEX_DIRECTORY, $USE_RTL_FUNCTIONS,$SERVER_URL;
-	global $DAYS_TO_SHOW_LIMIT;
+	global $DAYS_TO_SHOW_LIMIT, $lastcachedate;
 	global $CIRCULAR_BASE, $TBLPREFIX;
 
 	$dataArray[0] = $gm_lang["upcoming_events"];
-	$dataArray[1] = time();
+	if (!isset($lastcachedate)) $lastcachedate = LastBlockCacheDate();
+
+	if (!isset($lastcachedate)) $lastcachedate = LastBlockCacheDate();
+	if (is_array($lastcachedate) && $lastcachedate["gc_last_upcoming"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_upcoming"]);
+	else $dataArray[1] = iso8601_date(time());
 
 	if (empty($config)) $config = $GM_BLOCKS["print_upcoming_events"]["config"];
 	if (!isset($DAYS_TO_SHOW_LIMIT)) $DAYS_TO_SHOW_LIMIT = 30;
@@ -103,24 +106,24 @@ function getUpcomingEvents() {
 				$gid = $factarray[0];
 				$factrec = $factarray[1];
 				$disp = true;
-				if ($filter=="living" and is_dead_id($gid)){
+				if ($filter=="living" and IsDeadId($gid)){
 					$disp = false;
 				} else if (!displayDetailsByID($gid)) {
           			$disp = false;
           			$PrivateFacts = true;
         		}
 				if ($disp) {
-					$indirec = find_person_record($gid);
+					$indirec = FindPersonRecord($gid);
 					$filterev = "all";
 					if ($onlyBDM == "yes") $filterev = "bdm";
-					$tempText = get_calendar_fact($factrec, $action, $filter, $gid, $filterev);
+					$tempText = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
 					$text= preg_replace("/href=\"calendar\.php/", "href=".$SERVER_URL."calendar.php", $tempText);
 					if ($text!="filter") {
 						if (FactViewRestricted($gid, $factrec) or $text=="") {
 							$PrivateFacts = true;
 						} else {
 							if ($lastgid!=$gid) {
-								$name = check_NN(get_sortable_name($gid));
+								$name = CheckNN(GetSortableName($gid));
 								$daytext .= "<li><a href=\"".$SERVER_URL ."individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 								if ($SHOW_ID_NUMBERS) {
 									if ($TEXT_DIRECTION=="ltr"){
@@ -145,15 +148,15 @@ function getUpcomingEvents() {
 
 				$disp = true;
 				if ($filter=="living") {
-					$parents = find_parents_in_record($gid["gedcom"]);
-					if (is_dead_id($parents["HUSB"])){
+					$parents = FindParentsInRecord($gid["gedcom"]);
+					if (IsDeadId($parents["HUSB"])){
 						$disp = false;
 					} else if (!displayDetailsByID($parents["HUSB"])) {
 						$disp = false;
 						$PrivateFacts = true;
 					}
 					if ($disp) {
-						if (is_dead_id($parents["WIFE"])) $disp = false;
+						if (IsDeadId($parents["WIFE"])) $disp = false;
 						else if (!displayDetailsByID($parents["WIFE"])) {
 							$disp = false;
 							$PrivateFacts = true;
@@ -164,11 +167,11 @@ function getUpcomingEvents() {
 					$PrivateFacts = true;
 				}
 				if($disp) {
-					$famrec = find_family_record($gid);
-					$name = get_family_descriptor($gid);
+					$famrec = FindFamilyRecord($gid);
+					$name = GetFamilyDescriptor($gid);
 					$filterev = "all";
 					if ($onlyBDM == "yes") $filterev = "bdm";
-					$tempText = get_calendar_fact($factrec, $action, $filter, $gid, $filterev);
+					$tempText = GetCalendarFact($factrec, $action, $filter, $gid, $filterev);
 					$text = preg_replace("/href=\"calendar\.php/", "href=".$SERVER_URL."calendar.php", $tempText);
 					if ($text!="filter") {
 						if (FactViewRestricted($gid, $factrec) or $text=="") {
@@ -226,17 +229,20 @@ function getUpcomingEvents() {
  */
 function getTodaysEvents() {
 	global $gm_lang, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
-	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $INDEX_DIRECTORY, $IGNORE_FACTS, $IGNORE_YEAR, $SERVER_URL;
+	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $INDEX_DIRECTORY, $IGNORE_FACTS, $IGNORE_YEAR, $SERVER_URL, $lastcachedate;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
 
 	$skipfacts = "CHAN,BAPL,SLGC,SLGS,ENDL";
 
+	$dataArray = array();
 	$daytext = "<ul>";
 	$action = "today";
 	$dataArray[0] = $gm_lang["on_this_day"];
-	$dataArray[1] = time();
+	if (!isset($lastcachedate)) $lastcachedate = LastBlockCacheDate();
+	if (is_array($lastcachedate) && $lastcachedate["gc_last_today"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_today"]);
+	else $dataArray[1] = iso8601_date(time());
 
 	$found_facts = GetCachedEvents($action, 1, $filter, "no", $skipfacts);
 
@@ -246,11 +252,11 @@ function getTodaysEvents() {
 			$gid = $factarray[0];
 			$factrec = $factarray[1];
 	  		if ((displayDetailsById($gid)) && (!FactViewRestricted($gid, $factrec))) {
-				$indirec = find_person_record($gid);
-				$text = get_calendar_fact($factrec, $action, $filter, $gid);
+				$indirec = FindPersonRecord($gid);
+				$text = GetCalendarFact($factrec, $action, $filter, $gid);
 				if ($text!="filter") {
 					if ($lastgid!=$gid) {
-						$name = check_NN(get_sortable_name($gid));
+						$name = CheckNN(GetSortableName($gid));
 						$daytext .= "<li><a href=\"".$SERVER_URL ."individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")	$daytext .= " &lrm;($gid)&lrm;";
@@ -268,9 +274,9 @@ function getTodaysEvents() {
 			$gid = $factarray[0];
 			$factrec = $factarray[1];
 	  		if ((displayDetailsById($gid, "FAM")) && (!FactViewRestricted($gid, $factrec))) {
-				$famrec = find_family_record($gid);
-				$name = get_family_descriptor($gid);
-				$text = get_calendar_fact($factrec, $action, $filter, $gid);
+				$famrec = FindFamilyRecord($gid);
+				$name = GetFamilyDescriptor($gid);
+				$text = GetCalendarFact($factrec, $action, $filter, $gid);
 				if ($text!="filter") {
 					if ($lastgid!=$gid) {
 						$daytext .= "<li><a href=\"".$SERVER_URL ."family.php?famid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
@@ -305,15 +311,20 @@ function getTodaysEvents() {
  * @TODO does not pick up the GEDCOM stats block config and always shows most common names.
  */
 function getGedcomStats() {
-	global $gm_lang, $day, $month, $year, $GEDCOM, $GEDCOMS, $ALLOW_CHANGE_GEDCOM, $command, $COMMON_NAMES_THRESHOLD, $SERVER_URL, $RTLOrd, $TBLPREFIX;
+	global $gm_lang, $day, $month, $year, $GEDCOM, $GEDCOMS, $ALLOW_CHANGE_GEDCOM;
+	global $command, $COMMON_NAMES_THRESHOLD, $SERVER_URL, $RTLOrd, $TBLPREFIX;
+	global $GEDCOMID, $lastcachedate;
 
 	$data = "";
 	$dataArray[0] = $gm_lang["gedcom_stats"] . " - " . $GEDCOMS[$GEDCOM]["title"];
+	if (!isset($lastcachedate)) $lastcachedate = LastBlockCacheDate();
+	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
+	else $dataArray[1] = iso8601_date(time());
 
-	$head = find_gedcom_record("HEAD");
+	$head = FindGedcomRecord("HEAD");
 	$ct=preg_match("/1 SOUR (.*)/", $head, $match);
 	if ($ct>0) {
-		$softrec = get_sub_record(1, "1 SOUR", $head);
+		$softrec = GetSubRecord(1, "1 SOUR", $head);
 		$tt= preg_match("/2 NAME (.*)/", $softrec, $tmatch);
 		if ($tt>0) $title = trim($tmatch[1]);
 		else $title = trim($match[1]);
@@ -329,38 +340,44 @@ function getGedcomStats() {
 	$ct=preg_match("/1 DATE (.*)/", $head, $match);
 	if ($ct>0) {
 		$date = trim($match[1]);
-		$dataArray[1] = strtotime($date);
+		$ct2 = preg_match("/2 TIME (.*)/", $head, $match);
+		if ($ct2 > 0) $time = trim($match[1]);
+		else $time = "";	
 
-		if (empty($title)){
-			$data .= str_replace("#DATE#", get_changed_date($date), $gm_lang["gedcom_created_on"]);
-		} else {
-			$data .= str_replace("#DATE#", get_changed_date($date), $gm_lang["gedcom_created_on2"]);
+		if (empty($title)) {
+			$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on"]);
+			$text = str_replace("#TIME#", $time, $text);
 		}
+		else {
+			$text = str_replace("#DATE#", GetChangedDate($date), $gm_lang["gedcom_created_on2"]);
+			$text = str_replace("#TIME#", $time, $text);
+		}
+		$data .= $text;
 	}
 
 	$data .= " <br />\n";
-	$data .= get_list_size("indilist"). " - " .$gm_lang["stat_individuals"]."<br />";
-	$data .= get_list_size("famlist"). " - ".$gm_lang["stat_families"]."<br />";
-	$data .= get_list_size("sourcelist")." - ".$gm_lang["stat_sources"]."<br /> ";
-	$data .= get_list_size("otherlist")." - ".$gm_lang["stat_other"]."<br />";
+	$data .= GetListSize("indilist"). " - " .$gm_lang["stat_individuals"]."<br />";
+	$data .= GetListSize("famlist"). " - ".$gm_lang["stat_families"]."<br />";
+	$data .= GetListSize("sourcelist")." - ".$gm_lang["stat_sources"]."<br /> ";
+	$data .= GetListSize("otherlist")." - ".$gm_lang["stat_other"]."<br />";
 
 
 
 	// NOTE: Get earliest birth year
-	$sql = "select min(d_year) as lowyear from ".$TBLPREFIX."dates where d_file = '".$GEDCOMS[$GEDCOM]["id"]."' and d_fact = 'BIRT' and d_year != '0' and d_type is null";
-	$res = dbquery($sql);
-	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	$sql = "select min(d_year) as lowyear from ".$TBLPREFIX."dates where d_file = '".$GEDCOMID."' and d_fact = 'BIRT' and d_year != '0' and d_type is null";
+	$res = NewQuery($sql);
+	$row = $res->FetchAssoc();
 	$data .= $gm_lang["stat_earliest_birth"]." - ".$row["lowyear"]."<br />\n";
 
 	// NOTE: Get the latest birth year
-	$sql = "select max(d_year) as highyear from ".$TBLPREFIX."dates where d_file = '".$GEDCOMS[$GEDCOM]["id"]."' and d_fact = 'BIRT' and d_type is null";
-	$res = dbquery($sql);
-	$row = $res->fetchRow(DB_FETCHMODE_ASSOC);
+	$sql = "select max(d_year) as highyear from ".$TBLPREFIX."dates where d_file = '".$GEDCOMID."' and d_fact = 'BIRT' and d_type is null";
+	$res = NewQuery($sql);
+	$row = $res->FetchAssoc();
 	$data .= $gm_lang["stat_latest_birth"]." - " .$row["highyear"]."<br />\n";
 
 
 
-	$surnames = get_common_surnames_index($GEDCOM);
+	$surnames = GetCommonSurnamesIndex($GEDCOM);
 	if (count($surnames)>0) {
 		$data .="<b>" . $gm_lang["common_surnames"]."</b><br />";
 		$i=0;
@@ -389,7 +406,7 @@ function getGedcomStats() {
  * @TODO prepend relative URL's in news items with $SERVER_URL
  */
 function getGedcomNews() {
-	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $VERSION, $SERVER_URL;
+	global $gm_lang, $GM_IMAGE_DIR, $GM_IMAGES, $TEXT_DIRECTION, $GEDCOM, $command, $TIME_FORMAT, $VERSION, $SERVER_URL, $lastcachedate;
 
 	$usernews = getUserNews($GEDCOM);
 
@@ -455,22 +472,25 @@ function getTop10Surnames() {
 	if (empty($config)) $config = $GM_BLOCKS["print_block_name_top10"]["config"];
 
 	$dataArray[0] = str_replace("10", $config["num"], $gm_lang["block_top10_title"]);
-	$dataArray[1] = time();
+	if (!isset($lastcachedate)) $lastcachedate = LastBlockCacheDate();
+	if (is_array($lastcachedate) && $lastcachedate["gc_last_stats"] != 0) $dataArray[1] = iso8601_date($lastcachedate["gc_last_stats"]);
+	else $dataArray[1] = iso8601_date(time());
 
 	//-- cache the result in the session so that subsequent calls do not have to
 	//-- perform the calculation all over again.
-	if (isset($_SESSION["top10"][$GEDCOM])) {
-		$surnames = $_SESSION["top10"][$GEDCOM];
+	if (isset($_SESSION["top10"][$GEDCOM]["names"])) {
+		$surnames = $_SESSION["top10"][$GEDCOM]["names"];
+		$dataArray[1] = $_SESSION["top10"][$GEDCOM]["time"];
 	}
 	else {
-		$surnames = get_top_surnames($config["num"]);
+		$surnames = GetTopSurnames($config["num"]);
 
 		// Insert from the "Add Names" list if not already in there
 		if ($COMMON_NAMES_ADD != "") {
 			$addnames = preg_split("/[,;] /", $COMMON_NAMES_ADD);
 			if (count($addnames)==0) $addnames[] = $COMMON_NAMES_ADD;
 			foreach($addnames as $indexval => $name) {
-				//$surname = str2upper($name);
+				//$surname = Str2Upper($name);
 				$surname = $name;
 				if (!isset($surnames[$surname])) {
 					$surnames[$surname]["name"] = $name;
@@ -484,7 +504,7 @@ function getTop10Surnames() {
 			$delnames = preg_split("/[,;] /", $COMMON_NAMES_REMOVE);
 			if (count($delnames)==0) $delnames[] = $COMMON_NAMES_REMOVE;
 			foreach($delnames as $indexval => $name) {
-				//$surname = str2upper($name);
+				//$surname = Str2Upper($name);
 				$surname = $name;
 				unset($surnames[$surname]);
 			}
@@ -492,7 +512,8 @@ function getTop10Surnames() {
 
 		// Sort the list and save for future reference
 		uasort($surnames, "top_surname_sort");
-		$_SESSION["top10"][$GEDCOM] = $surnames;
+		$_SESSION["top10"][$GEDCOM]["names"] = $surnames;
+		$_SESSION["top10"][$GEDCOM]["time"] = $dataArray[1];
 	}
 	if (count($surnames)>0) {
 		$i=0;
@@ -515,11 +536,12 @@ function getTop10Surnames() {
  * 				$dataArray[2] = data
  * @TODO does not pick up the recent changes block config and always uses 30 days.
  * @TODO use date of most recent change instead of curent time
+ * @todo Find out why TOTAL_QUERIES is here???
  */
 function getRecentChanges() {
 	global $gm_lang, $factarray, $month, $year, $day, $monthtonum, $HIDE_LIVE_PEOPLE, $SHOW_ID_NUMBERS, $command, $TEXT_DIRECTION, $SHOW_FAM_ID_NUMBERS;
 	global $GM_IMAGE_DIR, $GM_IMAGES, $GEDCOM, $REGEXP_DB, $DEBUG, $ASC, $IGNORE_FACTS, $IGNORE_YEAR, $TOTAL_QUERIES, $LAST_QUERY, $GM_BLOCKS, $SHOW_SOURCES,$SERVER_URL;
-	global $medialist, $gm_username;
+	global $medialist, $gm_username, $Users;
 
 	if ($command=="user") $filter = "living";
 	else $filter = "all";
@@ -530,184 +552,12 @@ function getRecentChanges() {
 	else $HideEmpty = "no";
 
 	$dataArray[0] = $gm_lang["recent_changes"];
-	$dataArray[1] = time();//FIXME - get most recent change time
+	$dataArray[1] = time();//FIXED: get overwritten later, if any found.
 
 	$recentText = "";
-	$action = "today";
-	$dayindilist = array();
-	$dayfamlist = array();
-	$daysourcelist = array();
-	$dayrepolist = array();
-	$found_facts = array();
-	/* - don't cache this block
-	if (isset($_SESSION["recent_changes"][$command][$GEDCOM])&&(!isset($DEBUG)||($DEBUG==false))) {
-		$found_facts = $_SESSION["recent_changes"][$command][$GEDCOM];
-	}
-	else {
-		*/
-		$monthstart = mktime(1,0,0,$monthtonum[strtolower($month)],$day,$year);
-		$mmon = strtolower(date("M", $monthstart));
-		$mmon2 = strtolower(date("M", $monthstart-(60*60*24*$config["days"])));
-		$mday2 = date("d", $monthstart-(60*60*24*$config["days"]));
-		$myear2 = date("Y", $monthstart-(60*60*24*$config["days"]));
-
-		$fromdate = $myear2.date("m", $monthstart-(60*60*24*$config["days"])).$mday2;
-		if ($day < 10)
-			$mday3 = "0".$day;
-		else $mday3 = $day;
-		$todate = $year.date("m", $monthstart).$mday3;
-
-		$dayindilist = search_indis_dates("", $mmon, $year, "CHAN");
-		$dayfamlist = search_fams_dates("", $mmon, $year, "CHAN");
-		if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $dayrepolist = search_other_dates("", $mmon, $year, "CHAN");
-		if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $daysourcelist = search_sources_dates("", $mmon, $year, "CHAN");
-		if ($mmon!=$mmon2) {
-			$dayindilist2 = search_indis_dates("", $mmon2, $myear2, "CHAN");
-			$dayfamlist2 = search_fams_dates("", $mmon2, $myear2, "CHAN");
-			if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $dayrepolist2 = search_other_dates("", $mmon2, $myear2, "CHAN");
-			if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $daysourcelist2 = search_sources_dates("", $mmon2, $myear2, "CHAN");
-			$dayindilist = gm_array_merge($dayindilist, $dayindilist2);
-			$dayfamlist = gm_array_merge($dayfamlist, $dayfamlist2);
-			if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $daysourcelist = gm_array_merge($daysourcelist, $daysourcelist2);
-			if ($SHOW_SOURCES>=getUserAccessLevel($gm_username)) $dayrepolist = gm_array_merge($dayrepolist, $dayrepolist2);
-		}
-	/*
-	}
-	*/
-	if ((count($dayindilist)>0)||(count($dayfamlist)>0)||(count($daysourcelist)>0)) {
-		$found_facts = array();
-		$last_total = $TOTAL_QUERIES;
-		foreach($dayindilist as $gid=>$indi) {
-			$disp = true;
-			if (($filter=="living")&&(is_dead_id($gid)==1)) $disp = false;
-			else if ($HIDE_LIVE_PEOPLE) $disp = displayDetailsByID($gid);
-			if ($disp) {
-				$i = 1;
-				$factrec = get_sub_record(1, "1 CHAN", $indi["gedcom"], $i);
-				while(!empty($factrec)) {
-					$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-						$date = parse_date(trim($match[1]));
-
-						$datemonth=$monthtonum[str2lower($date[0]["month"])];
-						if ($datemonth > 0 && $datemonth < 10) $datemonth = "0".$datemonth;
-						$factdate = $date[0]["year"].$datemonth.$date[0]["day"];
-						if ($factdate <= $todate && $factdate > $fromdate) {
-							$found_facts[] = array($gid, $factrec, "INDI");
-						}
-					}
-					$i++;
-					$factrec = get_sub_record(1, "1 CHAN", $indi["gedcom"], $i);
-				}
-			}
-		}
-		foreach($dayfamlist as $gid=>$fam) {
-			$disp = true;
-			if ($filter=="living") {
-				$parents = find_parents_in_record($fam["gedcom"]);
-				if (is_dead_id($parents["HUSB"])==1) $disp = false;
-				else if ($HIDE_LIVE_PEOPLE) $disp = displayDetailsByID($parents["HUSB"]);
-				if ($disp) {
-					if (is_dead_id($parents["WIFE"])==1) $disp = false;
-					else if ($HIDE_LIVE_PEOPLE) $disp = displayDetailsByID($parents["WIFE"]);
-				}
-			}
-			else if ($HIDE_LIVE_PEOPLE) $disp = displayDetailsByID($gid, "FAM");
-			if ($disp) {
-				$i = 1;
-				$factrec = get_sub_record(1, "1 CHAN", $fam["gedcom"], $i);
-				while(!empty($factrec)) {
-					$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-						$date = parse_date(trim($match[1]));
-
-						$datemonth=$monthtonum[str2lower($date[0]["month"])];
-						if ($datemonth > 0 && $datemonth < 10) $datemonth = "0".$datemonth;
-						$factdate = $date[0]["year"].$datemonth.$date[0]["day"];
-
-						if ($factdate <= $todate && $factdate > $fromdate) {
-							$found_facts[] = array($gid, $factrec, "FAM");
-						}
-					}
-					$i++;
-					$factrec = get_sub_record(1, "1 CHAN", $fam["gedcom"], $i);
-				}
-			}
-		}
-		foreach($daysourcelist as $gid=>$source) {
-			$disp = true;
-			$disp = displayDetailsByID($gid, "SOUR");
-			if ($disp) {
-				$i = 1;
-				$factrec = get_sub_record(1, "1 CHAN", $source["gedcom"], $i);
-				while(!empty($factrec)) {
-					$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-					if ($ct>0) {
-						$date = parse_date(trim($match[1]));
-
-						$datemonth=$monthtonum[str2lower($date[0]["month"])];
-						if ($datemonth > 0 && $datemonth < 10) $datemonth = "0".$datemonth;
-						$factdate = $date[0]["year"].$datemonth.$date[0]["day"];
-						if ($factdate <= $todate && $factdate > $fromdate) {
-							$found_facts[] = array($gid, $factrec, "SOUR");
-						}
-					}
-					$i++;
-					$factrec = get_sub_record(1, "1 CHAN", $source["gedcom"], $i);
-				}
-			}
-		}
-		foreach($dayrepolist as $rid=>$repo) {
-			$disp = false;
-			if ($repo["type"] == "REPO") {
-				$disp = displayDetailsByID($rid, "REPO");
-				if ($disp) {
-					$i = 1;
-					$factrec = get_sub_record(1, "1 CHAN", $repo["gedcom"], $i);
-					while(!empty($factrec)) {
-						$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-						if ($ct>0) {
-							$date = parse_date(trim($match[1]));
-							$datemonth=$monthtonum[str2lower($date[0]["month"])];
-							if ($datemonth > 0 && $datemonth < 10) $datemonth = "0".$datemonth;
-							$factdate = $date[0]["year"].$datemonth.$date[0]["day"];
-							if ($factdate <= $todate && $factdate > $fromdate) {
-								$found_facts[] = array($rid, $factrec, "REPO");
-							}
-						}
-						$i++;
-						$factrec = get_sub_record(1, "1 CHAN", $repo["gedcom"], $i);
-					}
-				}
-			}
-			else if ($repo["type"] == "OBJE") {
-				$disp = displayDetailsByID($rid, "OBJE");
-				if ($disp) {
-					$i = 1;
-					$factrec = get_sub_record(1, "1 CHAN", $repo["gedcom"], $i);
-					while(!empty($factrec)) {
-
-						$ct = preg_match("/2 DATE (.*)/", $factrec, $match);
-						if ($ct>0) {
-							$date = parse_date(trim($match[1]));
-
-							$datemonth=$monthtonum[str2lower($date[0]["month"])];
-							if ($datemonth > 0 && $datemonth < 10) $datemonth = "0".$datemonth;
-							$factdate = $date[0]["year"].$datemonth.$date[0]["day"];
-							if ($factdate <= $todate && $factdate > $fromdate) {
-								$found_facts[] = array($rid, $factrec, "OBJE");
-							}
-						}
-						$i++;
-						$factrec = get_sub_record(1, "1 CHAN", $repo["gedcom"], $i);
-					}
-				}
-			}
-		}
-	}
-//-- store the results in the session to improve speed of future page loads
-//	$_SESSION["recent_changes"][$command][$GEDCOM] = $found_facts;
-
+	
+	$found_facts = GetRecentChangeFacts($day, $month, $year, $config["days"]);
+	
 // Start output
 	if (count($found_facts)==0 and $HideEmpty=="yes") return false;
 
@@ -715,24 +565,35 @@ function getRecentChanges() {
 //		Print block content
 	$gm_lang["global_num1"] = $config["days"];		// Make this visible
 	if (count($found_facts)==0) {
-		//$recentText .= $gm_lang["recent_changes"];
 		$recentText .= print_text("recent_changes_none", 0, 1);
 	} else {
-		//$recentText .= $gm_lang["recent_changes_some"];
 		$recentText .= print_text("recent_changes_some", 0, 1);
 		$ASC = 1;
 		$IGNORE_FACTS = 1;
 		$IGNORE_YEAR = 0;
-		uasort($found_facts, "compare_facts");
+		SortFacts($found_facts, "", true);
 		$lastgid="";
+		$first = true;
 		foreach($found_facts as $index=>$factarr) {
+			// Get the first record with the most recent change date
+			if ($first) {
+				$ct = preg_match("/\d DATE (.*)/", $factarr[1], $match);
+				if ($ct>0) {
+					$date = trim($match[1]);
+					$ct2 = preg_match("/\d TIME (.*)/", $factarr[1], $match);
+					if ($ct2 > 0) $time = trim($match[1]);
+					else $time = "";	
+					$dataArray[1] = strtotime($date." ".$time);
+					$first = false;
+				}
+			}
 			if ($factarr[2]=="INDI") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
 				if (displayDetailsById($gid)) {
-					$indirec = find_person_record($gid);
+					$indirec = FindPersonRecord($gid);
 					if ($lastgid!=$gid) {
-						$name = check_NN(get_sortable_name($gid));
+						$name = CheckNN(GetSortableName($gid));
 						$recentText .= "<a href=\"".$SERVER_URL ."individual.php?pid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_ID_NUMBERS) {
 							if ($TEXT_DIRECTION=="ltr")
@@ -745,7 +606,7 @@ function getRecentChanges() {
 					$recentText .= $factarray["CHAN"];
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
-							$recentText .= " - ".get_changed_date($match[1]);
+							$recentText .= " - ".GetChangedDate($match[1]);
 							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
 							if ($tt>0) {
 									$recentText .= " - ".$match[1];
@@ -759,8 +620,8 @@ function getRecentChanges() {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
 				if (displayDetailsById($gid, "FAM")) {
-					$famrec = find_family_record($gid);
-					$name = get_family_descriptor($gid);
+					$famrec = FindFamilyRecord($gid);
+					$name = GetFamilyDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".$SERVER_URL ."family.php?famid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_FAM_ID_NUMBERS) {
@@ -774,7 +635,7 @@ function getRecentChanges() {
 					$recentText .= $factarray["CHAN"];
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
-							$recentText .= " - ".get_changed_date($match[1]);
+							$recentText .= " - ".GetChangedDate($match[1]);
 							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
 							if ($tt>0) {
 									$recentText .= " - ".$match[1];
@@ -787,9 +648,9 @@ function getRecentChanges() {
 			if ($factarr[2]=="SOUR") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "SOUR")) {
-					$sourcerec = find_source_record($gid);
-					$name = get_source_descriptor($gid);
+				if (displayDetailsById($gid, "SOUR", 1, true)) {
+					$sourcerec = FindSourceRecord($gid);
+					$name = GetSourceDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".$SERVER_URL ."source.php?sid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_FAM_ID_NUMBERS) {
@@ -803,7 +664,7 @@ function getRecentChanges() {
 					$recentText .= $factarray["CHAN"];
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
-							$recentText .= " - ".get_changed_date($match[1]);
+							$recentText .= " - ".GetChangedDate($match[1]);
 							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
 							if ($tt>0) {
 									$recentText .= " - ".$match[1];
@@ -817,8 +678,8 @@ function getRecentChanges() {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
 				if (displayDetailsById($gid, "REPO")) {
-					$reporec = find_repo_record($gid);
-					$name = get_repo_descriptor($gid);
+					$reporec = FindRepoRecord($gid);
+					$name = GetRepoDescriptor($gid);
 					if ($lastgid!=$gid) {
 						$recentText .= "<a href=\"".$SERVER_URL ."repo.php?rid=$gid&amp;ged=".$GEDCOM."\"><b>".PrintReady($name)."</b>";
 						if ($SHOW_FAM_ID_NUMBERS) {
@@ -832,7 +693,7 @@ function getRecentChanges() {
 					$recentText .= $factarray["CHAN"];
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
-							$recentText .= " - ".get_changed_date($match[1]);
+							$recentText .= " - ".GetChangedDate($match[1]);
 							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
 							if ($tt>0) {
 								$recentText .= " - ".$match[1];
@@ -844,10 +705,10 @@ function getRecentChanges() {
 			if ($factarr[2]=="OBJE") {
 				$gid = $factarr[0];
 				$factrec = $factarr[1];
-				if (displayDetailsById($gid, "OBJE")) {
-					$mediarec = find_media_record($gid);
-					if (isset($medialist[0]["title"]) && $medialist[0]["title"] != "") $title=$medialist[0]["title"];
-					else $title = $medialist[0]["file"];
+				if (displayDetailsById($gid, "OBJE", 1, true)) {
+					$mediarec = FindMediaRecord($gid);
+					if (isset($medialist[$gid]["title"]) && $medialist[$gid]["title"] != "") $title=$medialist[$gid]["title"];
+					else $title = $medialist[$gid]["file"];
 					$SearchTitle = preg_replace("/ /","+",$title);
 					if ($lastgid!=$gid) {
  						$recentText .= "<a href=\"".$SERVER_URL ."medialist.php?action=filter&amp;search=yes&amp;filter=$SearchTitle&amp;ged=".$GEDCOM."\"><b>".PrintReady($title)."</b>";
@@ -862,7 +723,7 @@ function getRecentChanges() {
 					$recentText .= $factarray["CHAN"];
 					$ct = preg_match("/\d DATE (.*)/", $factrec, $match);
 					if ($ct>0) {
-							$recentText .= " - ".get_changed_date($match[1]);
+							$recentText .= " - ".GetChangedDate($match[1]);
 							$tt = preg_match("/3 TIME (.*)/", $factrec, $match);
 							if ($tt>0) {
 									$recentText .= " - ".$match[1];
@@ -878,7 +739,6 @@ function getRecentChanges() {
 	$recentText = strip_tags($recentText, '<a><br><b>');
 	$dataArray[2] = $recentText;
 	return $dataArray;
-
 }
 
 ?>

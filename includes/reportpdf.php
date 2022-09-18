@@ -5,7 +5,7 @@
  * used by the SAX parser to generate PDF reports from the XML report file.
  *
  * Genmod: Genealogy Viewer
- * Copyright (C) 2005 Genmod Development Team
+ * Copyright (C) 2005 - 2008 Genmod Development Team
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
  *
  * @package Genmod
  * @subpackage Reports
- * @version $Id: reportpdf.php,v 1.3 2006/04/17 20:01:52 roland-d Exp $
+ * @version $Id: reportpdf.php,v 1.19 2008/12/25 12:01:25 sjouke Exp $
  */
 
 //-- do not allow direct access to this file
@@ -33,6 +33,24 @@ if (strstr($_SERVER["SCRIPT_NAME"],"reportpdf.php")) {
 }
 
 define('FPDF_FONTPATH','fonts/');
+
+/**
+ * page sizes
+ *
+ * an array map of common page sizes
+ * Page sizes should be specified in inches
+ * @global array $pageSizes
+ */
+$pageSizes["A4"]["width"] = "8.27";		// 210 mm
+$pageSizes["A4"]["height"] = "11.73";	// 297 mm
+$pageSizes["A3"]["width"] = "11.73";	// 297 mm
+$pageSizes["A3"]["height"] = "16.54";	// 420 mm
+$pageSizes["A5"]["width"] = "5.83";		// 148 mm
+$pageSizes["A5"]["height"] = "8.27";	// 210 mm
+$pageSizes["letter"]["width"] = "8.5";	// 216 mm
+$pageSizes["letter"]["height"] = "11";	// 279 mm
+$pageSizes["legal"]["width"] = "8.5";	// 216 mm
+$pageSizes["legal"]["height"] = "14";	// 356 mm
 
 $ascii_langs = array("english", "danish", "dutch", "french", "german", "norwegian", "spanish", "spanish-ar");
 
@@ -73,22 +91,60 @@ class GMReport {
 	var $pdf;
 	var $processing;
 
-	function setup($pw, $ph, $o, $m) {
-		global $gm_lang, $VERSION;
+	function setup($pw, $ph, $pageSize, $o, $m, $showGenText=true) {
+		global $gm_lang, $VERSION, $vars, $pageSizes;
 
-		$this->pagew = $pw;
-		$this->pageh = $ph;
-		$this->orientation = $o;
+		// Determine the page dimensions
+		$this->pageFormat = strtoupper($pageSize);
+		if ($this->pageFormat == "LETTER") $this->pageFormat = "letter";
+		if ($this->pageFormat == "LEGAL") $this->pageFormat = "legal";
+
+		if (isset($pageSizes[$this->pageFormat]["width"])) {
+			$this->pagew = $pageSizes[$this->pageFormat]["width"];
+			$this->pageh = $pageSizes[$this->pageFormat]["height"];
+		} else {
+			if ($pw==0 || $ph==0) {
+				$this->pageFormat = "A4";
+				$this->pagew = $pageSizes["A4"]["width"];
+				$this->pageh = $pageSizes["A4"]["height"];
+			} else {
+				$this->pageFormat = "";
+				$this->pagew = $pw;
+				$this->pageh = $ph;
+			}
+		}
+
+		$this->orientation = strtoupper($o);
+		if ($this->orientation == "L") {
+			$temp = $this->pagew;
+			$this->pagew = $this->pageh;
+			$this->pageh = $temp;
+		} else {
+			$this->orientation = "P";
+		}
+
 		$this->margin = $m;
-		$this->pdf = new GMRPDF('P', 'pt', array($pw*72,$ph*72));
+		$vars['pageWidth']['id'] = $this->pagew*72;
+		$vars['pageHeight']['id'] = $this->pageh*72;
+
+		if (empty($this->pageFormat)) {		//-- send a custom size
+			$this->pdf = new GMRPDF($this->orientation, 'pt', array($pw*72,$ph*72));
+		} else {							//-- send a known size
+			$this->pdf = new GMRPDF($this->orientation, 'pt', $this->pageFormat);
+		}
+
 		$this->pdf->setMargins($m, $m);
 		$this->pdf->SetCompression(true);
 		$this->pdf->setReport($this);
 		$this->processing = "H";
-		$element = new GMRCell(0,10, "C", "");
-		$element->addText("$gm_lang[generated_by] Genmod $VERSION");
-		$element->setUrl("http://www.Genmod.net/");
-		$this->pdf->addFooter($element);
+		if ($showGenText) {
+			$element = new GMRCell(0,10, "C", "");
+			$element->addText("$gm_lang[generated_by] Genmod $VERSION");
+			$element->setUrl("http://www.genmod.net/");
+			$this->pdf->addFooter($element);
+		}
+		$this->pdf->SetAutoPageBreak(false);
+		$this->pdf->SetAutoLineWrap(false);
 	}
 
 	function setProcessing($p) {
@@ -97,7 +153,7 @@ class GMReport {
 
 	function addElement(&$element) {
 		if ($this->processing=="H") return $this->pdf->addHeader($element);
-		if ($this->processing=="PH") return $this->pdf->addPageHeader($element);
+		if ($this->processing=="") return $this->pdf->addPageHeader($element);
 		if ($this->processing=="F") return $this->pdf->addFooter($element);
 		if ($this->processing=="B") return $this->pdf->addBody($element);
 	}
@@ -107,7 +163,10 @@ class GMReport {
 	}
 
 	function getStyle($s) {
-		if (!isset($this->GMRStyles[$s])) $s = $this->pdf->getCurrentStyle();
+		if (!isset($this->GMRStyles[$s])) {
+			$s = $this->pdf->getCurrentStyle();
+			$this->GMRStyles[$s] = $s;
+		}
 		return $this->GMRStyles[$s];
 	}
 
@@ -116,6 +175,7 @@ class GMReport {
 
 		$this->pdf->SetEmbedFonts($embed_fonts);
 		if ($embed_fonts) $this->pdf->AddFont('LucidaSansUnicode', '', 'LucidaSansRegular.php');
+		$this->pdf->setCurrentStyle(key($this->GMRStyles));
 		$this->pdf->AliasNbPages();
 		$this->pdf->Body();
 		header("Expires:");
@@ -127,12 +187,12 @@ class GMReport {
 	}
 
 	function getMaxWidth() {
-		$w = (($this->pagew * 72) - ($this->margin+10)) - $this->pdf->GetX();
+		$w = (($this->pagew * 72) - ($this->margin)) - $this->pdf->GetX();
 		return $w;
 	}
 
 	function getPageHeight() {
-		return ($this->pageh*72)-72;
+		return ($this->pageh*72)-$this->margin;
 	}
 
 	function clearPageHeader() {
@@ -173,12 +233,14 @@ class GMRPDF extends UFPDF {
 		if (!isset($this->currentStyle)) $this->currentStyle = "";
 		$temp = $this->currentStyle;
 		foreach($this->headerElements as $indexval => $element) {
-			if ($element=="footnotetexts") $this->Footnotes();
+			if (is_string($element) && $element=="footnotetexts") $this->Footnotes();
+			else if (is_string($element) && $element=="addpage") $this->AddPage();
 			else $element->render($this);
 		}
 		foreach($this->pageHeaderElements as $indexval => $element) {
-			if ($element=="footnotetexts") $this->Footnotes();
-			else $element->render($this);
+			if (is_string($element) && $element=="footnotetexts") $this->Footnotes();
+			else if (is_string($element) && $element=="addpage") $this->AddPage();
+			else if (is_object($element)) $element->render($this);
 		}
 		$this->currentStyle = $temp;
 	}
@@ -187,8 +249,9 @@ class GMRPDF extends UFPDF {
 		$this->SetY(-36);
 		$this->currentStyle = "";
 		foreach($this->footerElements as $indexval => $element) {
-			if ($element=="footnotetexts") $this->Footnotes();
-			else $element->render($this);
+			if (is_string($element) && $element=="footnotetexts") $this->Footnotes();
+			else if (is_string($element) && $element=="addpage") $this->AddPage();
+			else if (is_object($element)) $element->render($this);
 		}
 	}
 
@@ -197,15 +260,20 @@ class GMRPDF extends UFPDF {
 		$this->AddPage();
 		$this->currentStyle = "";
 		foreach($this->bodyElements as $indexval => $element) {
-			if ($element=="footnotetexts") $this->Footnotes();
-			else $element->render($this);
+			if (is_string($element) && $element=="footnotetexts") $this->Footnotes();
+			else if (is_string($element) && $element=="addpage") $this->AddPage();
+			else if (is_object($element)) $element->render($this);
 		}
 	}
 
 	function Footnotes() {
 		$this->currentStyle = "";
 		foreach($this->printedfootnotes as $indexval => $element) {
+			//print ($this->GetY() + $element->getFootnoteHeight($this)).">".$this->getPageHeight();
+			if (($this->GetY() + $element->getFootnoteHeight($this) + 24) > $this->getPageHeight()) $this->AddPage();
 			$element->renderFootnote($this);
+			
+			if ($this->GetY() > $this->getPageHeight()) $this->AddPage();
 		}
 	}
 
@@ -268,6 +336,7 @@ class GMRPDF extends UFPDF {
 	function setCurrentStyle($s) {
 		$this->currentStyle = $s;
 		$style = $this->gmreport->getStyle($s);
+		//print_r($style);
 		$this->SetFont($style["font"], $style["style"], $style["size"]);
 	}
 
@@ -319,7 +388,7 @@ class GMRElement {
 		global $embed_fonts, $TEXT_DIRECTION, $SpecialOrds;
 
 		if (!isset($this->text)) $this->text = "";
-		
+
 		//$ord = ord(substr($t, 0, 1));
 		//print "[".substr($t, 0, 1)."=$ord]";
 		$found=false;
@@ -334,7 +403,7 @@ class GMRElement {
 		$t = strip_tags($t);
 		$t = unhtmlentities($t);
 		if ($embed_fonts) $t = bidi_text($t);
-		else $t = smart_utf8_decode($t);
+		else $t = SmartUtf8Decode($t);
 		$this->text .= $t;
 	}
 
@@ -349,7 +418,12 @@ class GMRElement {
 	}
 
 	function getHeight(&$pdf) {
-		return 0;
+		$ct = substr_count($this->text, "\n");
+		if ($ct>0) $ct+=1;
+		$style = $pdf->getStyle($this->styleName);
+		$h = (($style["size"]+1)*$ct);
+		//print "GMRElement getHeight [".$this->text." $ct $h]<br />";
+		return $h;
 	}
 
 	function getWidth(&$pdf) {
@@ -446,12 +520,13 @@ class GMRTextBox extends GMRElement {
 	var $top;
 	var $left;
 	var $elements = array();
+	var $pagecheck;
 
 	function get_type() {
 		return "GMRTextBox";
 	}
 
-	function GMRTextBox($width, $height, $border, $fill, $newline, $left=".", $top=".") {
+	function GMRTextBox($width, $height, $border, $fill, $newline, $left=".", $top=".", $pagecheck="true") {
 		$this->width = $width;
 		$this->height = $height;
 		$this->border = $border;
@@ -461,6 +536,8 @@ class GMRTextBox extends GMRElement {
 		else $this->style = "";
 		$this->top = $top;
 		$this->left = $left;
+		if ($pagecheck=="true") $this->pagecheck = true;
+		else $this->pagecheck = false;
 	}
 
 	function render(&$pdf) {
@@ -484,6 +561,8 @@ class GMRTextBox extends GMRElement {
 		}
 		if ($this->width==0) {
 			$this->width = $pdf->getMaxWidth();
+		} else if (substr($this->width, -1)=="%") {
+			$this->width = $pdf->getMaxWidth() * intval($this->width) / 100;
 		}
 
 		$newelements = array();
@@ -491,15 +570,15 @@ class GMRTextBox extends GMRElement {
 		//-- collapse duplicate elements
 		for($i=0; $i<count($this->elements); $i++) {
 			$element = $this->elements[$i];
-			if ($element!="footnotetexts") {
+			if (is_object($element)) {
 				if ($element->get_type()=="GMRText") {
-					if ($lastelement == "") $lastelement = $element;
+					if (empty($lastelement)) $lastelement = $element;
 					else {
 						if ($element->getStyleName()==$lastelement->getStyleName()) {
 							$lastelement->addText(preg_replace("/\n/", "<br />", $element->getValue()));
 						}
 						else {
-							if ($lastelement != "") {
+							if (!empty($lastelement)) {
 								$newelements[] = $lastelement;
 								$lastelement = $element;
 							}
@@ -508,7 +587,7 @@ class GMRTextBox extends GMRElement {
 				}
 				//-- do not keep empty footnotes
 				else if (($element->get_type()!="GMRFootnote")||(trim($element->getValue())!="")) {
-					if ($lastelement != "") {
+					if (!empty($lastelement)) {
 						$newelements[] = $lastelement;
 						$lastelement = "";
 					}
@@ -516,21 +595,21 @@ class GMRTextBox extends GMRElement {
 				}
 			}
 			else {
-				if ($lastelement != "") {
+				if (!empty($lastelement)) {
 					$newelements[] = $lastelement;
 					$lastelement = "";
 				}
 				$newelements[] = $element;
 			}
 		}
-		if ($lastelement!="") $newelements[] = $lastelement;
+		if (!empty($lastelement)) $newelements[] = $lastelement;
 		$this->elements = $newelements;
 
 		//-- calculate the text box height
 		$h = 0;
 		$w = 0;
 		for($i=0; $i<count($this->elements); $i++) {
-			if ($this->elements[$i]!="footnotetexts") {
+			if (is_object($this->elements[$i])) {
 				$ew = $this->elements[$i]->setWrapWidth($this->width-$w, $this->width);
 				if ($ew==$this->width) $w=0;
 				//-- $lw is an array 0=>last line width, 1=1 if text was wrapped, 0 if text did not wrap
@@ -545,6 +624,7 @@ class GMRTextBox extends GMRElement {
 				$h+=$eh;
 			}
 			else {
+				//print "Get the footnotes height<br />";
 				$h += $pdf->getFootnotesHeight();
 			}
 		}
@@ -565,26 +645,28 @@ class GMRTextBox extends GMRElement {
 		}
 
 		$newpage = false;
-		$ph = $pdf->getPageHeight();
-		if ($pdf->GetY()+$this->height > $ph) {
-			if ($this->border==1) {
-				//print "HERE2";
-				$pdf->AddPage();
-				$newpage = true;
-				$startX = $pdf->GetX();
-				$startY = $pdf->GetY();
-			}
-			else if ($pdf->GetY()>$ph-36) {
-				//print "HERE1";
-				$pdf->AddPage();
-				$startX = $pdf->GetX();
-				$startY = $pdf->GetY();
-			}
-			else {
-				//print "HERE3";
-				$th = $this->height;
-				$this->height = ($ph - $pdf->GetY())+36;
-				$newpage = true;
+		if ($this->pagecheck) {
+			$ph = $pdf->getPageHeight();
+			if ($pdf->GetY()+$this->height > $ph) {
+				if ($this->border==1) {
+					//print "HERE2";
+					$pdf->AddPage();
+					$newpage = true;
+					$startX = $pdf->GetX();
+					$startY = $pdf->GetY();
+				}
+				else if ($pdf->GetY()>$ph-36) {
+					//print "HERE1";
+					$pdf->AddPage();
+					$startX = $pdf->GetX();
+					$startY = $pdf->GetY();
+				}
+				else {
+					//print "HERE3";
+					$th = $this->height;
+					$this->height = ($ph - $pdf->GetY())+36;
+					$newpage = true;
+				}
 			}
 		}
 
@@ -592,7 +674,8 @@ class GMRTextBox extends GMRElement {
 		$pdf->SetXY($pdf->GetX(), $pdf->GetY()+1);
 		$curx = $pdf->GetX();
 		foreach($this->elements as $indexval => $element) {
-			if ($element=="footnotetexts") $pdf->Footnotes();
+			if (is_string($element) && $element=="footnotetexts") $pdf->Footnotes();
+			else if (is_string($element) && $element=="addpage") $pdf->AddPage();
 			else $element->render($pdf, $curx);
 		}
 		if ($curn != $pdf->PageNo()) $cury = $pdf->GetY();
@@ -627,15 +710,18 @@ class GMRText extends GMRElement {
 	var $styleName;
 	var $wrapWidth;
 	var $wrapWidth2;
+	var $align;
 
 	function get_type() {
 		return "GMRText";
 	}
 
-	function GMRText($style) {
+	function GMRText($style, $color, $align) {
 		$this->text = "";
+		$this->color = $color;
 		$this->wrapWidth = 0;
 		$this->styleName = $style;
+		$this->align = $align;
 	}
 
 	function render(&$pdf, $curx=0) {
@@ -645,19 +731,57 @@ class GMRText extends GMRElement {
 		//print $this->text;
 		$x = $pdf->GetX();
 		$cury = $pdf->GetY();
+
+		if (!empty($this->color)) {
+			$ct = preg_match("/#?(..)(..)(..)/", $this->color, $match);
+			if ($ct>0) {
+				//$this->style .= "F";
+				$r = hexdec($match[1]);
+				$g = hexdec($match[2]);
+				$b = hexdec($match[3]);
+				$pdf->SetTextColor($r, $g, $b);
+			}
+		}
+
 		$lines = preg_split("/\n/", $temptext);
 		$styleh = $pdf->getCurrentStyleHeight();
 		if (count($lines)>0) {
 			foreach($lines as $indexval => $line) {
+				if ($this->align=="R" || $this->align=="C") {
+					$temp=$this->text;
+					$this->text=$line;
+					$widths=$this->getWidth($pdf);
+					$this->text=$temp;
+					$width=intval(ceil($widths[0]));
+					if ($this->wrapWidth > $width) {
+						$cx = $this->wrapWidth - $width;
+						if ($this->align=="C") $cx /= 2;
+						$x += $cx;
+					}
+				}
 				$pdf->SetXY($x, $cury);
-				//print "[$x $cury $line]";
+//				print "[$x $cury $line]";
 				$pdf->Write($styleh,$line);
 				$cury+=$styleh+1;
 				if ($cury>$pdf->getPageHeight()) $cury = $pdf->getY()+$styleh+1;
 				$x = $curx;
 			}
+		} else {
+			if ($this->align=="R" || $this->align=="C") {
+				$temp=$this->text;
+				$this->text=$line;
+				$widths=$this->getWidth($pdf);
+				$this->text=$temp;
+				$width=intval(ceil($widths[0]));
+				if ($this->wrapWidth > $width) {
+					$cx = $this->wrapWidth - $width;
+					if ($this->align=="C") $cx /= 2;
+					$x += $cx;
+					$pdf->SetXY($x, $cury);
+				}
+			}
+			$pdf->Write($pdf->getCurrentStyleHeight(),$temptext);
 		}
-		else $pdf->Write($pdf->getCurrentStyleHeight(),$temptext);
 		$ct = preg_match_all("/".chr(215)."/", $temptext, $match);
 		if ($ct>1) {
 			$x = $pdf->GetX();
@@ -671,7 +795,7 @@ class GMRText extends GMRElement {
 		if ($ct>0) $ct+=1;
 		$style = $pdf->getStyle($this->styleName);
 		$h = (($style["size"]+1)*$ct);
-		//print "[".$this->text." $ct $h]";
+		//print "GMRText getHeight [".$this->text." $ct $h]<br />";
 		return $h;
 	}
 
@@ -685,6 +809,8 @@ class GMRText extends GMRElement {
 				$newtext = "";
 				$wrapwidth = $this->wrapWidth;
 				foreach($lines as $indexval => $line) {
+					//LERMAN - add line at beginning at next line rather than end of previous
+					if ($indexval > 0) $newtext .= "\n";
 					$w = $pdf->GetStringWidth($line)+10;
 					if ($w>$wrapwidth) {
 						$words = preg_split("/\s/", $line);
@@ -699,9 +825,9 @@ class GMRText extends GMRElement {
 								$wrapwidth = $this->wrapWidth2;
 							}
 						}
-						$newtext .= "\n";
+						//LERMAN $newtext .= "\n";
 					}
-					else $newtext .= $line."\n";
+					else $newtext .= $line;//LERMAN ."\n";
 				}
 				$this->text = $newtext;
 				//$this->text = preg_replace("/\n/", "\n~", $this->text);
@@ -797,7 +923,7 @@ class GMRFootnote extends GMRElement {
 		$t = strip_tags($t);
 		$t = unhtmlentities($t);
 		if ($embed_fonts) $t = bidi_text($t);
-		else $t = smart_utf8_decode($t);
+		else $t = SmartUtf8Decode($t);
 		$this->text .= $t;
 	}
 
@@ -808,6 +934,16 @@ class GMRFootnote extends GMRElement {
 	function setAddlink(&$a) {
 		$this->addlink = $a;
 	}
+	
+	function getFootnoteHeight(&$pdf) {
+		$ct = substr_count($this->text, "\n");
+		if ($ct>0) $ct+=1;
+		$style = $pdf->getStyle($this->styleName);
+		$h = (($style["size"]+1)*$ct);
+		//print "[".$this->text." $ct $h]";
+		return $h;
+	}
+
 }
 
 /**
@@ -866,7 +1002,7 @@ class GMRImage extends GMRElement {
 		if ($this->y==0) {
 			//-- first check for a collision with the last picture
 			if (isset($lastpicbottom)) {
-				if (($pdf->PageNo()==$lastpicpage)&&($lastpicbottom >= $pdf->GetY())&&($this->x>=$lastpicleft)&&($this->x<=$lastpicright)) 
+				if (($pdf->PageNo()==$lastpicpage)&&($lastpicbottom >= $pdf->GetY())&&($this->x>=$lastpicleft)&&($this->x<=$lastpicright))
 					$pdf->SetY($lastpicbottom+5);
 			}
 			$this->y=$pdf->GetY();
@@ -975,7 +1111,8 @@ $elementHandler["GMRList"]["end"] 		= "GMRListEHandler";
 $elementHandler["GMRListTotal"]["start"]       = "GMRListTotalSHandler";
 $elementHandler["GMRRelatives"]["start"] 		= "GMRRelativesSHandler";
 $elementHandler["GMRRelatives"]["end"] 		= "GMRRelativesEHandler";
-$elementHandler["GMRGeneration"]["start"]       = "GMRGenerationSHandler";
+$elementHandler["GMRGeneration"]["start"]      = "GMRGenerationSHandler";
+$elementHandler["GMRNewPage"]["start"]			= "GMRNewPageSHandler";
 
 $gmreport = new GMReport();
 $gmreportStack = array();
@@ -1013,15 +1150,6 @@ $processIfs = 0;
 $processGedcoms = 0;
 
 /**
- * page sizes
- *
- * an array map of common page sizes
- * @global array $pageSizes
- */
-$pageSizes["A4"]["width"] = "8.5";
-$pageSizes["A4"]["height"] = "11";
-
-/**
  * xml start element handler
  *
  * this function is called whenever a starting element is reached
@@ -1035,7 +1163,6 @@ function startElement($parser, $name, $attrs) {
 	$newattrs = array();
 	$temp = "";
 	foreach($attrs as $key=>$value) {
-//		$ct = preg_match("/^\\$([a-zA-Z0-9\-_]+)$/", $value, $match);
 		$ct = preg_match("/^\\$(\w+)$/", $value, $match);
 		if ($ct>0) {
 			if ((isset($vars[$match[1]]["id"]))&&(!isset($vars[$match[1]]["gedcom"]))) $value = $vars[$match[1]]["id"];
@@ -1105,20 +1232,14 @@ function GMRDocSHandler($attrs) {
 
 	$pageSize = $attrs["pageSize"];
 	$orientation = $attrs["orientation"];
-
-	if (!isset($pageSizes[$pageSize])) $pageSize="A4";
-	$pagew = $pageSizes[$pageSize]["width"];
-	$pageh = $pageSizes[$pageSize]["height"];
-
-	if ($orientation=="L") {
-		$pagew = $pageSizes[$pageSize]["height"];
-		$pageh = $pageSizes[$pageSize]["width"];
-	}
+	$showGenText = true;
+	if (isset($attrs['showGeneratedBy'])) $showGenText = $attrs['showGeneratedBy'];
 
 	$margin = "";
 	$margin = $attrs["margin"];
 
-	$gmreport->setup($pagew, $pageh, $orientation, $margin);
+//	$gmreport->setup($pagew, $pageh, $pageSize, $orientation, $margin);
+	$gmreport->setup(0, 0, $pageSize, $orientation, $margin, $showGenText);
 }
 
 function GMRDocEHandler() {
@@ -1199,7 +1320,7 @@ function GMRCellEHandler() {
 function GMRNowSHandler($attrs) {
 	global $currentElement;
 
-	$currentElement->addText(get_changed_date(date("j", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))." ".date("M", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))." ".date("Y", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))));
+	$currentElement->addText(GetChangedDate(date("j", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))." ".date("M", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))." ".date("Y", time()-(isset($_SESSION["timediff"])?$_SESSION["timediff"]:0))));
 }
 
 function GMRPageNumSHandler($attrs) {
@@ -1217,6 +1338,7 @@ function GMRTotalPagesSHandler($attrs) {
 function GMRGedcomSHandler($attrs) {
 	global $vars, $gedrec, $gedrecStack, $processGedcoms, $fact, $desc, $ged_level;
 
+	$debug = false;
 	if ($processGedcoms>0) {
 		$processGedcoms++;
 		return;
@@ -1229,12 +1351,21 @@ function GMRGedcomSHandler($attrs) {
 	}
 
 	$tag = $attrs["id"];
+
+//LERMAN - add ability to put a variable in the tag
+	$ct = preg_match_all("/\\$(\w+)/", $tag, $match, PREG_SET_ORDER);
+	for($i=0; $i<$ct; $i++) {
+		$t = $vars[$match[$i][1]]["id"];
+		$tag = preg_replace("/\\$".$match[$i][1]."/", $t, $tag, 1);
+	}
+
 	$tag = preg_replace("/@fact/", $fact, $tag);
 	//print "[$tag]";
 	$tags = preg_split("/:/", $tag);
 	$newgedrec = "";
 	if (count($tags)<2) {
-		$newgedrec = find_gedcom_record($attrs["id"]);
+		//$newgedrec = findgedcomrecord($attrs["id"]);
+		$newgedrec = findgedcomrecord($tag);
 	}
 	if (empty($newgedrec)) {
 		$tgedrec = $gedrec;
@@ -1244,7 +1375,7 @@ function GMRGedcomSHandler($attrs) {
 			$ct = preg_match("/\\$(.+)/", $tag, $match);
 			if ($ct>0) {
 				if (isset($vars[$match[1]]["gedcom"])) $newgedrec = $vars[$match[1]]["gedcom"];
-				else $newgedrec = find_gedcom_record($match[1]);
+				else $newgedrec = FindGedcomRecord($match[1]);
 			}
 			else {
 				$ct = preg_match("/@(.+)/", $tag, $match);
@@ -1253,7 +1384,7 @@ function GMRGedcomSHandler($attrs) {
 					//print $gt;
 					if ($gt > 0) {
 						//print "[".$gmatch[1]."]";
-						$newgedrec = find_gedcom_record($gmatch[1]);
+						$newgedrec = FindGedcomRecord($gmatch[1]);
 						//print $newgedrec;
 						$tgedrec = $newgedrec;
 					}
@@ -1264,11 +1395,11 @@ function GMRGedcomSHandler($attrs) {
 					}
 				}
 				else {
-					//$newgedrec = find_gedcom_record($gmatch[1]);
+					//$newgedrec = FindGedcomRecord($gmatch[1]);
 					$temp = preg_split("/\s+/", trim($tgedrec));
 					$level = $temp[0] + 1;
 					if (showFact($tag, $id)&&showFactDetails($tag,$id)) {
-						$newgedrec = get_sub_record($level, "$level $tag", $tgedrec);
+						$newgedrec = GetSubRecord($level, "$level $tag", $tgedrec);
 						$tgedrec = $newgedrec;
 					}
 					else {
@@ -1280,16 +1411,37 @@ function GMRGedcomSHandler($attrs) {
 		}
 	}
 	if (!empty($newgedrec)) {
-		$newgedrec = privatize_gedcom($newgedrec);
-		array_push($gedrecStack, array($gedrec, $fact, $desc));
-		//print "[$newgedrec]";
-		$gedrec = $newgedrec;
-		$ct = preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $gedrec, $match);
-		if ($ct>0) {
-			$ged_level = $match[1];
-			$fact = $match[2];
-			$desc = trim($match[3]);
+		$rectype = GetRecType($gedrec);	
+		$newreclevel = GetRecLevel($newgedrec);
+		$newid = GetRecID($newgedrec);
+		$newrectype = GetRecType($newgedrec);
+		if ($debug) {
+			print "Start output<br />";
+			print "newgedrec: ".$newgedrec."<br />";
+			print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br />rectype: ".$rectype."<br />";
 		}
+		if (($newreclevel == 1 && !FactViewRestricted($id, $newgedrec)) || 
+		($newreclevel == 0 && DisplayDetailsByID($newid, $newrectype)) &&
+		DisplayDetailsById($id, $rectype)) {
+			if ($debug) print "can show<br />";
+//			$newgedrec = privatize_gedcom($newgedrec);
+			$gedObj = new GedcomRecord($newgedrec);
+			array_push($gedrecStack, array($gedrec, $fact, $desc));
+			//print "[$newgedrec]";
+			$gedrec = $gedObj->getGedcomRecord();
+			$ct = preg_match("/(\d+) (_?[A-Z0-9]+) (.*)/", $gedrec, $match);
+			if ($debug) print_r($match);
+			if ($ct>0) {
+				$ged_level = $match[1];
+				$fact = $match[2];
+				$desc = trim($match[3]);
+			}
+		}
+		else {
+			$processGedcoms++;
+			if ($debug) print "can NOT show<br /><br />";
+		}
+		if ($debug) print "<br />End output<br /><br />";
 	}
 	else {
 		$processGedcoms++;
@@ -1322,6 +1474,7 @@ function GMRTextBoxSHandler($attrs) {
 	$style = "D";
 	$left = ".";
 	$top = ".";
+	$pagecheck="true";
 
 	if (isset($attrs["width"])) $width = $attrs["width"];
 	if (isset($attrs["height"])) $height = $attrs["height"];
@@ -1330,12 +1483,13 @@ function GMRTextBoxSHandler($attrs) {
 	if (isset($attrs["fill"])) $fill = $attrs["fill"];
 	if (isset($attrs["left"])) $left = $attrs["left"];
 	if (isset($attrs["top"])) $top = $attrs["top"];
+	if (isset($attrs["pagecheck"])) $pagecheck = $attrs["pagecheck"];
 
 	array_push($printDataStack, $printData);
 	$printData = false;
 
 	array_push($gmreportStack, $gmreport);
-	$gmreport = new GMRTextBox($width, $height, $border, $fill, $newline, $left, $top);
+	$gmreport = new GMRTextBox($width, $height, $border, $fill, $newline, $left, $top, $pagecheck);
 }
 
 function GMRTextBoxEHandler() {
@@ -1356,11 +1510,19 @@ function GMRTextSHandler($attrs) {
 	$printData = true;
 
 	$style = "";
+	if (isset($attrs["style"])) $style = $attrs["style"];
 
-	if (isset($attrs["style"])) {
-		$style = $attrs["style"];
-	}
-	$currentElement = new GMRText($style);
+	$color = "#000000";
+	if (isset($attrs["color"])) $color = $attrs["color"];
+
+	$align= "left";
+	if (isset($attrs["align"])) $align = $attrs["align"];
+	if ($align=="left") $align="L";
+	if ($align=="right") $align="R";
+	if ($align=="center") $align="C";
+	//if ($align=="justify") $align="J";
+
+	$currentElement = new GMRText($style, $color, $align);
 }
 
 function GMRTextEHandler() {
@@ -1372,21 +1534,31 @@ function GMRTextEHandler() {
 
 function GMRGetPersonNameSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $gm_lang;
-	global $SHOW_ID_NUMBERS;
+	global $SHOW_ID_NUMBERS, $NICK_DELIM, $SHOW_NICK;
+
+	$showIndID = $SHOW_ID_NUMBERS; // false, 0, "0", NOT "false"
+	if (isset($vars["showIndID"]["id"])) $showIndID = $vars["showIndID"]["id"];
+	if ($showIndID) { // can override showing
+		if (isset($attrs["hideID"])) {
+			$hideID = $attrs["hideID"];
+			if (preg_match("/\\$(\w+)/", $hideID, $vmatch)>0) {
+				$hideID = trim($vars[$vmatch[1]]["id"]);
+			}
+			$showIndID = !$hideID;
+		}
+	}
 
 	$id = "";
 	if (empty($attrs["id"])) {
 		$ct = preg_match("/0 @(.+)@/", $gedrec, $match);
 		if ($ct>0) $id = $match[1];
-	}
-	else {
+	} else {
 		$ct = preg_match("/\\$(.+)/", $attrs["id"], $match);
 		if ($ct>0) {
 			if (isset($vars[$match[1]]["id"])) {
 				$id = $vars[$match[1]]["id"];
 			}
-		}
-		else {
+		} else {
 			$ct = preg_match("/@(.+)/", $attrs["id"], $match);
 			if ($ct>0) {
 				$gt = preg_match("/\d $match[1] @([^@]+)@/", $gedrec, $gmatch);
@@ -1395,43 +1567,59 @@ function GMRGetPersonNameSHandler($attrs) {
 					$id = $gmatch[1];
 					//print "[$id]";
 				}
-			}
-			else {
+			} else {
 				$id = $attrs["id"];
 			}
 		}
 	}
 	if (!empty($id)) {
-		if (!displayDetailsById($id) && !showLivingNameByID($id)) $currentElement->addText($gm_lang["private"]);
-		else {
-			$name = trim(get_person_name($id));
-			$addname = trim(get_add_person_name($id));
+		if (!displayDetailsById($id) && !showLivingNameByID($id)) {
+			$name=$gm_lang["private"];
+		} else {
+			$name = trim(GetPersonName($id));
+			//LERMAN-- added individuals in pending list does not have Gedcom record yet
+			if ($name == $gm_lang["PN"]." ".$gm_lang["NN"]) { $name = trim(GetPersonName($id,$gedrec)); }
+			$addname = trim(GetAddPersonName($id));
 			if (!empty($addname)) $name .= " ".$addname;
+			// This is a workaround to display the PinYin name instead of the name in Chinese characters, as Chinese characters are not printed properly.
+			if (HasChinese($name)) $name = $addname;
 			if (!empty($attrs["truncate"])) {
 				if (strlen($name)>$attrs["truncate"]) {
-					$name = preg_replace("/\(.*\) ?/", "", $name);
+					//LERMAN-was this removing the nickname? If so, replace with what follows
+					//$name = preg_replace("/\(.*\) ?/", "", $name);
+					// remove nickname if exists
+					// BEWARE this is reversed engineering. Could cause problems depending on what the admin set as delimiters.
+					if ($SHOW_NICK) $name = preg_replace("/".substr($NICK_DELIM, 0, 1).".*".substr($NICK_DELIM, 1, 1)." ?/", "", $name);
 				}
 				if (strlen($name)>$attrs["truncate"]) {
 					$words = preg_split("/ /", $name);
 					$name = $words[count($words)-1];
 					for($i=count($words)-2; $i>=0; $i--) {
 						$len = strlen($name);
-						for($j=count($words)-3; $j>=0; $j--) {
-							$len += strlen($words[$j]);
+						for($j=$i; $j>=0; $j--) {
+							// Added: count the space
+							$len += strlen($words[$j]) + 1;
 						}
-						if ($len>$attrs["truncate"]) $name = get_first_letter($words[$i]).". ".$name;
+						if ($len>$attrs["truncate"]) {
+							// Added: only convert upper case first letter nameparts to first letters. This prevents a surname as "de Haan" to convert to "D. Haan"
+							if (str2lower($words[$i]) == $words[$i]) {
+								$name = $words[$i]." ".$name;
+							}
+							else $name = GetFirstLetter($words[$i]).". ".$name;
+						}
 						else $name = $words[$i]." ".$name;
 					}
 				}
 			}
-			$currentElement->addText(trim($name));
 		}
+		$currentElement->addText(trim($name));
+		if ($showIndID) $currentElement->addText(" ($id)");
 	}
 }
 
 function GMRGedcomValueSHandler($attrs) {
 	global $currentElement, $vars, $gedrec, $gedrecStack, $fact, $desc, $type;
-	global $SHOW_PEDIGREE_PLACES, $gm_lang;
+	global $SHOW_PEDIGREE_PLACES, $gm_lang, $GEDCOM;
 
 	$id = "";
 	$gt = preg_match("/0 @(.+)@/", $gedrec, $gmatch);
@@ -1440,18 +1628,26 @@ function GMRGedcomValueSHandler($attrs) {
 	}
 
 	$tag = $attrs["tag"];
-	// print $tag;
+	//print $tag;
 	if (!empty($tag)) {
 		if ($tag=="@desc") {
 			if (showFact($fact, $id)&&showFactDetails($fact,$id)) $value = $desc;
 			else $value = "";
 			$value = trim($value);
-			$currentElement->addText($value);
+			if (HasChinese($value)) $currentElement->addText(GetPinYin($value));
+			else $currentElement->addText($value);
 		}
 		if ($tag=="@id") {
 			$currentElement->addText($id);
 		}
 		else {
+//LERMAN - add ability to put a variable in the tag
+		        $ct = preg_match_all("/\\$(\w+)/", $tag, $match, PREG_SET_ORDER);
+		        for($i=0; $i<$ct; $i++) {
+		                $t = $vars[$match[$i][1]]["id"];
+		                $tag = preg_replace("/\\$".$match[$i][1]."/", $t, $tag, 1);
+		        }
+
 			$tag = preg_replace("/@fact/", $fact, $tag);
 			if (empty($attrs["level"])) {
 				$temp = preg_split("/\s+/", trim($gedrec));
@@ -1461,8 +1657,35 @@ function GMRGedcomValueSHandler($attrs) {
 			else $level = $attrs["level"];
 			$truncate = "";
 			if (isset($attrs["truncate"])) $truncate=$attrs["truncate"];
-			$value = get_gedcom_value($tag, $level, $gedrec, $truncate);
-			if (showFact($fact, $id)&&showFactDetails($fact,$id)) $currentElement->addText($value);
+			$tags = preg_split("/:/", $tag);
+			//-- check all of the tags for privacy
+			foreach($tags as $t=>$subtag) {
+				if (!empty($subtag)) {
+					if (!showFact($tag, $id)||!showFactDetails($tag,$id)) return;
+				}
+			}
+//LERMAN - add ability to get changed data
+                        if (isset($attrs["changed"]) && $attrs["changed"] && GetChangeData(true, $id, true, "gedlines")) {
+				$pend_gedcoms = GetChangeData(false, $id, true, "gedlinesCHAN");
+				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
+					if ($gedcom == $GEDCOM) {
+						foreach ($pend_indis as $key=>$changed) {
+							$value = GetGedcomValue($tag, $level, $changed, $truncate);
+						}
+					}
+				}
+			} else {
+				$value = GetGedcomValue($tag, $level, $gedrec, $truncate);
+			}
+//		print "tag: ".$tags[0]."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />type: ".$type."<br />gedrec: ".$gedrec."<br />value: ".$value."<br /><br />";
+			if (showFact($tags[0], $id) && showFactDetails($tags[0],$id)) {
+				if (!empty($id)) $factrec = GetSubRecord(1, $tags[0], $gedrec);
+				else $factrec = "";
+				if (!FactViewRestricted($id, $factrec)) {
+					if (HasChinese($value)) $currentElement->addText(GetPinYin($value));
+					else $currentElement->addText($value);
+				}
+			}
 		}
 	}
 }
@@ -1470,6 +1693,8 @@ function GMRGedcomValueSHandler($attrs) {
 function GMRRepeatTagSHandler($attrs) {
 	global $repeats, $repeatsStack, $gedrec, $repeatBytes, $parser, $parserStack, $processRepeats;
 	global $fact, $desc;
+	
+	$debug = false;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -1486,49 +1711,66 @@ function GMRRepeatTagSHandler($attrs) {
 
 	$tag = "";
 	if (isset($attrs["tag"])) $tag = $attrs["tag"];
-	if (!empty($tag)) {
-		if ($tag=="@desc") {
-			if (showFact($fact, $id)&&showFactDetails($fact,$id)) $value = $desc;
-			else $value = "";
-			$value = trim($value);
-			$currentElement->addText($value);
-		}
-		else {
-			$tag = preg_replace("/@fact/", $fact, $tag);
-			$tags = preg_split("/:/", $tag);
-			$temp = preg_split("/\s+/", trim($gedrec));
-			$level = $temp[0];
-			if ($level==0) $level++;
-			$subrec = $gedrec;
-			$t = $tag;
-			for($i=0; $i<count($tags); $i++) {
-				$t = $tags[$i];
-				if (!empty($t)) {
-				if ($level==1 && strstr("CHIL,FAMS,FAMC", $t)===false && (!showFact($t, $id) || !showFactDetails($t,$id))) return;
-				if ($i<count($tags)-1) {
-					$subrec = get_sub_record($level, "$level $t", $subrec);
-					if (empty($subrec)) {
-						$level--;
-						$subrec = get_sub_record($level, "@ $t", $gedrec);
-						if (empty($subrec)) return;
+	if ($debug) {
+		print "Start debug<br />";
+		print "tag: ".$tag."<br />fact: ".$fact."<br />id: ".$id."<br />desc: ".$desc."<br />gedrec: ".$gedrec."<br /><br />";
+	}
+	if (!empty($tag) && DisplayDetailsById($id)) {
+		// Get the factrec to check RESN privacy
+		$sub = GetSubRecord(1, "1 ".$tag, $gedrec);
+		if ($debug) print "sub: ".$sub;
+		if (!FactViewRestricted($id, $sub)) {
+			if ($debug) print "processing......<br />";
+			if ($tag=="@desc") {
+				if ($debug) Print "@desc branch<br />";
+				if (showFact($fact, $id)&&showFactDetails($fact,$id)) $value = $desc;
+				else $value = "";
+				$value = trim($value);
+				$currentElement->addText($value);
+			}
+			else {
+				if ($debug) Print "else branch<br />";
+				$tag = preg_replace("/@fact/", $fact, $tag);
+				$tags = preg_split("/:/", $tag);
+				if ($debug) Print_r($tags);
+				$temp = preg_split("/\s+/", trim($gedrec));
+				$level = $temp[0];
+				if ($level==0) $level++;
+				$subrec = $gedrec;
+				$t = $tag;
+				for($i=0; $i<count($tags); $i++) {
+					$t = $tags[$i];
+					if (!empty($t)) {
+					if ($level==1 && strstr("CHIL,FAMS,FAMC", $t)===false && (!showFact($t, $id) || !showFactDetails($t,$id))) return;
+					if ($i<count($tags)-1) {
+						$subrec = GetSubRecord($level, "$level $t", $subrec);
+						if ($debug) print "<br />subrec: ".$subrec."<br />";
+						if (empty($subrec)) {
+							$level--;
+							$subrec = GetSubRecord($level, "@ $t", $gedrec);
+							if ($debug) print "<br />subrec2: ".$subrec."<br />";
+							if (empty($subrec)) return;
+						}
 					}
+					if ($debug) print "[$level $t] ";
+					$level++;
 				}
-				//print "[$level $t] ";
-				$level++;
-			}
-			}
-			$level--;
-			if ($level!=1 || strstr("CHIL,FAMS,FAMC", $t)!==false || (showFact($t, $id) && showFactDetails($t,$id))) {
-				$ct = preg_match_all("/$level $t(.*)/", $subrec, $match, PREG_SET_ORDER);
-				//print "$ct $subrec";
-				for($i=0; $i<$ct; $i++) {
-					$rec = get_sub_record($level, "$level $t", $gedrec, $i+1);
-					$repeats[] = $rec;
 				}
-				//$repeats = array_reverse($repeats);
-				//print_r($repeats);
+				$level--;
+				if ($level!=1 || strstr("CHIL,FAMS,FAMC", $t)!==false || (showFact($t, $id) && showFactDetails($t,$id))) {
+					$ct = preg_match_all("/$level $t(.*)/", $subrec, $match, PREG_SET_ORDER);
+					if ($debug) print "$ct $subrec";
+					for($i=0; $i<$ct; $i++) {
+						$rec = GetSubRecord($level, "$level $t", $gedrec, $i+1);
+						if ($debug) print "<br />subrec3: ".$rec."<br /><br />";
+						$repeats[] = $rec;
+					}
+					//$repeats = array_reverse($repeats);
+					//print_r($repeats);
+				}
 			}
 		}
+		if ($debug) Print "Done or not<br /><br />";
 	}
 }
 
@@ -1600,6 +1842,13 @@ function GMRvarSHandler($attrs) {
 			$var = $vars[$var]['id'];
 		}
 		else {
+//LERMAN - add ability to put a variable in the tag
+			$ct = preg_match_all("/\\$(\w+)/", $var, $match, PREG_SET_ORDER);
+			for($i=0; $i<$ct; $i++) {
+				$t = $vars[$match[$i][1]]["id"];
+				$var = preg_replace("/\\$".$match[$i][1]."/", $t, $var, 1);
+			}
+
 			$tfact = $fact;
 			if ($fact=="EVEN" || $fact=="FACT") $tfact = $type;
 			$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
@@ -1620,7 +1869,7 @@ function GMRvarLetterSHandler($attrs) {
 		$var = preg_replace(array("/\[/","/\]/","/@fact/","/@desc/"), array("['","']",$tfact,$desc), $var);
 		eval("if (!empty(\$$var)) \$var = \$$var;");
 
-		$letter = get_first_letter($var);
+		$letter = GetFirstLetter($var);
 
 		$currentElement->addText($letter);
 	}
@@ -1652,7 +1901,29 @@ function GMRFactsSHandler($attrs) {
 		$tag = $vars[$match[1]]["id"];
 	}
 
-	$repeats = get_all_subrecords($gedrec, $tag, $families);
+//LERMAN
+	$diff = 0;
+	if (isset($attrs["diff"])) $diff = $attrs["diff"];
+
+	if (!$diff) {
+		$repeats = GetAllSubrecords($gedrec, $tag, $families);
+	} else {
+		$ignorefacts = preg_split("/[\s,;:]/", $tag);
+		$oldperson = new Person($gedrec);
+		$facts = RetrieveNewFacts($oldperson->xref, true);
+		foreach ($facts as $key=>$fact) {
+			$ct = preg_match("/1 (.+)/", $fact, $match);
+			if ($ct<=0) {
+				$fact = preg_replace("/0 @(.+)@/", "1", $fact);
+				$ct = preg_match("/1 (.+)/", $fact, $match);
+			}
+			if ($ct>0) {
+				if (!in_array ($match[1], $ignorefacts)) {
+					$repeats[] = $fact;
+				}
+			}
+		}
+	}
 }
 
 function GMRFactsEHandler() {
@@ -1671,8 +1942,12 @@ function GMRFactsEHandler() {
 	//-- read the xml from the file
 	$lines = file($report);
 	$reportxml = "<tempdoc>\n";
-	if ($lineoffset>0) $lineoffset--;
-	for($i=$repeatBytes+$lineoffset; $i<$line+$lineoffset; $i++) $reportxml .= $lines[$i];
+	//--back up to beginning of GMRFacts and then get past it
+	while($lineoffset+$repeatBytes>0 && strstr($lines[$lineoffset+$repeatBytes], "<GMRFacts ")===false) $lineoffset--;
+	$lineoffset++;
+	for($i=$repeatBytes+$lineoffset; $i<$line+$lineoffset; $i++) {
+		$reportxml .= $lines[$i];
+	}
 	$reportxml .= "</tempdoc>\n";
 
 	array_push($parserStack, $parser);
@@ -1691,7 +1966,7 @@ function GMRFactsEHandler() {
 				}
 			}
 			$desc = trim($match[2]);
-			$desc .= get_cont(2, $gedrec);
+			$desc .= GetCont(2, $gedrec);
 		}
 		//-- start the sax parser
 		$repeat_parser = xml_parser_create();
@@ -1713,6 +1988,27 @@ function GMRFactsEHandler() {
 	$temp = array_pop($repeatsStack);
 	$repeats = $temp[0];
 	$repeatBytes = $temp[1];
+}
+
+function NumToRoman($num, $lower) {
+	$result = $num;	// return input if an error
+	if (preg_match('/^[0-9]+$/', $num) === 1) {
+		// only have numbers
+		$num = intval($num);
+		if (($num > 0) && ($num <= 3999)) {
+			// valid range
+			$lookup = array('M' => 1000, 'CM' => 900, 'D' => 500, 'CD' => 400, 'C' => 100, 'XC' => 90,
+				'L' => 50, 'XL' => 40, 'X' => 10, 'IX' => 9, 'V' => 5, 'IV' => 4, 'I' => 1);
+			$result = '';
+			foreach ($lookup as $roman=>$value) {
+				$matches = intval($num / $value);
+				$result .= str_repeat($roman, $matches);
+				$num = $num % $value;
+			}
+			if ($lower) $result = strtolower($result);
+		}
+	}
+	return $result;
 }
 
 function GMRSetVarSHandler($attrs) {
@@ -1744,11 +2040,16 @@ function GMRSetVarSHandler($attrs) {
 		if ($gt > 0) $value = preg_replace("/@/", "", trim($gmatch[1]));
 	}
 
+	if ((substr($value, 0, 9) == "\$gm_lang[") || (substr($value, 0, 11) == "\$factarray[")) {
+		$var = preg_replace(array("/\[/","/\]/"), array("['","']"), $value);
+		eval("\$value = $var;");
+	}
+
 	$ct = preg_match_all("/\\$(\w+)/", $value, $match, PREG_SET_ORDER);
 	for($i=0; $i<$ct; $i++) {
-		//print $match[$i][1];
+		// print $match[$i][1]."<br />";
 		$t = $vars[$match[$i][1]]["id"];
-		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value);
+		$value = preg_replace("/\\$".$match[$i][1]."/", $t, $value, 1);
 	}
 
 	$ct = preg_match("/(\d+)\s*([\-\+\*\/])\s*(\d+)/", $value, $match);
@@ -1772,13 +2073,26 @@ function GMRSetVarSHandler($attrs) {
 				break;
 		}
 	}
-	//print "[$value]";
+//	print "$name=[$value] ";
 	if (strstr($value, "@")!==false) $value="";
+
+	if (isset($attrs["option"])) {
+		switch ($attrs["option"]) {
+		case "NumToUpperRoman":
+			$value = NumToRoman($value, false);
+			break;
+		case "NumToLowerRoman":
+			$value = NumToRoman($value, true);
+			break;
+		}
+	}
+
 	$vars[$name]["id"]=$value;
 }
 
 function GMRifSHandler($attrs) {
 	global $vars, $gedrec, $processIfs, $fact, $desc, $generation, $POSTAL_CODE;
+	global $SHOW_ID_NUMBERS, $SHOW_FAM_ID_NUMBERS;
 
 	if ($processIfs>0) {
 		$processIfs++;
@@ -1789,35 +2103,42 @@ function GMRifSHandler($attrs) {
 	$condition = $attrs["condition"];
 	$condition = preg_replace("/\\$(\w+)/", "\$vars['$1'][\"id\"]", $condition);
 	$condition = preg_replace(array("/ LT /", "/ GT /"), array("<", ">"), $condition);
-	$ct = preg_match("/@([\w:]+)/", $condition, $match);
-	if ($ct > 0) {
+	while (preg_match("/@([\w:]+)/", $condition, $match) > 0) {
 		$id = $match[1];
 		$value="''";
-		if ($id=="ID") {
+		switch ($id) {
+		case "ID":
 			$ct = preg_match("/0 @(.+)@/", $gedrec, $match);
 			if ($ct>0) $value = "'".$match[1]."'";
-		}
-		else if ($id=="fact") {
+			break;
+		case "fact":
 			$value = "'$fact'";
-		}
-		else if ($id=="desc") {
+			break;
+		case "desc":
 			$value = "'$desc'";
-		}
-		else if ($id=="generation") {
+			break;
+		case "generation":
 			$value = "'$generation'";
-		}
-		else {
+			break;
+		case "SHOW_ID_NUMBERS":
+			$value = "'$SHOW_ID_NUMBERS'";
+			break;
+                case "SHOW_FAM_ID_NUMBERS":
+                        $value = "'$SHOW_FAM_ID_NUMBERS'";
+			break;
+		default:
 			$temp = preg_split("/\s+/", trim($gedrec));
 			$level = $temp[0];
 			if ($level==0) $level++;
-			$value = get_gedcom_value($id, $level, $gedrec);
+			$value = GetGedcomValue($id, $level, $gedrec, "", false);
 			//print "level:$level id:$id value:$value ";
 			if (empty($value)) {
 				$level++;
-				$value = get_gedcom_value($id, $level, $gedrec);
+				$value = GetGedcomValue($id, $level, $gedrec, "", false);
 				//print "level:$level id:$id value:$value gedrec:$gedrec<br />\n";
 			}
-			$value = "'".$value."'";
+			$value = "'".preg_replace("/'/", "\\'", $value)."'";
+			break;
 		}
 		$condition = preg_replace("/@$id/", $value, $condition);
 	}
@@ -1825,7 +2146,7 @@ function GMRifSHandler($attrs) {
 	$ret = @eval($condition);
 	//print $condition."<br />";
 	//print_r($vars);
-	//if ($ret) print " true\n"; else print " false\n";
+	//if ($ret) print " true<br />"; else print " false<br />";
 	if (!$ret) {
 		$processIfs++;
 	}
@@ -1891,11 +2212,11 @@ function GMRHighlightedImageSHandler($attrs) {
 	if (isset($attrs["height"])) $height = $attrs["height"];
 
 	if (showFact("OBJE", $id)) {
-		$media = find_highlighted_object($id, $gedrec);
+		$media = FindHighlightedObject($id, $gedrec);
 		if (!empty($media["file"])) {
 			if (preg_match("/(jpg)|(jpeg)|(png)$/i", $media["file"])>0) {
 				if (file_exists($media["file"])) {
-					$size = getimagesize($media["file"]);
+					$size = findImageSize($media["file"]);
 					if (($width>0)&&($size[0]>$size[1])) {
 						$perc = $width / $size[0];
 						$height= round($size[1]*$perc);
@@ -1933,17 +2254,18 @@ function GMRImageSHandler($attrs) {
 	if (isset($attrs["file"])) $file = $attrs["file"];
 	if ($file=="@FILE") {
 		$ct = preg_match("/\d OBJE @(.+)@/", $gedrec, $match);
-		if ($ct>0) $orec = find_gedcom_record($match[1]);
+		if ($ct>0) $orec = FindGedcomRecord($match[1]);
 		else $orec = $gedrec;
 		if (!empty($orec)) {
-			$fullpath = check_media_depth($orec);
+			$fullpath = ExtractFullpath($orec);
 			$filename = "";
-			$filename = check_media_depth($fullpath);
+			$filename = ExtractFilename($fullpath);
+			$filename = $MEDIA_DIRECTORY.$filename;
 			$filename = trim($filename);
 			if (!empty($filename)) {
 				if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
 					if (file_exists($filename)) {
-						$size = getimagesize($filename);
+						$size = findImageSize($filename);
 						if (($width>0)&&($height==0)) {
 							$perc = $width / $size[0];
 							$height= round($size[1]*$perc);
@@ -1961,9 +2283,10 @@ function GMRImageSHandler($attrs) {
 		}
 	}
 	else {
+		$filename = $file;
 		if (preg_match("/(jpg)|(jpeg)|(png)$/i", $filename)>0) {
 			if (file_exists($filename)) {
-				$size = getimagesize($filename);
+				$size = findImageSize($filename);
 				if (($width>0)&&($size[0]>$size[1])) {
 					$perc = $width / $size[0];
 					$height= round($size[1]*$perc);
@@ -1998,6 +2321,7 @@ function GMRLineSHandler($attrs) {
 
 function GMRListSHandler($attrs) {
 	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby;
+	global $GEDCOM;
 
 	$processRepeats++;
 	if ($processRepeats>1) return;
@@ -2056,6 +2380,8 @@ function GMRListSHandler($attrs) {
 					$level = 1;
 					foreach($tags as $indexval => $t) {
 						if (!empty($searchstr)) $searchstr.="[^\n]*(\n[2-9][^\n]*)*\n";
+						//-- search for both EMAIL and _EMAIL... silly double gedcom standard
+						if ($t=="EMAIL" || $t=="_EMAIL") $t="_?EMAIL";
 						$searchstr .= $level." ".$t;
 						$level++;
 					}
@@ -2075,20 +2401,38 @@ function GMRListSHandler($attrs) {
 		}
 	}
 	switch($listname) {
-	/*	case "family":
-			$list = get_family_list();
+		case "family":
+			if (count($filters)>0) $list = SearchFams($filters);
+			else $list = GetFamList("no");
 			break;
+		/*
 		case "source":
 			$list = get_source_list();
 			break;
 		case "other":
 			$list = get_other_list();
 			break; */
+//LERMAN
+		case "pending":
+			$list = array();
+			if (GetChangeData(true, "", true, "gedlinesCHAN")) {
+				$pend_gedcoms = GetChangeData(false, "", true, "gedlinesCHAN");
+				foreach($pend_gedcoms as $gedcom=>$pend_indis) {
+					if ($gedcom == $GEDCOM) {
+						foreach ($pend_indis as $key=>$changed) {
+							$list[$key] = $changed;
+						}
+					}
+				}
+			}
+			break;
 		default:
-			if (count($filters)>0) $list = search_indis($filters);
-			else $list = GetIndiList();
+			if (count($filters)>0) $list = SearchIndis($filters);
+//LERMAN - added "no" parameter. Fixes one list, but not sure if have other ramifications
+			else $list = GetIndiList("no");
 			break;
 	}
+	
 	//-- apply other filters to the list that could not be added to the search string
 	if (count($filters2)>0) {
 		$mylist = array();
@@ -2104,7 +2448,12 @@ function GMRListSHandler($attrs) {
 					$level = 1;
 					$subrec = $value["gedcom"];
 					foreach($tags as $indexval => $t) {
-						$subrec = get_sub_record($level, $level." ".$t, $subrec);
+						$oldsub = $subrec;
+						$subrec = GetSubRecord($level, $level." ".$t, $subrec);
+						if ($t=='EMAIL' && empty($subrec)) {
+							$t = "_EMAIL";
+							$subrec = GetSubRecord($level, $level." ".$t, $oldsub);
+						}
 						$level++;
 					}
 					$level--;
@@ -2114,13 +2463,13 @@ function GMRListSHandler($attrs) {
 							if ($ct>0) {
 								$v = trim($match[1]);
 								if ($t=="DATE") {
-									$date1 = parse_date($v);
-									$date2 = parse_date($val);
+									$date1 = ParseDate($v);
+									$date2 = ParseDate($val);
 									if ($date1[0]["year"] > $date2[0]["year"]) $keep = true;
 									else if ($date1[0]["year"] == $date2[0]["year"]) {
-										if ($date1[0]["mon"] > $date2[0]["mon"]) $keep = true;
+										if ($date1[0]["mon"] > $date2[0]["mon"] or empty($date1[0]["mon"]) or empty($date2[0]["mon"])) $keep = true;
 										else if ($date1[0]["mon"] == $date2[0]["mon"]) {
-											if ($date1[0]["day"] >= $date2[0]["day"]) $keep = true;
+											if ($date1[0]["day"] >= $date2[0]["day"] or empty($date1[0]["day"]) or empty($date2[0]["day"])) $keep = true;
 											else $keep = false;
 										} else $keep = false;
 									} else $keep = false;
@@ -2135,13 +2484,13 @@ function GMRListSHandler($attrs) {
 							if ($ct>0) {
 								$v = trim($match[1]);
 								if ($t=="DATE") {
-									$date1 = parse_date($v);
-									$date2 = parse_date($val);
+									$date1 = ParseDate($v);
+									$date2 = ParseDate($val);
 									if ($date1[0]["year"] < $date2[0]["year"]) $keep = true;
 									else if ($date1[0]["year"] == $date2[0]["year"]) {
-										if ($date1[0]["mon"] < $date2[0]["mon"]) $keep = true;
+										if ($date1[0]["mon"] < $date2[0]["mon"] or empty($date1[0]["mon"]) or empty($date2[0]["mon"])) $keep = true;
 										else if ($date1[0]["mon"] == $date2[0]["mon"]) {
-											if ($date1[0]["day"] <= $date2[0]["day"]) $keep = true;
+											if ($date1[0]["day"] <= $date2[0]["day"] or empty($date1[0]["day"]) or empty($date2[0]["day"])) $keep = true;
 											else $keep = false;
 										} else $keep = false;
 									} else $keep = false;
@@ -2157,8 +2506,13 @@ function GMRListSHandler($attrs) {
 							else $keep = false;
 							break;
 						default:
-							$v = get_gedcom_value($t, $level, $subrec);
-							//print "[$v == $val] ";
+							$v = GetGedcomValue($t, $level, $subrec);
+							//-- check for EMAIL and _EMAIL (silly double gedcom standard :P)
+							if ($t=="EMAIL"&&empty($v)) {
+								$t = "_EMAIL";
+								$v = GetGedcomValue($t, $level, $subrec);
+							}
+							//print "[$key $t $v == $val $subrec]<br />";
 							if ($v==$val) $keep=true;
 							else $keep = false;
 							//print $keep;
@@ -2170,9 +2524,12 @@ function GMRListSHandler($attrs) {
 		}
 		$list = $mylist;
 	}
-	if ($sortby=="NAME") uasort($list, "itemsort");
-	else if ($sortby=="ID") uasort($list, "idsort");
-	else uasort($list, "compare_date");
+//LERMAN - fix case (not case sensitive, but that confused me)
+	if ($sortby=="NAME") uasort($list, "ItemSort");
+	else if ($sortby=="ID") uasort($list, "IdSort");
+//LERMAN
+	else if ($sortby=="CHAN") uasort($list, "CompareDateDescending");
+	else uasort($list, "CompareDate");
 	//print count($list);
 	array_push($repeatsStack, array($repeats, $repeatBytes));
 	$repeatBytes = xml_get_current_line_number($parser)+1;
@@ -2212,8 +2569,12 @@ function GMRListEHandler() {
 	$list_total = count($list);
 	$list_private = 0;
 	foreach($list as $key=>$value) {
-		if (displayDetailsById($key)) {
-			$gedrec = find_gedcom_record($key);
+		$rectype = GetRecType($value["gedcom"]);
+		if (displayDetailsById($key, $rectype)) {
+			$gedrec = $value["gedcom"];
+//			$gedrec = FindGedcomRecord($key);
+			//LERMAN-- added individuals in pending list does not have Gedcom record yet. Could check $lines[$repeatBytes+$lineoffset-1] to see if list="pending"
+			if (empty($gedrec)) { $gedrec = $value; }
 			//-- start the sax parser
 			$repeat_parser = xml_parser_create();
 			$parser = $repeat_parser;
@@ -2252,82 +2613,106 @@ function GMRListTotalSHandler($attrs) {
 function GMRRelativesSHandler($attrs) {
 	global $gmreport, $gedrec, $repeats, $repeatBytes, $list, $repeatsStack, $processRepeats, $parser, $vars, $sortby, $indilist;
 
+	$debug = false;
+	
 	$processRepeats++;
 	if ($processRepeats>1) return;
 
 	$sortby = "NAME";
-	$group = "child-family";
-	$id = "";
 	if (isset($attrs["sortby"])) $sortby = $attrs["sortby"];
 	if (preg_match("/\\$(\w+)/", $sortby, $vmatch)>0) {
 		$sortby = $vars[$vmatch[1]]["id"];
 		$sortby = trim($sortby);
 	}
+
+	$maxgen = -1;
+	if (isset($attrs["maxgen"])) $maxgen = $attrs["maxgen"];
+	if ($maxgen=="*") $maxgen = -1;
+
+	$group = "child-family";
 	if (isset($attrs["group"])) $group = $attrs["group"];
 	if (preg_match("/\\$(\w+)/", $group, $vmatch)>0) {
 		$group = $vars[$vmatch[1]]["id"];
-		$group = trim($sortby);
+		$group = trim($group);
 	}
 
+	$id = "";
 	if (isset($attrs["id"])) $id = $attrs["id"];
 	if (preg_match("/\\$(\w+)/", $id, $vmatch)>0) {
 		$id = $vars[$vmatch[1]]["id"];
 		$id = trim($id);
 	}
+	
+	$showempty = false;
+	if (isset($attrs["showempty"])) $showempty = $attrs["showempty"];
+	if (preg_match("/\\$(\w+)/", $showempty, $vmatch)>0) {
+		$showempty = $vars[$vmatch[1]]["id"];
+		$showempty = trim($showempty);
+	}
+	
 
 	$list = array();
-	$indirec = find_person_record($id);
-	if (!empty($indirec)) {
+	$indirec = FindPersonRecord($id);
+	if (!empty($indirec) && (DisplayDetailsByID($id, "INDI") || ShowLivingNameByID($id))) {
 		$list[$id] = $indilist[$id];
+		if ($debug) print "we have group: ".$group." id: ".$id."<br />";
 		switch ($group) {
 			case "child-family":
-				$famids = find_family_ids($id);
-				foreach($famids as $indexval => $famid) {
-					$parents = find_parents($famid);
-					if (!empty($parents["HUSB"])) {
-						find_person_record($parents["HUSB"]);
-						$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-					}
-					if (!empty($parents["WIFE"])) {
-						find_person_record($parents["WIFE"]);
-						$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-					}
-					$famrec = find_family_record($famid);
-					$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-					for($i=0; $i<$num; $i++) {
-						find_person_record($smatch[$i][1]);
-						$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+				$famids = FindPrimaryFamilyId($id);
+				foreach($famids as $indexval => $ffamid) {
+					$famid = $ffamid["famid"];
+					if (DisplayDetailsByID($famid, "FAM")) {
+						if ($debug) print "we can show ".$famid."<br />";
+						$parents = FindParents($famid);
+						if (!empty($parents["HUSB"])) {
+							FindPersonRecord($parents["HUSB"]);
+							$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
+						}
+						if (!empty($parents["WIFE"])) {
+							FindPersonRecord($parents["WIFE"]);
+							$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
+						}
+						$famrec = FindFamilyRecord($famid);
+						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
+						for($i=0; $i<$num; $i++) {
+							FindPersonRecord($smatch[$i][1]);
+							$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+						}
 					}
 				}
 				break;
 			case "spouse-family":
-				$famids = find_sfamily_ids($id);
-				foreach($famids as $indexval => $famid) {
-					$parents = find_parents($famid);
-					find_person_record($parents["HUSB"]);
-					find_person_record($parents["WIFE"]);
-					$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
-					$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
-					$famrec = find_family_record($famid);
-					$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
-					for($i=0; $i<$num; $i++) {
-						find_person_record($smatch[$i][1]);
-						$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+				$famids = FindSfamilyIds($id);
+				foreach($famids as $indexval => $fams) {
+					if (DisplayDetailsByID($famid, "FAM")) {
+						$famid = $fams["famid"];
+						$parents = FindParents($famid);
+						FindPersonRecord($parents["HUSB"]);
+						FindPersonRecord($parents["WIFE"]);
+						$list[$parents["HUSB"]] = $indilist[$parents["HUSB"]];
+						$list[$parents["WIFE"]] = $indilist[$parents["WIFE"]];
+						$famrec = FindFamilyRecord($famid);
+						$num = preg_match_all("/1\s*CHIL\s*@(.*)@/", $famrec, $smatch,PREG_SET_ORDER);
+						for($i=0; $i<$num; $i++) {
+							FindPersonRecord($smatch[$i][1]);
+							$list[$smatch[$i][1]] = $indilist[$smatch[$i][1]];
+						}
 					}
 				}
 				break;
 			case "direct-ancestors":
-				add_ancestors($id);
+				AddAncestors($id,false,$maxgen, $showempty);
 				break;
 			case "ancestors":
-				add_ancestors($id,true);
+				AddAncestors($id,true,$maxgen,$showempty); 
 				break;
 			case "descendants":
-				add_descendancy($id);
+				$list[$id]["generation"] = 1;
+				AddDescendancy($id,false,$maxgen);
 				break;
 			case "all":
-				add_ancestors($id,true);
-				add_descendancy($id,true);
+				AddAncestors($id,true,$maxgen,$showempty);
+				AddDescendancy($id,true,$maxgen);
 				break;
 		}
 	}
@@ -2335,7 +2720,22 @@ function GMRRelativesSHandler($attrs) {
 	if ($sortby!="none") {
 		if ($sortby=="NAME") uasort($list, "itemsort");
 		else if ($sortby=="ID") uasort($list, "idsort");
-		else uasort($list, "compare_date");
+		else if ($sortby=="generation") {
+			$newarray = array();
+			reset($list);
+			$genCounter = 1;
+			while (count($newarray) < count($list)) {
+		        	foreach ($list as $key => $value) {
+			                $generation = $value["generation"];
+			                if ($generation == $genCounter) {
+						$newarray[$key]["generation"]=$generation;
+					}
+				}
+				$genCounter++;
+			}
+			$list = $newarray;
+		}
+		else uasort($list, "CompareDate");
 	}
 //	print count($list);
 	array_push($repeatsStack, array($repeats, $repeatBytes));
@@ -2377,8 +2777,8 @@ function GMRRelativesEHandler() {
 	$list_private = 0;
 	foreach($list as $key=>$value) {
 		if (isset($value["generation"])) $generation = $value["generation"];
-		if (displayDetailsById($key)) {
-			$gedrec = find_gedcom_record($key);
+//KN		if (displayDetailsById($key)) {
+			$gedrec = FindGedcomRecord($key);
 			//-- start the sax parser
 			$repeat_parser = xml_parser_create();
 			$parser = $repeat_parser;
@@ -2395,8 +2795,8 @@ function GMRRelativesEHandler() {
 				exit;
 			}
 			xml_parser_free($repeat_parser);
-		}
-		else $list_private++;
+//KN		}
+//KN		else $list_private++;
 	}
 	$parser = array_pop($parserStack);
 
@@ -2412,5 +2812,11 @@ function GMRGenerationSHandler($attrs) {
 	if (empty($generation)) $generation = 1;
 
 	$currentElement->addText($generation);
+}
+
+function GMRNewPageSHandler($attrs) {
+	global $gmreport;
+	$temp = "addpage";
+	$gmreport->addElement($temp);
 }
 ?>
