@@ -323,7 +323,7 @@ if (isset($MANUAL_SESSION_START) && !empty($SID)) session_id($SID);
 @session_start();
 
 //-- import the post, get, and cookie variable into the scope on new versions of php
-if (phpversion() >= '4.1') {
+if (phpversion() >= '4.1' && phpversion() <= '5.3') {
 	@import_request_variables("cgp");
 }
 

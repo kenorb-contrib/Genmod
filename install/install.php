@@ -75,7 +75,9 @@ foreach ($_SESSION as $name => $value) {
 }
 
 // NOTE: Turn post variables into global variables
-@import_request_variables("cgp");
+if (phpversion() >= '4.1' && phpversion() <= '5.3') {
+  @import_request_variables("cgp");
+}
 
 // NOTE: Load the functions
 require("install_functions.php");
